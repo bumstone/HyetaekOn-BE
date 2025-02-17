@@ -37,7 +37,7 @@ spring:
       max-request-size: 100MB   # 전체 요청의 최대 크기
 
 #  profiles:
-#    active: dev  # logback-spring SpringProfile 설정
+#    active: dev, s3Bucket  # logback-spring SpringProfile 설정 및 AWS S3 Bucket 설정
 
 
 #public-data:
