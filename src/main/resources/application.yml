@@ -40,8 +40,8 @@ spring:
     active: dev, s3Bucket  # logback-spring SpringProfile 설정 및 AWS S3 Bucket 설정
 
 
-#public-data:
-#  public-service: ${PUBLIC_SERVICE_INFO_KEY:}
+public-data:
+  public-service: ${PUBLIC_SERVICE_INFO_KEY}
 
 
 #jwt:
