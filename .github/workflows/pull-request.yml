@@ -17,14 +17,19 @@ jobs:
 
       # Set up JDK 21
       - name: Set up JDK 21
-        uses: actions/setup-java@v4.5.0
+        uses: actions/setup-java@v4.7.0
         with:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Check Java and Gradle version
+        run: |
+          java -version
+          ./gradlew --version
+
       # Cache Gradle dependencies
       - name: Cache Gradle dependencies
-        uses: actions/cache@v4.1.2
+        uses: actions/cache@v4.2.1
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
@@ -37,4 +42,4 @@ jobs:
 
       # Build project
       - name: Build Project
-        run: ./gradlew clean build -x test
+        run: ./gradlew clean assemble -x test
