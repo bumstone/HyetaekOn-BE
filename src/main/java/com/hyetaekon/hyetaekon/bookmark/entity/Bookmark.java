@@ -15,8 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(
         indexes = {
-                @Index(name = "idx_id", columnList = "id"),
-                @Index(name = "idx_created_at", columnList = "createdAt")
+            @Index(name = "idx_id", columnList = "id")
         }
 )
 public class Bookmark {
