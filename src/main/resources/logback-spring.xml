@@ -19,7 +19,7 @@
 
         <logger name="com.hyetaekon.hyetaekon" level="DEBUG" />
 
-        <logger name="org.springframework.data.mongodb" level="DEBUG" />
+<!--        <logger name="org.springframework.data.mongodb" level="DEBUG" />-->
         <logger name="org.springframework.web" level="DEBUG" />
     </springProfile>
 
