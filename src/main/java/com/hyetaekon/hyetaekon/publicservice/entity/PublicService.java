@@ -1,14 +1,13 @@
 package com.hyetaekon.hyetaekon.publicservice.entity;
 
-import com.hyetaekon.hyetaekon.publicservice.converter.BusinessTypeConverter;
-import com.hyetaekon.hyetaekon.publicservice.converter.FamilyTypeConverter;
-import com.hyetaekon.hyetaekon.publicservice.converter.OccupationConverter;
-import com.hyetaekon.hyetaekon.publicservice.converter.SpecialGroupConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -22,69 +21,69 @@ public class PublicService {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 255)
-    private String title;
+    @Column(name = "service_name", nullable = false, length = 255)
+    private String serviceName;  // 서비스명
 
     // TODO: 서비스 분야 - 카테고리 + 해시태그
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ServiceCategory serviceCategory;
+    private ServiceCategory serviceCategory;   // 서비스 분야
 
     @Column(name = "summary_purpose", columnDefinition = "TEXT")
-    private String summaryPurpose;
+    private String summaryPurpose;  // 서비스 목적 요약
 
     @Column(name = "service_purpose", nullable = false, columnDefinition = "TEXT")
-    private String servicePurpose;
+    private String servicePurpose;  // 서비스 목적
 
     @Column(name = "governing_agency", nullable = false, length = 100)
-    private String governingAgency;
+    private String governingAgency;  // 소관기관명
 
     @Column(name = "department", nullable = false, length = 100)
-    private String department;
+    private String department;  // 부서명
 
     @Column(name = "user_type", nullable = false, length = 50)
-    private String userType;
+    private String userType;  // 사용자 구분
 
 
     // 지원 대상 필드
     @Column(name = "support_target", nullable = false, columnDefinition = "TEXT")
-    private String supportTarget;
+    private String supportTarget;  // 지원 대상
 
     @Column(name = "selection_criteria", nullable = false, columnDefinition = "TEXT")
-    private String selectionCriteria;
+    private String selectionCriteria;  // 선정 기준
 
 
     // 지원 관련 필드
     @Column(name = "support_details", nullable = false, columnDefinition = "TEXT")
-    private String supportDetails;
+    private String supportDetails;  // 지원 내용
 
     @Column(name = "support_type", nullable = false, length = 100)
-    private String supportType;
+    private String supportType;  // 지원 유형
 
 
     // 신청 내용 필드
     @Column(name = "application_method", nullable = false, columnDefinition = "TEXT")
-    private String applicationMethod;
+    private String applicationMethod;  // 신청 방법(상세)
 
     @Column(name = "application_deadline", nullable = false, columnDefinition = "TEXT")
-    private String applicationDeadline;
+    private String applicationDeadline;  // 신청 기한(상세)
 
 
     // 추가정보 필드
     @Column(name = "required_documents", columnDefinition = "TEXT")
-    private String requiredDocuments;
+    private String requiredDocuments;  // 구비 서류
 
     @Column(name = "contact_info", length = 255)
-    private String contactInfo;
+    private String contactInfo;  // 문의처
 
     @Column(name = "online_application_url", columnDefinition = "TEXT")
-    private String onlineApplicationUrl;
+    private String onlineApplicationUrl;  // 온라인 경로 url
 
     @Column(name = "related_laws", columnDefinition = "TEXT")
-    private String relatedLaws;
+    private String relatedLaws;  // 관련 법률
 
 
-    // 지원조건 필드
+    // 지원조건 필드 - 유저 정보 비교용
     @Column(name = "target_gender_male", nullable = false)
     private boolean targetGenderMale;
 
@@ -112,18 +111,21 @@ public class PublicService {
     private Integer bookmarkCnt = 0;
 
 
-    // TODO: 특수 대상 그룹 - 검색 + 해시태그
-    @Convert(converter = SpecialGroupConverter.class)  // 명시적 선언
-    private SpecialGroup specialGroup;
-    // TODO: 가구 형태 - 검색 + 해시태그
-    @Convert(converter = FamilyTypeConverter.class)
-    private FamilyType familyType;
-    // TODO: 대상 직종 - 회원 정보
-    @Convert(converter = OccupationConverter.class)
-    private Occupation occupation;
-    // TODO: 사업체 형태 - 회원 정보
-    @Convert(converter = BusinessTypeConverter.class)
-    private BusinessType businessType;
+    @OneToMany(mappedBy = "publicService",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<SpecialGroup> specialGroups = new ArrayList<>();
+
+    @OneToMany(mappedBy = "publicService",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<FamilyType> familyTypes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "publicService",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Occupation> occupations = new ArrayList<>();
+
+    @OneToMany(mappedBy = "publicService",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<BusinessType> businessTypes = new ArrayList<>();
 
 
     public void updateBookmarkCntUp() {

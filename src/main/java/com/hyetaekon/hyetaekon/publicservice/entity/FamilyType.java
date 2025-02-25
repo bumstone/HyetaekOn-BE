@@ -1,19 +1,25 @@
 package com.hyetaekon.hyetaekon.publicservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import com.hyetaekon.hyetaekon.publicservice.converter.FamilyTypeConverter;
+import jakarta.persistence.*;
+import lombok.*;
 
+@Entity
 @Getter
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
-public enum FamilyType implements CodeEnum {
-    IS_NOT_APPLICABLE("해당사항 없음", "JA0410"),
-    IS_MULTI_CHILDREN_FAMILY("다자녀가구", "JA0411"),
-    IS_NON_HOUSING_HOUSEHOLD("무주택세대", "JA0412"),
-    IS_NEW_RESIDENCE("신규전입", "JA0413"),
-    IS_EXTENDED_FAMILY("확대가족", "JA0414");
+@Table(name = "family_type")
+public class FamilyType {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @JsonValue
-    private final String type;
-    private final String code;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "public_service_id", nullable = false)
+    private PublicService publicService;
+
+    // TODO: 가구 형태 - 검색 + 해시태그
+    @Convert(converter = FamilyTypeConverter.class)
+    private FamilyTypeEnum familyTypeEnum;
 }
