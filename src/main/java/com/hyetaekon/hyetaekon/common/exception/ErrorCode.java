@@ -35,8 +35,8 @@ public enum ErrorCode {
     // 유효 JACODE 확인
     INVALID_ENUM_CODE(HttpStatus.BAD_REQUEST, "ENUM-001", "유효하지 않은 코드 값입니다."),
 
-    SERVICE_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "CATEGORY-001", "해당 서비스 카테고리를 찾을 수 없습니다."),
-
+    SERVICE_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-001", "해당 서비스 분야를 찾을 수 없습니다."),
+    SERVICE_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND,"SERVICE-002", "해당 아이디의 서비스를 찾을 수 없습니다"),
 
     // S3 파일 관련
     FILE_COUNT_EXCEEDED(HttpStatus.BAD_REQUEST, "FILE-001", "업로드 가능한 파일 개수를 초과했습니다."),

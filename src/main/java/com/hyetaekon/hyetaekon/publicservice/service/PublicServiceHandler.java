@@ -6,6 +6,7 @@ import com.hyetaekon.hyetaekon.publicservice.entity.PublicService;
 import com.hyetaekon.hyetaekon.publicservice.entity.ServiceCategory;
 import com.hyetaekon.hyetaekon.publicservice.mapper.PublicServiceMapper;
 import com.hyetaekon.hyetaekon.publicservice.repository.PublicServiceRepository;
+import com.hyetaekon.hyetaekon.publicservice.util.PublicServiceValidate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class PublicServiceHandler {
     private final PublicServiceRepository publicServiceRepository;
     private final PublicServiceMapper publicServiceMapper;
+    private final PublicServiceValidate publicServiceValidate;
 
 
     public Page<PublicServiceListResponseDto> getServicesByCategory(ServiceCategory category, Pageable pageable) {
@@ -30,8 +32,7 @@ public class PublicServiceHandler {
     }
 
     public PublicServiceDetailResponseDto getServiceDetail(Long serviceId) {
-        PublicService service = publicServiceRepository.findById(serviceId)
-            .orElseThrow(() -> new NoSuchElementException("Service not found with id: " + serviceId));
+        PublicService service = publicServiceValidate.validateServiceById(serviceId);
 
         // 조회수 증가
         service.updateViewsUp();
@@ -41,6 +42,8 @@ public class PublicServiceHandler {
     }
 
     public List<PublicServiceListResponseDto> getPopularServices() {
+        // publicServiceValidate.validateUserById(userId);
+
         List<PublicService> services = publicServiceRepository.findTop6ByOrderByViewsDesc();
 
         return services.stream()
