@@ -38,6 +38,11 @@ public enum ErrorCode {
     SERVICE_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-001", "해당 서비스 분야를 찾을 수 없습니다."),
     SERVICE_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND,"SERVICE-002", "해당 아이디의 서비스를 찾을 수 없습니다"),
 
+    // PublicServiceData 관련
+    INVALID_PUBLIC_SERVICE_DATA(HttpStatus.BAD_REQUEST, "PUBLIC_SERVICE-001", "유효하지 않은 공공서비스 데이터입니다."),
+    PUBLIC_SERVICE_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "PUBLIC_SERVICE-002", "공공서비스 데이터 조회 중 오류가 발생했습니다."),
+    PUBLIC_SERVICE_URI_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "PUBLIC_SERVICE-003", "공공서비스 API URI 구문 오류가 발생했습니다."),
+
     // S3 파일 관련
     FILE_COUNT_EXCEEDED(HttpStatus.BAD_REQUEST, "FILE-001", "업로드 가능한 파일 개수를 초과했습니다."),
     FILE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "FILE-002", "파일 크기가 허용된 용량을 초과했습니다."),
