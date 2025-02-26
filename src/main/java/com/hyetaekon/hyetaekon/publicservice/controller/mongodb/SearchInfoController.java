@@ -11,5 +11,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SearchInfoController {
 
+    // 검색(키워드 + 서비스 조건, 분야 선택)
+
+
+    // 자동완성
+
+
+    // 검색 기록 전체 조회
+
+
+    // 검색 기록 삭제
+
+
+    // 검색 기록 전체 삭제
+
 
 }
