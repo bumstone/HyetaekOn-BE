@@ -32,9 +32,6 @@ public class PublicService {
     @Column(name = "summary_purpose", columnDefinition = "TEXT")
     private String summaryPurpose;  // 서비스 목적 요약
 
-    @Column(name = "service_purpose", nullable = false, columnDefinition = "TEXT")
-    private String servicePurpose;  // 서비스 목적
-
     @Column(name = "governing_agency", nullable = false, length = 100)
     private String governingAgency;  // 소관기관명
 
@@ -54,6 +51,9 @@ public class PublicService {
 
 
     // 지원 관련 필드
+    @Column(name = "service_purpose", nullable = false, columnDefinition = "TEXT")
+    private String servicePurpose;  // 서비스 목적
+
     @Column(name = "support_details", nullable = false, columnDefinition = "TEXT")
     private String supportDetails;  // 지원 내용
 
@@ -99,6 +99,16 @@ public class PublicService {
     @Column(name = "income_level", length = 255)
     private String incomeLevel;
 
+    /*@Column(name = "income_level_very_low")
+    private boolean incomeLevelVeryLow; // 중위소득 0~50%
+    @Column(name = "income_level_low")
+    private boolean incomeLevelLow; // 중위소득 51~75%
+    @Column(name = "income_level_medium")
+    private boolean incomeLevelMedium; // 중위소득 76~100%
+    @Column(name = "income_level_high")
+    private boolean incomeLevelHigh; // 중위소득 101~200%
+    @Column(name = "income_level_very_high")
+    private boolean incomeLevelVeryHigh; // 중위소득 200% 초과*/
 
     // 조회수
     @Builder.Default
