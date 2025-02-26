@@ -50,4 +50,8 @@ public class PublicServiceHandler {
             .map(publicServiceMapper::toListDto)
             .collect(Collectors.toList());
     }
+
+    public ServiceCategory getServiceCategory(String categoryName) {
+        return publicServiceValidate.validateServiceCategory(categoryName);
+    }
 }

@@ -33,12 +33,8 @@ public class PublicServiceController {
         @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
         @RequestParam(name = "size", defaultValue = "9") @Positive @Max(30) int size) {
 
-        try {
-            ServiceCategory category = ServiceCategory.valueOf(categoryName);
-            return ResponseEntity.ok(publicServiceHandler.getServicesByCategory(category, PageRequest.of(page, size)));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        ServiceCategory category = publicServiceHandler.getServiceCategory(categoryName);
+        return ResponseEntity.ok(publicServiceHandler.getServicesByCategory(category, PageRequest.of(page, size)));
 
     }
 
@@ -48,7 +44,7 @@ public class PublicServiceController {
         return ResponseEntity.ok(publicServiceHandler.getServiceDetail(serviceId));
     }
 
-    // 인기 서비스 목록 조회(조회수)
+    // 인기 서비스 목록 조회(조회수) -> 6개 리스트 고정
     // TODO: 유저 인증
     @GetMapping("/popular")
     public ResponseEntity<List<PublicServiceListResponseDto>> getPopolarServices() {
