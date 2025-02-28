@@ -1,7 +1,6 @@
 package com.hyetaekon.hyetaekon.common.publicdata.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -16,43 +15,30 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PublicServiceConditionsDataDto {
-    private Response response;
+    @JsonProperty("currentCount")
+    private long currentCount;
+
+    @JsonProperty("matchCount")
+    private long matchCount;
+
+    @JsonProperty("page")
+    private long page;
+
+    @JsonProperty("perPage")
+    private long perPage;
+
+    @JsonProperty("totalCount")
+    private long totalCount;
+
+    @JsonProperty("data")
+    private List<Data> data;
 
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
     @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-    public static class Response {
-        private Body body;
-    }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-    public static class Body {
-        private Items items;
-        private long page;
-        private long perPage;
-    }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-    public static class Items {
-        private List<Item> items;
-    }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-    public static class Item {
+    public static class Data {
         @JsonProperty("서비스ID")
         private long serviceId;
 
@@ -66,6 +52,7 @@ public class PublicServiceConditionsDataDto {
         @JsonProperty("JA0111")
         private Integer targetAgeEnd;
 
+        // 소득 수준
         @JsonProperty("JA0201")
         private String incomeLevelVeryLow; // 중위소득 0~50%
         @JsonProperty("JA0202")

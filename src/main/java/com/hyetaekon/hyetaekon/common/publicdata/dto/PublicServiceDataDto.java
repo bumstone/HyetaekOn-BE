@@ -15,43 +15,30 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PublicServiceDataDto {
-    private Response response;
+    @JsonProperty("currentCount")
+    private long currentCount;
+
+    @JsonProperty("matchCount")
+    private long matchCount;
+
+    @JsonProperty("page")
+    private long page;
+
+    @JsonProperty("perPage")
+    private long perPage;
+
+    @JsonProperty("totalCount")
+    private long totalCount;
+
+    @JsonProperty("data")
+    private List<Data> data;
 
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
     @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-    public static class Response {
-        private Body body;
-    }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-    public static class Body {
-        private Items items;
-        private long page;
-        private long perPage;
-    }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-    public static class Items {
-        private List<Item> items;
-    }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-    public static class Item {
+    public static class Data {
         @JsonProperty("서비스ID")
         private long serviceId;
 

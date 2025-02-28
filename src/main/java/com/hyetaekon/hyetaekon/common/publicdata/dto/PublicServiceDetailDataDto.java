@@ -8,38 +8,39 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class PublicServiceDetailDataDto {
-    private Response response;
+
+    @JsonProperty("currentCount")
+    private long currentCount;
+
+    @JsonProperty("matchCount")
+    private long matchCount;
+
+    @JsonProperty("page")
+    private long page;
+
+    @JsonProperty("perPage")
+    private long perPage;
+
+    @JsonProperty("totalCount")
+    private long totalCount;
+
+    @JsonProperty("data")
+    private List<Data> data;
 
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
     @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-    public static class Response {
-        private Body body;
-    }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-    public static class Body {
-        private Item item;
-    }
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-    public static class Item {
+    public static class Data {
         @JsonProperty("서비스ID")
         private long serviceId;
 

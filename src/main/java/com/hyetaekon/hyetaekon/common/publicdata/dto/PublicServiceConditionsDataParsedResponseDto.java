@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 public class PublicServiceConditionsDataParsedResponseDto {
     private long serviceId;
 
-    private boolean targetGenderMale;
-    private boolean targetGenderFemale;
+    private String targetGenderMale;
+    private String targetGenderFemale;
     private Integer targetAgeStart;
     private Integer targetAgeEnd;
 
