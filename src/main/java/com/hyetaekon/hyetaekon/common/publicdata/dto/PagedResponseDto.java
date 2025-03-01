@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * 공통 페이징 응답 DTO 
+ * 공통 페이징 응답 DTO
+ * 임시
  */
 
-// 공공데이터를 페이징 처리하는 경우 사용
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
