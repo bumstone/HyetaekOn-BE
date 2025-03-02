@@ -9,10 +9,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PublicServiceRepository extends JpaRepository<PublicService, Long> {
     Page<PublicService> findByServiceCategory(ServiceCategory category, Pageable pageable);
 
     List<PublicService> findTop6ByOrderByViewsDesc();
+
+    Optional<PublicService> findById(long serviceId);
+
+    int deleteByServiceIdNotIn(List<Long> currentServiceIds);
 }

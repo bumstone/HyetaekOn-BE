@@ -4,36 +4,25 @@ import com.hyetaekon.hyetaekon.common.publicdata.dto.*;
 import com.hyetaekon.hyetaekon.common.publicdata.util.PublicDataPath;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public interface PublicServiceDataService {
 
-    /**
-     * 공공서비스 전체 목록 API에서 데이터를 조회합니다.
-     */
-    List<PublicServiceDataDto> fetchPublicServiceData(PublicDataPath apiPath);
+    // 페이징 파라미터를 포함한 API 호출 메서드
+    List<PublicServiceDataDto> fetchPublicServiceData(PublicDataPath apiPath, int page, int perPage);
+    List<PublicServiceDetailDataDto> fetchPublicServiceDetailData(PublicDataPath apiPath, int page, int perPage);
+    List<PublicServiceConditionsDataDto> fetchPublicServiceConditionsData(PublicDataPath apiPath, int page, int perPage);
 
-    /**
-     * 공공서비스 전체 상세정보 API에서 데이터를 조회합니다.
-     */
-    List<PublicServiceDetailDataDto> fetchPublicServiceDetailData(PublicDataPath apiPath);
+    // 전체 데이터 동기화 메서드 (스케줄러용)
+    void syncPublicServiceData(PublicDataPath apiPath);
+    void syncPublicServiceDetailData(PublicDataPath apiPath);
+    void syncPublicServiceConditionsData(PublicDataPath apiPath);
 
-    /**
-     * 공공서비스 지원조건 전체 API에서 데이터를 조회합니다.
-     */
-    List<PublicServiceConditionsDataDto> fetchPublicServiceConditionsData(PublicDataPath apiPath);
+    // 데이터 저장 메서드
+    List<PublicServiceDataDto.Data> upsertServiceData(List<PublicServiceDataDto.Data> dataList);
+    List<PublicServiceDetailDataDto.Data> upsertServiceDetailData(List<PublicServiceDetailDataDto.Data> dataList);
+    List<PublicServiceConditionsDataDto.Data> upsertSupportConditionsData(List<PublicServiceConditionsDataDto.Data> dataList);
 
-    /**
-     * 조회된 공공서비스 목록 데이터를 Batch Insert 저장합니다.
-     */
-    List<PublicServiceDataDto.Data> upsertServiceData(List<PublicServiceDataDto> publicServiceDataDto);
-
-    /**
-     * 조회된 공공서비스 상세정보 데이터를 Batch Insert 저장합니다.
-     */
-    List<PublicServiceDetailDataDto.Data> upsertServiceDetailData(List<PublicServiceDetailDataDto> publicServiceDetailDataDtoList);
-
-    /**
-     * 조회된 공공서비스 지원조건 데이터를 Batch Insert 저장합니다.
-     */
-    List<PublicServiceConditionsDataDto.Data> upsertSupportConditionsData(List<PublicServiceConditionsDataDto> publicServiceConditionsDataDto);
+    // 미사용 데이터 정리 메서드
+    int cleanupObsoleteServices();
 }

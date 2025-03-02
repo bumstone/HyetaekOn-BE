@@ -1,6 +1,5 @@
 package com.hyetaekon.hyetaekon.common.publicdata.controller;
 
-
 import com.hyetaekon.hyetaekon.common.publicdata.dto.*;
 import com.hyetaekon.hyetaekon.common.publicdata.service.PublicServiceDataServiceImpl;
 import com.hyetaekon.hyetaekon.common.publicdata.util.PublicServiceDataValidate;
@@ -26,58 +25,64 @@ public class PublicServiceDataController {
   private final PublicServiceDataValidate validator;
 
   /**
-   * 공공서비스 목록 전체 조회 및 Batch Insert 저장
+   * 공공서비스 목록 전체 동기화 (페이징 처리)
    */
   @PostMapping("/serviceList")
-  public ResponseEntity<List<PublicServiceDataDto.Data>> createAndStoreServiceList() {
-
-    List<PublicServiceDataDto.Data> response = validator.validateAndHandleException(() -> {
-      // 공공데이터 API에서 전체 서비스 목록 조회
-      List<PublicServiceDataDto> dtoList = publicServiceDataService.fetchPublicServiceData(SERVICE_LIST);
-
-      // 조회된 데이터 처리 및 저장 (Batch Insert)
-      return publicServiceDataService.upsertServiceData(dtoList);
+  public ResponseEntity<String> createAndStoreServiceList() {
+    validator.validateAndHandleException(() -> {
+      // 전체 서비스 목록 동기화 (페이징 처리)
+      publicServiceDataService.syncPublicServiceData(SERVICE_LIST);
+      return null;
     }, SERVICE_LIST);
 
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+    return ResponseEntity.status(HttpStatus.OK).body("공공서비스 목록 데이터 동기화 완료");
   }
 
   /**
-   * 공공서비스 상세정보 전체 조회 및 Batch Insert 저장
+   * 공공서비스 상세정보 전체 동기화 (페이징 처리)
    */
   @PostMapping("/serviceDetailList")
-  public ResponseEntity<List<PublicServiceDetailDataDto.Data>> createAndStoreServiceDetailList() {
+  public ResponseEntity<String> createAndStoreServiceDetailList() {
+    validator.validateAndHandleException(() -> {
+      // 전체 상세정보 동기화 (페이징 처리)
+      publicServiceDataService.syncPublicServiceDetailData(SERVICE_DETAIL_LIST);
+      return null;
+    }, SERVICE_DETAIL_LIST);
 
-    List<PublicServiceDetailDataDto.Data> response = validator.validateAndHandleException(
-        () -> {
-          // 공공데이터 API에서 전체 상세정보 조회
-          List<PublicServiceDetailDataDto> dtoList = publicServiceDataService.fetchPublicServiceDetailData(
-              SERVICE_DETAIL_LIST);
-
-          // 조회된 데이터 처리 및 저장 (Batch Insert)
-          return publicServiceDataService.upsertServiceDetailData(dtoList);
-        },
-        SERVICE_DETAIL_LIST
-    );
-
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+    return ResponseEntity.status(HttpStatus.OK).body("공공서비스 상세정보 데이터 동기화 완료");
   }
 
   /**
-   * 공공서비스 지원조건 전체 조회 및 Batch Insert 저장
+   * 공공서비스 지원조건 전체 동기화 (페이징 처리)
    */
   @PostMapping("/supportConditionsList")
-  public ResponseEntity<List<PublicServiceConditionsDataDto.Data>> createAndStoreSupportConditionsList() {
-
-    List<PublicServiceConditionsDataDto.Data> response = validator.validateAndHandleException(() -> {
-      // 공공데이터 API에서 전체 지원조건 데이터 조회
-      List<PublicServiceConditionsDataDto> dtoList = publicServiceDataService.fetchPublicServiceConditionsData(
-          SERVICE_CONDITIONS_LIST);
-
-      // 조회된 데이터 처리 및 저장 (Batch Insert)
-      return publicServiceDataService.upsertSupportConditionsData(dtoList);
+  public ResponseEntity<String> createAndStoreSupportConditionsList() {
+    validator.validateAndHandleException(() -> {
+      // 전체 지원조건 동기화 (페이징 처리)
+      publicServiceDataService.syncPublicServiceConditionsData(SERVICE_CONDITIONS_LIST);
+      return null;
     }, SERVICE_CONDITIONS_LIST);
 
-    return ResponseEntity.status(HttpStatus.OK).body(response);
+    return ResponseEntity.status(HttpStatus.OK).body("공공서비스 지원조건 데이터 동기화 완료");
+  }
+
+  /**
+   * 페이지 단위 공공서비스 목록 조회 (테스트용)
+   */
+  @GetMapping("/serviceList")
+  public ResponseEntity<List<PublicServiceDataDto.Data>> getServiceListByPage(
+      @RequestParam(defaultValue = "1") int page,
+      @RequestParam(defaultValue = "100") int perPage) {
+
+    List<PublicServiceDataDto.Data> result = validator.validateAndHandleException(() -> {
+      List<PublicServiceDataDto> dtoList = publicServiceDataService.fetchPublicServiceData(SERVICE_LIST, page, perPage);
+
+      return dtoList.stream()
+          .filter(dto -> dto.getResponse() != null && dto.getResponse().getData() != null)
+          .flatMap(dto -> dto.getResponse().getData().stream())
+          .toList();
+    }, SERVICE_LIST);
+
+    return ResponseEntity.status(HttpStatus.OK).body(result);
   }
 }
