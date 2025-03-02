@@ -42,6 +42,10 @@ public enum ErrorCode {
     INVALID_PUBLIC_SERVICE_DATA(HttpStatus.BAD_REQUEST, "PUBLIC_SERVICE-001", "유효하지 않은 공공서비스 데이터입니다."),
     PUBLIC_SERVICE_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "PUBLIC_SERVICE-002", "공공서비스 데이터 조회 중 오류가 발생했습니다."),
     PUBLIC_SERVICE_URI_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "PUBLIC_SERVICE-003", "공공서비스 API URI 구문 오류가 발생했습니다."),
+    PUBLIC_SERVICE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "PUBLIC_SERVICE-004", "공공서비스 API 요청이 잘못되었습니다."),
+    PUBLIC_SERVICE_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "PUBLIC_SERVICE-005", "공공서비스 API 서버 오류가 발생했습니다."),
+    PUBLIC_SERVICE_DATA_MAPPING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "PUBLIC_SERVICE-006", "공공서비스 데이터 매핑 중 오류가 발생했습니다."),
+    PUBLIC_SERVICE_NETWORK_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "PUBLIC_SERVICE-007", "공공서비스 API 네트워크 오류가 발생했습니다."),
 
     // S3 파일 관련
     FILE_COUNT_EXCEEDED(HttpStatus.BAD_REQUEST, "FILE-001", "업로드 가능한 파일 개수를 초과했습니다."),
