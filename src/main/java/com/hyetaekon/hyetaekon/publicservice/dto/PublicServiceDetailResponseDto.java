@@ -32,7 +32,7 @@ public class PublicServiceDetailResponseDto {
 
     // 서비스 내용
     private String servicePurpose;  // 서비스 목적
-    private String supportDetails;  // 지원 내용
+    private String supportDetail;  // 지원 내용
     //private String supportType;  // 지원 유형(공통)
 
     // 신청 방법
