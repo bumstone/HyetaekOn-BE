@@ -1,10 +1,7 @@
 package com.hyetaekon.hyetaekon.publicservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +9,13 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "public_service")
 public class PublicService {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "service_name", nullable = false, length = 255)
@@ -54,8 +51,8 @@ public class PublicService {
     @Column(name = "service_purpose", nullable = false, columnDefinition = "TEXT")
     private String servicePurpose;  // 서비스 목적
 
-    @Column(name = "support_details", nullable = false, columnDefinition = "TEXT")
-    private String supportDetails;  // 지원 내용
+    @Column(name = "support_detail", nullable = false, columnDefinition = "TEXT")
+    private String supportDetail;  // 지원 내용
 
     @Column(name = "support_type", nullable = false, length = 100)
     private String supportType;  // 지원 유형
@@ -85,10 +82,10 @@ public class PublicService {
 
     // 지원조건 필드 - 유저 정보 비교용
     @Column(name = "target_gender_male", nullable = false)
-    private boolean targetGenderMale;
+    private String targetGenderMale;
 
     @Column(name = "target_gender_Female", nullable = false)
-    private boolean targetGenderFemale;
+    private String targetGenderFemale;
 
     @Column(name = "target_age_start")
     private Integer targetAgeStart;
