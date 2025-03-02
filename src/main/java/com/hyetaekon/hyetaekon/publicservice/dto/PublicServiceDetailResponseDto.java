@@ -2,15 +2,29 @@ package com.hyetaekon.hyetaekon.publicservice.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @ToString
-public class PublicServiceDetailResponseDto extends PublicServiceListResponseDto {
-    //private Long publicServiceId;
-    //private String serviceName;  // 서비스명(공통)
+public class PublicServiceDetailResponseDto {
+    private Long publicServiceId;
+    private String serviceName;
+    private String summaryPurpose;
+    private String governingAgency;
+    private String department;
+    private String userType;
+    private String contactInfo;
+    private String applicationDeadline;
+    private String supportType;
+    private String serviceCategory;
+    private List<String> specialGroup;
+    private List<String> familyType;
+    private int views;
+    private int bookmarkCnt;
 
     // 지원 대상
     private String supportTarget;  // 지원 대상
