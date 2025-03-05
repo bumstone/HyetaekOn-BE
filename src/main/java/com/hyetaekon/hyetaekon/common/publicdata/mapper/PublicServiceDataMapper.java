@@ -2,13 +2,25 @@ package com.hyetaekon.hyetaekon.common.publicdata.mapper;
 
 import com.hyetaekon.hyetaekon.common.converter.ServiceCategoryConverter;
 import com.hyetaekon.hyetaekon.common.publicdata.dto.*;
+import com.hyetaekon.hyetaekon.publicservice.converter.BusinessTypeConverter;
+import com.hyetaekon.hyetaekon.publicservice.converter.FamilyTypeConverter;
+import com.hyetaekon.hyetaekon.publicservice.converter.OccupationConverter;
+import com.hyetaekon.hyetaekon.publicservice.converter.SpecialGroupConverter;
 import com.hyetaekon.hyetaekon.publicservice.entity.PublicService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring", uses = {ServiceCategoryConverter.class}, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring",
+    uses = {
+        ServiceCategoryConverter.class,
+        SpecialGroupConverter.class,
+        FamilyTypeConverter.class,
+        OccupationConverter.class,
+        BusinessTypeConverter.class
+    },
+    unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PublicServiceDataMapper {
 
     @Mapping(target = "id", source = "serviceId")

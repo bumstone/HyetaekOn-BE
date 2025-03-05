@@ -19,5 +19,5 @@ public interface PublicServiceRepository extends JpaRepository<PublicService, Lo
 
     Optional<PublicService> findById(long serviceId);
 
-    int deleteByServiceIdNotIn(List<Long> currentServiceIds);
+    int deleteByIdNotIn(List<Long> Ids);
 }
