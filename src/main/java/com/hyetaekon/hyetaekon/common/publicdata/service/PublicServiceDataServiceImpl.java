@@ -15,9 +15,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 
@@ -91,52 +94,20 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
      */
     @Transactional
     public void syncPublicServiceData(PublicDataPath apiPath) {
-        currentServiceIds.clear(); // 현재 서비스 ID 초기화
-
-        int page = 1;
-        int perPage = DEFAULT_PAGE_SIZE;
-        boolean hasMoreData = true;
-        long totalProcessed = 0;
-
-        try {
-            while (hasMoreData) {
-                List<PublicServiceDataDto> dtoList = fetchPublicServiceData(apiPath, page, perPage);
-                List<PublicServiceDataDto.Data> pageData = new ArrayList<>();
-
-                // 현재 페이지 데이터 추출
-                for (PublicServiceDataDto dto : dtoList) {
-                    if (dto.getResponse() != null && dto.getResponse().getData() != null) {
-                        pageData.addAll(dto.getResponse().getData());
-
-                        // 전체 데이터 개수 확인
-                        long totalCount = dto.getResponse().getTotalCount();
-                        long currentCount = dto.getResponse().getCurrentCount();
-
-                        // 더 이상 데이터가 없는지 확인
-                        if (currentCount < perPage || page * perPage >= totalCount) {
-                            hasMoreData = false;
-                        }
-                    } else {
-                        hasMoreData = false;
-                    }
-                }
-
-                if (!pageData.isEmpty()) {
-                    upsertServiceData(pageData);
-                    totalProcessed += pageData.size();
-                    log.info("공공서비스 목록 데이터 페이지 {} 처리 완료: {}건, 총 {}건", page, pageData.size(), totalProcessed);
-                } else {
-                    hasMoreData = false;
-                }
-
-                page++;
-            }
-        } catch (Exception e) {
-            log.error("공공서비스 목록 데이터 동기화 중 오류 발생", e);
-            throw e;
-        }
-
-        log.info("공공서비스 목록 데이터 전체 동기화 완료: 총 {}건", totalProcessed);
+        syncDataWithPaging(
+            apiPath,
+            // 데이터 조회 함수
+            (path, pg) -> fetchPublicServiceData(path, pg, DEFAULT_PAGE_SIZE),
+            // 데이터 추출 함수
+            PublicServiceDataDto::getData,
+            // 전체 개수 getter
+            PublicServiceDataDto::getTotalCount,
+            // 현재 페이지 개수 getter
+            PublicServiceDataDto::getCurrentCount,
+            // 데이터 처리 함수
+            this::upsertServiceData,
+            "공공서비스 목록 데이터"
+        );
     }
 
     /**
@@ -144,50 +115,15 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
      */
     @Transactional
     public void syncPublicServiceDetailData(PublicDataPath apiPath) {
-        int page = 1;
-        int perPage = DEFAULT_PAGE_SIZE;
-        boolean hasMoreData = true;
-        long totalProcessed = 0;
-
-        try {
-            while (hasMoreData) {
-                List<PublicServiceDetailDataDto> dtoList = fetchPublicServiceDetailData(apiPath, page, perPage);
-                List<PublicServiceDetailDataDto.Data> pageData = new ArrayList<>();
-
-                // 현재 페이지 데이터 추출
-                for (PublicServiceDetailDataDto dto : dtoList) {
-                    if (dto.getResponse() != null && dto.getResponse().getData() != null) {
-                        pageData.addAll(dto.getResponse().getData());
-
-                        // 전체 데이터 개수 확인
-                        long totalCount = dto.getResponse().getTotalCount();
-                        long currentCount = dto.getResponse().getCurrentCount();
-
-                        // 더 이상 데이터가 없는지 확인
-                        if (currentCount < perPage || page * perPage >= totalCount) {
-                            hasMoreData = false;
-                        }
-                    } else {
-                        hasMoreData = false;
-                    }
-                }
-
-                if (!pageData.isEmpty()) {
-                    upsertServiceDetailData(pageData);
-                    totalProcessed += pageData.size();
-                    log.info("공공서비스 상세정보 데이터 페이지 {} 처리 완료: {}건, 총 {}건", page, pageData.size(), totalProcessed);
-                } else {
-                    hasMoreData = false;
-                }
-
-                page++;
-            }
-        } catch (Exception e) {
-            log.error("공공서비스 상세정보 데이터 동기화 중 오류 발생", e);
-            throw e;
-        }
-
-        log.info("공공서비스 상세정보 데이터 전체 동기화 완료: 총 {}건", totalProcessed);
+        syncDataWithPaging(
+            apiPath,
+            (path, pg) -> fetchPublicServiceDetailData(path, pg, DEFAULT_PAGE_SIZE),
+            PublicServiceDetailDataDto::getData,
+            PublicServiceDetailDataDto::getTotalCount,
+            PublicServiceDetailDataDto::getCurrentCount,
+            this::upsertServiceDetailData,
+            "공공서비스 상세정보 데이터"
+        );
     }
 
     /**
@@ -195,6 +131,31 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
      */
     @Transactional
     public void syncPublicServiceConditionsData(PublicDataPath apiPath) {
+        syncDataWithPaging(
+            apiPath,
+            (path, pg) -> fetchPublicServiceConditionsData(path, pg, DEFAULT_PAGE_SIZE),
+            PublicServiceConditionsDataDto::getData,
+            PublicServiceConditionsDataDto::getTotalCount,
+            PublicServiceConditionsDataDto::getCurrentCount,
+            this::upsertSupportConditionsData,
+            "공공서비스 지원조건 데이터"
+        );
+    }
+
+    /**
+     * 공통 데이터 동기화 메서드 - 중복 코드 제거를 위한 템플릿 메서드
+     */
+    private <T, D> long syncDataWithPaging(
+        PublicDataPath apiPath,
+        BiFunction<PublicDataPath, Integer, List<T>> fetcher, // 데이터 조회 함수
+        Function<T, List<D>> dataExtractor, // DTO에서 데이터 추출 함수
+        Function<T, Long> totalCountGetter, // 전체 개수 조회 함수
+        Function<T, Long> currentCountGetter, // 현재 페이지 개수 조회 함수
+        Function<List<D>, List<D>> processor, // 데이터 처리 함수
+        String operationName) { // 작업 이름 (로깅용)
+
+        currentServiceIds.clear(); // ID 초기화 (필요한 경우)
+
         int page = 1;
         int perPage = DEFAULT_PAGE_SIZE;
         boolean hasMoreData = true;
@@ -202,20 +163,22 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
 
         try {
             while (hasMoreData) {
-                List<PublicServiceConditionsDataDto> dtoList = fetchPublicServiceConditionsData(apiPath, page, perPage);
-                List<PublicServiceConditionsDataDto.Data> pageData = new ArrayList<>();
+                // 데이터 조회
+                List<T> dtoList = fetcher.apply(apiPath, page);
+                List<D> pageData = new ArrayList<>();
 
-                // 현재 페이지 데이터 추출
-                for (PublicServiceConditionsDataDto dto : dtoList) {
-                    if (dto.getResponse() != null && dto.getResponse().getData() != null) {
-                        pageData.addAll(dto.getResponse().getData());
+                // 페이지 데이터 추출
+                for (T dto : dtoList) {
+                    List<D> extractedData = dataExtractor.apply(dto);
+                    if (extractedData != null && !extractedData.isEmpty()) {
+                        pageData.addAll(extractedData);
 
-                        // 전체 데이터 개수 확인
-                        long totalCount = dto.getResponse().getTotalCount();
-                        long currentCount = dto.getResponse().getCurrentCount();
+                        // 페이징 처리 로직
+                        long totalCount = totalCountGetter.apply(dto);
+                        long currentCount = currentCountGetter.apply(dto);
 
                         // 더 이상 데이터가 없는지 확인
-                        if (currentCount < perPage || page * perPage >= totalCount) {
+                        if (currentCount < perPage || (long)page * perPage >= totalCount) {
                             hasMoreData = false;
                         }
                     } else {
@@ -223,10 +186,12 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
                     }
                 }
 
+                // 데이터 처리 및 저장
                 if (!pageData.isEmpty()) {
-                    upsertSupportConditionsData(pageData);
-                    totalProcessed += pageData.size();
-                    log.info("공공서비스 지원조건 데이터 페이지 {} 처리 완료: {}건, 총 {}건", page, pageData.size(), totalProcessed);
+                    List<D> processedData = processor.apply(pageData);
+                    totalProcessed += processedData.size();
+                    log.info("{} 페이지 {} 처리 완료: {}건, 총 {}건",
+                        operationName, page, pageData.size(), totalProcessed);
                 } else {
                     hasMoreData = false;
                 }
@@ -234,11 +199,12 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
                 page++;
             }
         } catch (Exception e) {
-            log.error("공공서비스 지원조건 데이터 동기화 중 오류 발생", e);
+            log.error("{} 동기화 중 오류 발생", operationName, e);
             throw e;
         }
 
-        log.info("공공서비스 지원조건 데이터 전체 동기화 완료: 총 {}건", totalProcessed);
+        log.info("{} 전체 동기화 완료: 총 {}건", operationName, totalProcessed);
+        return totalProcessed;
     }
 
     /**

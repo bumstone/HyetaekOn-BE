@@ -78,8 +78,8 @@ public class PublicServiceDataController {
       List<PublicServiceDataDto> dtoList = publicServiceDataService.fetchPublicServiceData(SERVICE_LIST, page, perPage);
 
       return dtoList.stream()
-          .filter(dto -> dto.getResponse() != null && dto.getResponse().getData() != null)
-          .flatMap(dto -> dto.getResponse().getData().stream())
+          .filter(dto -> dto.getData() != null)
+          .flatMap(dto -> dto.getData().stream())
           .toList();
     }, SERVICE_LIST);
 

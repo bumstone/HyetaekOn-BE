@@ -15,21 +15,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PublicServiceConditionsDataDto {
-    private Response response;
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-    public static class Response {
-        private List<Data> data;
-        private long totalCount;
-        private long currentCount;
-        private long matchCount;
-        private long page;
-        private long perPage;
-    }
+    private List<Data> data;
+    private long totalCount;
+    private long currentCount;
+    private long matchCount;
+    private long page;
+    private long perPage;
 
     @Getter
     @NoArgsConstructor
