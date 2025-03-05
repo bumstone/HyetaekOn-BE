@@ -13,11 +13,6 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(
-        indexes = {
-            @Index(name = "idx_id", columnList = "id")
-        }
-)
 public class Bookmark {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -13,7 +13,6 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "public_service")
 public class PublicService {
     @Id
     private Long id;
