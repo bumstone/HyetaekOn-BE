@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 
@@ -32,7 +33,7 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
     private final PublicServiceDataValidate validator;
 
     private static final int DEFAULT_PAGE_SIZE = 1000; // 기본 페이지 크기를 1000으로 설정
-    private Set<Long> currentServiceIds = Collections.synchronizedSet(new HashSet<>()); // 현재 동기화된 서비스 ID 저장
+    private final Set<Long> currentServiceIds = ConcurrentHashMap.newKeySet(); // 현재 동기화된 서비스 ID 저장
 
     /**
      * 공공서비스 목록 데이터 호출 (페이징 처리)
@@ -420,7 +421,7 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
             return 0;
         }
 
-        int deletedCount = publicServiceRepository.deleteByServiceIdNotIn(new ArrayList<>(currentServiceIds));
+        int deletedCount = publicServiceRepository.deleteByIdNotIn(new ArrayList<>(currentServiceIds));
         log.info("미사용 공공서비스 데이터 {}건 삭제 완료", deletedCount);
         return deletedCount;
     }

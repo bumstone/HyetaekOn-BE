@@ -4,7 +4,6 @@ import com.hyetaekon.hyetaekon.common.publicdata.dto.*;
 import com.hyetaekon.hyetaekon.common.publicdata.util.PublicDataPath;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 public interface PublicServiceDataService {
 
