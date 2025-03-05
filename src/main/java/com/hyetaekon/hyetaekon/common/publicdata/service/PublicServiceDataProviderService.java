@@ -19,7 +19,7 @@ import static com.hyetaekon.hyetaekon.common.publicdata.util.PublicDataConstants
 @Service
 @RequiredArgsConstructor
 public class PublicServiceDataProviderService {
-    @Value("${PUBLIC_SERVICE_INFO_KEY}")
+    @Value("${public-data.public-service}")
     private String serviceKey;
 
     /**
