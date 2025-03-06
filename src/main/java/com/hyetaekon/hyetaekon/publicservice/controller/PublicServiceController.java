@@ -27,7 +27,7 @@ public class PublicServiceController {
 
 
     // 서비스 분야별 공공서비스 목록 조회
-    @GetMapping("/{category}")
+    @GetMapping("/category/{category}")
     public ResponseEntity<Page<PublicServiceListResponseDto>> getServicesByCategory (
         @PathVariable("category") String categoryName,
         @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
@@ -39,7 +39,7 @@ public class PublicServiceController {
     }
 
     // 공공서비스 상세 조회
-    @GetMapping("/{serviceId}")
+    @GetMapping("/detail/{serviceId}")
     public ResponseEntity<PublicServiceDetailResponseDto> getServiceDetail (@PathVariable("serviceId") Long serviceId) {
         return ResponseEntity.ok(publicServiceHandler.getServiceDetail(serviceId));
     }
