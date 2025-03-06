@@ -18,11 +18,15 @@ public class UserReport {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "reporter_id")
-    private Long reporterId;
+    // 신고한 사용자
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reporter_id")
+    private User reporter;
 
-    @Column(name = "reported_id")
-    private Long reportedId;
+    // 신고당한 사용자
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reported_id")
+    private User reported;
 
     @Column(name = "reason", length = 200)
     private String reason;
