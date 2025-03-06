@@ -45,3 +45,6 @@ spring:
 
 public-data:
   public-service: ${PUBLIC_SERVICE_INFO_KEY}
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
