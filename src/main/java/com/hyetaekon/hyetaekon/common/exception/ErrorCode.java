@@ -27,6 +27,10 @@ public enum ErrorCode {
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "ACCOUNT-005", "현재 비밀번호가 일치하지 않습니다."),
     PASSWORD_SAME_AS_OLD(HttpStatus.BAD_REQUEST, "ACCOUNT-006", "새로운 비밀번호는 현재 비밀번호와 달라야 합니다."),
     CURRENT_PASSWORD_REQUIRED(HttpStatus.BAD_REQUEST, "ACCOUNT-007", "현재 비밀번호를 입력해야 합니다."),
+    FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "미완", "잘못된 접근입니다."),
+
+    BOOKMARK_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "BOOKMARK-001", "북마크한 유저를 찾을 수 없습니다."),
+
 
     // 관심사 선택 제한
     INTEREST_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "INTEREST-001", "관심사는 최대 6개까지만 등록 가능합니다."),
