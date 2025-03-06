@@ -1,4 +1,4 @@
 package com.hyetaekon.hyetaekon.comment.service;
 
-public class AnswerService {
+public class CommentService {
 }
