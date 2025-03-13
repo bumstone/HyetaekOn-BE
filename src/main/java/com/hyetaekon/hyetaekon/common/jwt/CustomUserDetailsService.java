@@ -1,5 +1,6 @@
 package com.hyetaekon.hyetaekon.common.jwt;
 
+import com.hyetaekon.hyetaekon.user.entity.User;
 import com.hyetaekon.hyetaekon.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;

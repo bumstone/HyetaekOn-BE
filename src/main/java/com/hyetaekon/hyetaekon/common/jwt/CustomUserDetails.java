@@ -2,7 +2,6 @@ package com.hyetaekon.hyetaekon.common.jwt;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 
 import com.hyetaekon.hyetaekon.user.entity.Role;
 import lombok.Getter;
@@ -10,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+@Getter
 public class CustomUserDetails implements UserDetails, CustomUserPrincipal {
     private final Long id;
     private final String email;
@@ -17,7 +17,6 @@ public class CustomUserDetails implements UserDetails, CustomUserPrincipal {
     private final Role role;
     private final String password;
     private final String name;
-    private final String oauthName = null;
 
     public CustomUserDetails(Long id, String email, String nickname, Role role, String password, String name) {
         this.id = id;
