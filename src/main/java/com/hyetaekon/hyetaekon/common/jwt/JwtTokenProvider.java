@@ -36,8 +36,8 @@ public class JwtTokenProvider {
     @Autowired
     private RefreshTokenService refreshTokenService;
 
-    /*@Autowired
-    private BlacklistService blackListService;*/
+    @Autowired
+    private BlacklistService blackListService;
 
     @Autowired
     private JwtTokenParser jwtTokenParser;
@@ -133,15 +133,17 @@ public class JwtTokenProvider {
     }
 
     // 토큰 정보 검증
-    // TODO: redis - blackList
     public boolean validateToken(String token) {
         log.debug("validateToken start");
         try {
-            Jwts.parserBuilder()
+            Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
-                .parseClaimsJws(token);
-            return true;
+                .parseClaimsJws(token)
+                .getBody();
+
+            String jti = claims.getId(); // JTI 추출
+            return !blackListService.isTokenBlacklisted(jti);
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.error("Invalid JWT Token", e);
         } catch (ExpiredJwtException e) {

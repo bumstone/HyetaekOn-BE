@@ -1,30 +1,24 @@
 package com.hyetaekon.hyetaekon.common.jwt;
 
-import jakarta.persistence.*;
-import jakarta.persistence.GenerationType;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.TimeToLive;
 
-@Entity
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-// TODO: Redis
-// @RedisHash("refreshToken")
+@RedisHash("refreshToken")
 public class RefreshToken {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", updatable = false)
-    private Long id;
-
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
-    @Column(name = "refresh_token", nullable = false, length = 255)
     private String refreshToken;
 
-    public RefreshToken update(String newRefreshToken) {
-        this.refreshToken = newRefreshToken;
-        return this;
-    }
+    private String email;
+    private Long issuedAt;
+
+    // Time to live (TTL) 설정, Redis에 만료 시간을 설정
+    @TimeToLive
+    private Long ttl;
 }
