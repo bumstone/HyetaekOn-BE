@@ -19,7 +19,7 @@ public class SpecialGroup {
     @JoinColumn(name = "public_service_id", nullable = false)
     private PublicService publicService;
 
-    // TODO: 특수 대상 그룹 - 검색 + 해시태그
+    // 특수 대상 그룹 - 검색 + 해시태그
     @Convert(converter = SpecialGroupConverter.class)  // 명시적 선언
     private SpecialGroupEnum specialGroupEnum;
 }

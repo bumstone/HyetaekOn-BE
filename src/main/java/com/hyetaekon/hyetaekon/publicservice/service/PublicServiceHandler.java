@@ -41,8 +41,8 @@ public class PublicServiceHandler {
         return publicServiceMapper.toDetailDto(service);
     }
 
-    public List<PublicServiceListResponseDto> getPopularServices() {
-        // publicServiceValidate.validateUserById(userId);
+    public List<PublicServiceListResponseDto> getPopularServices(Long userId) {
+        publicServiceValidate.validateUserById(userId);  // 반드시 로그인한 유저의 경우에만 조회
 
         List<PublicService> services = publicServiceRepository.findTop6ByOrderByViewsDesc();
 

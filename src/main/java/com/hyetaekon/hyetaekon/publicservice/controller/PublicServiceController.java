@@ -46,12 +46,11 @@ public class PublicServiceController {
     }
 
     // 인기 서비스 목록 조회(조회수) -> 6개 리스트 고정
-    // TODO: 유저 인증
     @GetMapping("/popular")
     public ResponseEntity<List<PublicServiceListResponseDto>> getPopolarServices() {
         Long userId = authenticateUser.authenticateUserId();
 
-        return ResponseEntity.ok(publicServiceHandler.getPopularServices()); // 최대 6개로 제한
+        return ResponseEntity.ok(publicServiceHandler.getPopularServices(userId)); // 최대 6개로 제한
     }
 
 }

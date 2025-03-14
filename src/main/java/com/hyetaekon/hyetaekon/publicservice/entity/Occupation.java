@@ -19,7 +19,7 @@ public class Occupation {
     @JoinColumn(name = "public_service_id", nullable = false)
     private PublicService publicService;
 
-    // TODO: 대상 직종 - 회원 정보
+    // 대상 직종 - 회원 정보
     @Convert(converter = OccupationConverter.class)
     private OccupationEnum occupationEnum;
 }

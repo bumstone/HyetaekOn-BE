@@ -20,7 +20,7 @@ public class PublicService {
     @Column(name = "service_name", nullable = false, length = 255)
     private String serviceName;  // 서비스명
 
-    // TODO: 서비스 분야 - 카테고리 + 해시태그
+    // 서비스 분야 - 카테고리 + 해시태그
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ServiceCategory serviceCategory;   // 서비스 분야
