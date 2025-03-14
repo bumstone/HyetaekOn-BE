@@ -133,18 +133,15 @@ public class JwtTokenProvider {
     }
 
     // 토큰 정보 검증
+    // TODO: redis - blackList
     public boolean validateToken(String token) {
         log.debug("validateToken start");
         try {
-            /*Claims claims = Jwts.parserBuilder()
+            Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
-
-            String jti = claims.getId(); // JTI 추출
-            return !blackListService.isTokenBlacklisted(jti);*/
-
+                .parseClaimsJws(token);
+            return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.error("Invalid JWT Token", e);
         } catch (ExpiredJwtException e) {
