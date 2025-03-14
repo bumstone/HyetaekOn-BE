@@ -9,6 +9,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+// TODO: Redis
 // @RedisHash("refreshToken")
 public class RefreshToken {
     @Id
