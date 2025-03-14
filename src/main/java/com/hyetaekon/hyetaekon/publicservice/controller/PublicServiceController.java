@@ -4,6 +4,7 @@ import com.hyetaekon.hyetaekon.publicservice.dto.PublicServiceDetailResponseDto;
 import com.hyetaekon.hyetaekon.publicservice.dto.PublicServiceListResponseDto;
 import com.hyetaekon.hyetaekon.publicservice.entity.ServiceCategory;
 import com.hyetaekon.hyetaekon.publicservice.service.PublicServiceHandler;
+import com.hyetaekon.hyetaekon.common.util.AuthenticateUser;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
@@ -23,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PublicServiceController {
     private final PublicServiceHandler publicServiceHandler;
-    // private final AuthenticateUser authenticateUser;
+    private final AuthenticateUser authenticateUser;
 
 
     // 서비스 분야별 공공서비스 목록 조회
@@ -48,6 +49,8 @@ public class PublicServiceController {
     // TODO: 유저 인증
     @GetMapping("/popular")
     public ResponseEntity<List<PublicServiceListResponseDto>> getPopolarServices() {
+        Long userId = authenticateUser.authenticateUserId();
+
         return ResponseEntity.ok(publicServiceHandler.getPopularServices()); // 최대 6개로 제한
     }
 
