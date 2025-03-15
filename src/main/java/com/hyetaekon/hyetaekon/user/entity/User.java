@@ -6,6 +6,7 @@ import com.hyetaekon.hyetaekon.recommend.entity.Recommend;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,20 +35,29 @@ public class User {
     @Column(name = "nickname", length = 50)
     private String nickname;
 
-    @Column(name = "age")
-    private Integer age;
+    @Column(name = "birth_at")
+    private LocalDate birthAt;
 
     @Column(name = "gender", length = 10)
     private String gender;
 
-    @Column(name = "region", length = 100)
-    private String region;
+    @Column(name = "city", length = 100)
+    private String city;
 
+    @Column(name = "state", length = 100)
+    private String state;
+
+    // TODO: BusinessType, Occupation 고려
     @Column(name = "job", length = 50)
     private String job;
 
+    // TODO: 등급에 따른 ENUM 분류 (4단계)
     @Column(name = "level", length = 20)
     private String level;
+
+    // TODO: 게시글 작성, 댓글 및 질문글 답변 시 적용
+    @Column(name = "point")
+    private int point;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
@@ -99,4 +109,45 @@ public class User {
     public void updatePassword(String newPassword) {
         this.password = newPassword;
     }
+
+    // 회원 이름 변경
+    public void updateName(String newName) {
+        this.name = newName;
+    }
+
+    // 회원 생년월일 변경
+    public void updateBirthAt(LocalDate newBirthAt) {
+        this.birthAt = newBirthAt;
+    }
+
+    // 회원 성별 변경
+    public void updateGender(String newGender) {
+        this.gender = newGender;
+    }
+
+    // 회원 지역(시/도) 변경
+    public void updateCity(String newCity) {
+        this.city = newCity;
+    }
+
+    // 회원 지역(시/군/구) 변경
+    public void updateState(String newState) {
+        this.state = newState;
+    }
+
+    // 회원 등급 Enum 변경
+    public void updateLevel(UserLevel level) {
+        this.level = level.name();
+    }
+
+    // 점수 추가
+    public void addPoint(int amount) {
+        this.point += amount;
+    }
+
+    // 점수 감점 (0점 이상으로)
+    public void subtractPoint(int amount) {
+        this.point = Math.max(0, this.point - amount);
+    }
+
 }
