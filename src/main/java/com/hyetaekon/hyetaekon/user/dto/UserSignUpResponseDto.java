@@ -3,6 +3,7 @@ package com.hyetaekon.hyetaekon.user.dto;
 import lombok.Builder;
 import lombok.Getter;
 
+
 @Getter
 @Builder
 public class UserSignUpResponseDto {
