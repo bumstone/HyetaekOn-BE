@@ -51,9 +51,9 @@ public class User {
     @Column(name = "job", length = 50)
     private String job;
 
-    // TODO: 등급에 따른 ENUM 분류 (4단계)
-    @Column(name = "level", length = 20)
-    private String level;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "level", length = 50)
+    private UserLevel level;
 
     // TODO: 게시글 작성, 댓글 및 질문글 답변 시 적용
     @Column(name = "point")
@@ -137,7 +137,7 @@ public class User {
 
     // 회원 등급 Enum 변경
     public void updateLevel(UserLevel level) {
-        this.level = level.name();
+        this.level = level;
     }
 
     // 점수 추가

@@ -14,8 +14,8 @@ public class UserLevelService {
         UserLevel appropriateLevel = UserLevel.fromPoint(currentPoint);
 
         // 현재 레벨과 적절한 레벨이 다른 경우에만 업데이트
-        if (!appropriateLevel.name().equals(user.getLevel())) {
-            user.updateLevel(UserLevel.valueOf(appropriateLevel.name()));
+        if (appropriateLevel != user.getLevel()) {
+            user.updateLevel(appropriateLevel);
             // 레벨 업 이벤트 발행 가능 (옵션)
         }
     }
