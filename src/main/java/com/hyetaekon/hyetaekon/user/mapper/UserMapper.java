@@ -1,11 +1,9 @@
 package com.hyetaekon.hyetaekon.user.mapper;
 
 import com.hyetaekon.hyetaekon.user.dto.UserResponseDto;
-import com.hyetaekon.hyetaekon.user.dto.UserSignUpRequestDto;
 import com.hyetaekon.hyetaekon.user.dto.UserSignUpResponseDto;
 import com.hyetaekon.hyetaekon.user.entity.User;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
