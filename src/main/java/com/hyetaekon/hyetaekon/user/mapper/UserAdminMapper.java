@@ -12,12 +12,11 @@ import org.mapstruct.ReportingPolicy;
 public interface UserAdminMapper {
 
     // User Entity -> 관리자용 회원 정보 DTO 변환
+    @Mapping(target = "levelName", expression = "java(user.getLevel().getName())")
     UserAdminResponseDto toAdminResponseDto(User user);
 
     // UserReport Entity -> 신고 내역 DTO 변환
-    @Mapping(source = "reporter.id", target = "reporterId")
     @Mapping(source = "reporter.nickname", target = "reporterNickname")
-    @Mapping(source = "reported.id", target = "reportedId")
     @Mapping(source = "reported.nickname", target = "reportedNickname")
     UserReportResponseDto toReportResponseDto(UserReport userReport);
 }

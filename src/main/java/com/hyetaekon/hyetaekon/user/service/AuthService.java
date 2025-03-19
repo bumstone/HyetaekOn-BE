@@ -31,7 +31,7 @@ public class AuthService {
     @Transactional
     public JwtToken login(UserSignInRequestDto signInRequestDto) {
         User user = validateUser(signInRequestDto);
-        Authentication authentication = authenticateUser(user.getEmail(), signInRequestDto.getPassword());
+        Authentication authentication = authenticateUser(user.getRealId(), signInRequestDto.getPassword());
         return jwtTokenProvider.generateToken(authentication);
     }
 
@@ -42,9 +42,9 @@ public class AuthService {
         RefreshToken tokenDetails = refreshTokenService.getRefreshToken(refreshToken)
             .orElseThrow(() -> new GlobalException(ErrorCode.INVALID_TOKEN));
 
-        String email = tokenDetails.getEmail();
+        String realId = tokenDetails.getRealId();
 
-        User user = userService.findUserByEmail(email);
+        User user = userService.findUserByRealId(realId);
         Authentication authentication = createAuthentication(user);
 
         // 기존에 있던 리프레시 토큰은 DB에서 제거
@@ -62,9 +62,9 @@ public class AuthService {
         CookieUtil.deleteCookie(response, "refreshToken");
     }
 
-    // email, password를 사용해서 유저 확인
+    // realId, password를 사용해서 유저 확인
     private User validateUser(UserSignInRequestDto signInRequestDto) {
-        User user = userService.findUserByEmail(signInRequestDto.getEmail());
+        User user = userService.findUserByRealId(signInRequestDto.getRealId());
 
         if (!passwordEncoder.matches(signInRequestDto.getPassword(), user.getPassword())) {
             throw new GlobalException(ErrorCode.INVALID_PASSWORD);
@@ -73,9 +73,9 @@ public class AuthService {
     }
 
     // 이메일, authentication 생성
-    private Authentication authenticateUser(String email, String password) {
+    private Authentication authenticateUser(String realId, String password) {
         UsernamePasswordAuthenticationToken authenticationToken =
-            new UsernamePasswordAuthenticationToken(email, password);
+            new UsernamePasswordAuthenticationToken(realId, password);
 
         return authenticationManagerBuilder.getObject().authenticate(authenticationToken);
     }
@@ -84,7 +84,7 @@ public class AuthService {
     // User 객체를 사용해 authentication 생성
     private Authentication createAuthentication(User user) {
         CustomUserDetails customUserDetails = new CustomUserDetails(
-            user.getId(), user.getEmail(), user.getNickname(), user.getRole(), user.getPassword(),user.getName());
+            user.getId(), user.getRealId(), user.getNickname(), user.getRole(), user.getPassword(),user.getName());
 
         return new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
     }

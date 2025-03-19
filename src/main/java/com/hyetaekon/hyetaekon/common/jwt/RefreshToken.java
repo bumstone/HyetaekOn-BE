@@ -15,7 +15,7 @@ public class RefreshToken {
     @Id
     private String refreshToken;
 
-    private String email;
+    private String realId;
     private Long issuedAt;
 
     // Time to live (TTL) 설정, Redis에 만료 시간을 설정

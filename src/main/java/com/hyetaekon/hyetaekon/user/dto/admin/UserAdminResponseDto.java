@@ -11,14 +11,14 @@ import java.time.LocalDateTime;
 @Builder
 public class UserAdminResponseDto {
     private Long id;
-    private String email;
+    private String realId;
     private String nickname;
     private String name;
     private String gender;
     private LocalDate birthAt;
     private String city;
     private String state;
-    private String level;
+    private String levelName;
     private int point;
     private Role role;
     private LocalDateTime createdAt;

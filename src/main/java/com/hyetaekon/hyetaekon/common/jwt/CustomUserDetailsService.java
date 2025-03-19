@@ -19,14 +19,14 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String realId) throws UsernameNotFoundException {
         // DB에서 사용자 조회
-        User user = userRepository.findByEmailAndDeletedAtIsNull(email)
+        User user = userRepository.findByRealIdAndDeletedAtIsNull(realId)
             .orElseThrow(() -> new UsernameNotFoundException("해당하는 정보의 사용자를 찾을 수 없습니다."));
 
         // CustomUserDetails 생성
         return new CustomUserDetails(
-            user.getId(), user.getEmail(), user.getNickname(), user.getRole(), user.getPassword(), user.getName()
+            user.getId(), user.getRealId(), user.getNickname(), user.getRole(), user.getPassword(), user.getName()
         );
     }
 }

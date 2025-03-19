@@ -20,8 +20,8 @@ public enum ErrorCode {
     BLACKLIST_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH-010", "사용할 수 없는 액세스 토큰입니다."),
 
     // 계정 관련
-    DUPLICATED_EMAIL(HttpStatus.CONFLICT, "ACCOUNT-001", "이미 존재하는 이메일입니다."),
-    USER_NOT_FOUND_BY_EMAIL(HttpStatus.NOT_FOUND, "ACCOUNT-002", "해당 이메일의 회원을 찾을 수 없습니다."),
+    DUPLICATED_REAL_ID(HttpStatus.CONFLICT, "ACCOUNT-001", "이미 존재하는 아이디입니다."),
+    USER_NOT_FOUND_BY_REAL_ID(HttpStatus.NOT_FOUND, "ACCOUNT-002", "해당 아이디의 회원을 찾을 수 없습니다."),
     USER_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND, "ACCOUNT-003", "해당 아이디의 회원을 찾을 수 없습니다."),
     DUPLICATED_NICKNAME(HttpStatus.CONFLICT, "ACCOUNT-004", "이미 사용 중인 닉네임입니다."),
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "ACCOUNT-005", "현재 비밀번호가 일치하지 않습니다."),

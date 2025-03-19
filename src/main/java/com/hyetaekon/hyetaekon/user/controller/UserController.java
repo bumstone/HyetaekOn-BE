@@ -26,7 +26,7 @@ public class UserController {
   @PostMapping("/signup")
   public ResponseEntity<UserSignUpResponseDto> registerUser(@RequestBody @Valid UserSignUpRequestDto userSignUpRequestDto) {
     UserSignUpResponseDto userSignUpResponseDto = userService.registerUser(userSignUpRequestDto);
-    log.debug("회원가입 성공: email={}", userSignUpRequestDto.getEmail());
+    log.debug("회원가입 성공: realId={}", userSignUpRequestDto.getRealId());
     return ResponseEntity.status(HttpStatus.CREATED).body(userSignUpResponseDto);
   }
 

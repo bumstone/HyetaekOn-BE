@@ -12,15 +12,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Getter
 public class CustomUserDetails implements UserDetails, CustomUserPrincipal {
     private final Long id;
-    private final String email;
+    private final String realId;
     private final String nickname;
     private final Role role;
     private final String password;
     private final String name;
 
-    public CustomUserDetails(Long id, String email, String nickname, Role role, String password, String name) {
+    public CustomUserDetails(Long id, String realId, String nickname, Role role, String password, String name) {
         this.id = id;
-        this.email = email;
+        this.realId = realId;
         this.nickname = nickname;
         this.role = role;
         this.password = password;
@@ -44,7 +44,7 @@ public class CustomUserDetails implements UserDetails, CustomUserPrincipal {
 
     @Override
     public String getUsername() {
-        return email;
+        return realId;
     }
 
     @Override

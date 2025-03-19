@@ -8,6 +8,6 @@ import lombok.Getter;
 @Builder
 public class UserSignUpResponseDto {
     private Long id;       // 사용자 ID
-    private String email;  // 이메일
+    private String realId;  // 아이디
     private String nickname; // 닉네임
 }

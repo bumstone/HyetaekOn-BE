@@ -1,6 +1,5 @@
 package com.hyetaekon.hyetaekon.user.dto;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -17,9 +16,8 @@ import java.time.LocalDate;
 @Builder
 public class UserSignUpRequestDto {
 
-    @NotBlank(message = "이메일은 공백일 수 없습니다.")
-    @Email(message = "유효하지 않은 이메일 형식입니다.")
-    private String email;
+    @NotBlank(message = "아이디는 공백일 수 없습니다.")
+    private String realId;
 
     @NotBlank(message = "비밀번호는 공백일 수 없습니다.")
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,20}$",

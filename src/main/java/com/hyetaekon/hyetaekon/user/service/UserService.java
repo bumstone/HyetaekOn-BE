@@ -37,15 +37,15 @@ public class UserService {
     @Transactional
     public UserSignUpResponseDto registerUser(UserSignUpRequestDto userSignUpRequestDto) {
         // 이메일 또는 닉네임 중복 검사
-        Optional<User> existingUser = userRepository.findByEmailOrNicknameAndDeletedAtIsNull(
-            userSignUpRequestDto.getEmail(),
+        Optional<User> existingUser = userRepository.findByRealIdOrNicknameAndDeletedAtIsNull(
+            userSignUpRequestDto.getRealId(),
             userSignUpRequestDto.getNickname()
         );
 
         if (existingUser.isPresent()) {
             User user = existingUser.get(); // NPE 방지
-            if (user.getEmail().equals(userSignUpRequestDto.getEmail())) {
-                throw new GlobalException(ErrorCode.DUPLICATED_EMAIL);
+            if (user.getRealId().equals(userSignUpRequestDto.getRealId())) {
+                throw new GlobalException(ErrorCode.DUPLICATED_REAL_ID);
             }
             if (user.getNickname().equals(userSignUpRequestDto.getNickname())) {
                 throw new GlobalException(ErrorCode.DUPLICATED_NICKNAME);
@@ -56,7 +56,7 @@ public class UserService {
 
         // 추가 필드를 포함한 User 객체 생성
         User newUser = User.builder()
-            .email(userSignUpRequestDto.getEmail())
+            .realId(userSignUpRequestDto.getRealId())
             .nickname(userSignUpRequestDto.getNickname())
             .password(encodedPassword)
             .name(userSignUpRequestDto.getName())
@@ -70,7 +70,7 @@ public class UserService {
             .build();
 
         User savedUser = userRepository.save(newUser);
-        log.debug("회원 가입 - 이메일: {}", savedUser.getEmail());
+        log.debug("회원 가입 - 이메일: {}", savedUser.getRealId());
 
         return userMapper.toSignUpResponseDto(savedUser);
     }
@@ -86,9 +86,9 @@ public class UserService {
 
     // 이메일로 회원 검색
     @Transactional(readOnly = true)
-    public User findUserByEmail(String email) {
-        return userRepository.findByEmailAndDeletedAtIsNull(email)
-            .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND_BY_EMAIL));
+    public User findUserByRealId(String realId) {
+        return userRepository.findByRealIdAndDeletedAtIsNull(realId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND_BY_REAL_ID));
 
     }
 
@@ -164,7 +164,7 @@ public class UserService {
 
         // 변경된 사용자 정보 저장
         User updatedUser = userRepository.save(user);
-        log.debug("회원 정보 업데이트 - 이메일: {}", updatedUser.getEmail());
+        log.debug("회원 정보 업데이트 - 이메일: {}", updatedUser.getRealId());
         return userMapper.toResponseDto(updatedUser);
     }
 
@@ -186,10 +186,10 @@ public class UserService {
 
     }
 
-    // 중복 확인(회원 가입시 이메일, 닉네임 부분)
+    // 중복 확인(회원 가입시 아이디, 닉네임 부분)
     public boolean checkDuplicate(String type, String value) {
         return switch (type.toLowerCase()) {
-            case "email" -> userRepository.existsByEmailAndDeletedAtIsNull(value);
+            case "realid" -> userRepository.existsByRealIdAndDeletedAtIsNull(value);
             case "nickname" -> userRepository.existsByNickname(value);
             default -> throw new IllegalArgumentException("잘못된 타입 입력값입니다.");
         };

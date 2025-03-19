@@ -9,9 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 public class UserReportResponseDto {
     private Long id;
-    private Long reporterId;
     private String reporterNickname;
-    private Long reportedId;
     private String reportedNickname;
     private String reason;
     private String content;

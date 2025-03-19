@@ -12,7 +12,7 @@ import java.time.LocalDate;
 public class UserResponseDto {
     private Long id;          // 사용자 ID
     private String name;        // 사용자 이름
-    private String email;     // 이메일
+    private String realId;     // 아이디
     private String nickname;  // 닉네임
     private Role role;      // 권한 (USER/ADMIN 등)
 
@@ -21,6 +21,6 @@ public class UserResponseDto {
     private String city;    // 시/도
     private String state;   // 시/군/구
 
-    private String level;   // 회원 등급
+    private String levelName;   // 회원 등급
     private int point;   // 회원 포인트
 }

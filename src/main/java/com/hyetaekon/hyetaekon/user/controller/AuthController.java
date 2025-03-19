@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 
 @Slf4j
 @RestController
@@ -29,7 +28,7 @@ public class AuthController {
     // 로그인 처리
     @PostMapping("/login")
     public ResponseEntity<UserTokenResponseDto> login(@RequestBody UserSignInRequestDto userSignInRequestDto,
-                                                      HttpServletResponse response) throws IOException {
+                                                      HttpServletResponse response) {
 
         JwtToken jwtToken = authService.login(userSignInRequestDto);
         CookieUtil.setCookie(response, "refreshToken", jwtToken.getRefreshToken(),refreshTokenExpired);
@@ -57,8 +56,7 @@ public class AuthController {
     @GetMapping("/token/refresh")
     public ResponseEntity<UserTokenResponseDto> refreshAccessToken(
         @CookieValue(name = "refreshToken", required = false) String refreshToken,
-        HttpServletResponse response
-    ) throws IOException {
+        HttpServletResponse response) {
 
         if (refreshToken == null) {
             throw new GlobalException(ErrorCode.NO_TOKEN);

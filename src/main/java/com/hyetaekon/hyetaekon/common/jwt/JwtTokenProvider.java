@@ -65,7 +65,7 @@ public class JwtTokenProvider {
         String jti = UUID.randomUUID().toString();
         // Access Token 생성
         String accessToken = Jwts.builder()
-            .setSubject(userPrincipal.getEmail()) // 이메일을 Subject로 설정
+            .setSubject(userPrincipal.getRealId()) // 이메일을 Subject로 설정
             .setIssuedAt(new Date()) // 발행 시간
             .setId(jti)  // blacklist 관리를 위한 jwt token id
             .claim("nickname", userPrincipal.getNickname()) // 닉네임
@@ -79,7 +79,7 @@ public class JwtTokenProvider {
         String refreshToken = UUID.randomUUID().toString();
 
         // Redis에 Refresh Token 정보 저장
-        refreshTokenService.saveRefreshToken( refreshToken, userPrincipal.getEmail(), refreshTokenExpired);
+        refreshTokenService.saveRefreshToken( refreshToken, userPrincipal.getRealId(), refreshTokenExpired);
 
 
         // JWT Token 객체 반환
@@ -103,7 +103,7 @@ public class JwtTokenProvider {
         }
 
         // 사용자 정보 추출
-        String email = claims.getSubject(); // 토큰 subject에서 email 추출
+        String realId = claims.getSubject(); // 토큰 subject에서 realId 추출
         String nickname = claims.get("nickname").toString(); // nickname 추출
         String password = claims.get("password", String.class);
         String name = claims.get("name", String.class);
@@ -113,15 +113,15 @@ public class JwtTokenProvider {
         // 문자열에서 Role 객체로 변환
         Role role = Role.valueOf(roleName); // Enum이라면 가능
 
-        // email로 User 조회
-        User user = userRepository.findByEmailAndDeletedAtIsNull(email)
+        // realId로 User 조회
+        User user = userRepository.findByRealIdAndDeletedAtIsNull(realId)
             .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
         // 사용자 ID 가져오기
         Long id = user.getId();
 
         // CustomUserDetails 생성
-        CustomUserDetails userDetails = new CustomUserDetails(id, email, nickname, role, password, name);
+        CustomUserDetails userDetails = new CustomUserDetails(id, realId, nickname, role, password, name);
 
         // 문자열을 GrantedAuthority로 변환
         Collection<? extends GrantedAuthority> authorities =
