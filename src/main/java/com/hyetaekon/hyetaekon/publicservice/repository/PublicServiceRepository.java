@@ -15,9 +15,10 @@ import java.util.Optional;
 public interface PublicServiceRepository extends JpaRepository<PublicService, Long> {
     Page<PublicService> findByServiceCategory(ServiceCategory category, Pageable pageable);
 
-    List<PublicService> findTop6ByOrderByViewsDesc();
+    List<PublicService> findTop6ByOrderByBookmarkCntDesc();
 
     Optional<PublicService> findById(long serviceId);
 
     int deleteByIdNotIn(List<Long> Ids);
+
 }

@@ -33,5 +33,5 @@ public class PublicServiceListResponseDto {
 
     private int views;  // 조회수
     private int bookmarkCnt;  // 북마크수
-
+    private boolean bookmarked;  // 북마크 여부
 }

@@ -25,6 +25,7 @@ public class PublicServiceDetailResponseDto {
     private List<String> familyType;
     private int views;
     private int bookmarkCnt;
+    private boolean bookmarked;   // 북마크 여부
 
     // 지원 대상
     private String supportTarget;  // 지원 대상

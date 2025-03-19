@@ -33,19 +33,21 @@ public class PublicServiceController {
         @PathVariable("category") String categoryName,
         @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
         @RequestParam(name = "size", defaultValue = "9") @Positive @Max(30) int size) {
-
+        Long userId = authenticateUser.authenticateUserId();
         ServiceCategory category = publicServiceHandler.getServiceCategory(categoryName);
-        return ResponseEntity.ok(publicServiceHandler.getServicesByCategory(category, PageRequest.of(page, size)));
+        return ResponseEntity.ok(publicServiceHandler.getServicesByCategory(category, PageRequest.of(page, size), userId));
 
     }
 
     // 공공서비스 상세 조회
     @GetMapping("/detail/{serviceId}")
     public ResponseEntity<PublicServiceDetailResponseDto> getServiceDetail (@PathVariable("serviceId") Long serviceId) {
-        return ResponseEntity.ok(publicServiceHandler.getServiceDetail(serviceId));
+        Long userId = authenticateUser.authenticateUserId();
+
+        return ResponseEntity.ok(publicServiceHandler.getServiceDetail(serviceId, userId));
     }
 
-    // 인기 서비스 목록 조회(조회수) -> 6개 리스트 고정
+    // 인기 서비스 목록 조회(북마크 수) -> 6개 고정
     @GetMapping("/popular")
     public ResponseEntity<List<PublicServiceListResponseDto>> getPopularServices() {
         Long userId = authenticateUser.authenticateUserId();

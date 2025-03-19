@@ -134,13 +134,14 @@ public class PublicService {
     private List<BusinessType> businessTypes = new ArrayList<>();
 
 
-    public void updateBookmarkCntUp() {
+    public void increaseBookmarkCount() {
         bookmarkCnt++;
     }
 
-    public void updateBookmarkCntDown() {
+    public void decreaseBookmarkCount() {
         bookmarkCnt--;
     }
 
     public void updateViewsUp() { views++; }
+
 }
