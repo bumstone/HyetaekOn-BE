@@ -31,8 +31,10 @@ public enum ErrorCode {
     NOT_SUSPENDED_USER(HttpStatus.BAD_REQUEST, "ACCOUNT-008", "정지 상태가 아닌 회원입니다."),
     INVALID_SUSPEND_TIME(HttpStatus.BAD_REQUEST, "ACCOUNT-009", "정지 기간이 유효하지 않습니다."),
 
-
+    // 북마크
     BOOKMARK_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "BOOKMARK-001", "북마크한 유저를 찾을 수 없습니다."),
+    BOOKMARK_ALREADY_EXISTS(HttpStatus.CONFLICT, "BOOKMARK-002", "이미 북마크한 서비스입니다."),
+    BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND, "BOOKMARK-003", "북마크 정보를 찾을 수 없습니다."),
 
     // 관심사 선택 제한
     INTEREST_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "INTEREST-001", "관심사는 최대 6개까지만 등록 가능합니다."),
