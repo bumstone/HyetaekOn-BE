@@ -14,12 +14,15 @@ public class UserAdminResponseDto {
     private String realId;
     private String nickname;
     private String name;
+
     private String gender;
     private LocalDate birthAt;
     private String city;
     private String state;
+
     private String levelName;
     private int point;
+
     private Role role;
     private LocalDateTime createdAt;
     private LocalDateTime deletedAt;

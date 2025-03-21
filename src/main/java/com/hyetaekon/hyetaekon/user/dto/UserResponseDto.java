@@ -23,4 +23,5 @@ public class UserResponseDto {
 
     private String levelName;   // 회원 등급
     private int point;   // 회원 포인트
+    private int remainPoint;  // 승급까지 남은 포인트
 }
