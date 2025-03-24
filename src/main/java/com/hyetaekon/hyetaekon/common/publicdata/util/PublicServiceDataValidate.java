@@ -84,9 +84,8 @@ public class PublicServiceDataValidate {
 
         // 가족 유형 조건 확인
         boolean hasFamilyTypeCondition =
-            "Y".equals(data.getJA0410()) || "Y".equals(data.getJA0411()) ||
-                "Y".equals(data.getJA0412()) || "Y".equals(data.getJA0413()) ||
-                "Y".equals(data.getJA0414());
+            "Y".equals(data.getJA0411()) || "Y".equals(data.getJA0412()) ||
+            "Y".equals(data.getJA0413()) || "Y".equals(data.getJA0414());
 
         // 직업 유형 조건 확인
         boolean hasOccupationCondition =

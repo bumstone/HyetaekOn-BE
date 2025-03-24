@@ -63,7 +63,7 @@ public class PublicServiceConditionsDataDto {
         private String JA0330;  // 질병/질환자
 
         // Family Type
-        private String JA0410;  // 해당사항 없음
+        // private String JA0410;  // 해당사항 없음
         private String JA0411;  // 다자녀가구
         private String JA0412;  // 무주택세대
         private String JA0413;  // 신규전입

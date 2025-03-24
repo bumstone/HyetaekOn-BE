@@ -77,9 +77,9 @@ public class PublicServiceDataProviderService {
         // 새로운 가족 유형 정보 추가
         List<FamilyType> familyTypes = new ArrayList<>();
 
-        if ("Y".equals(data.getJA0410())) {
+        /*if ("Y".equals(data.getJA0410())) {
             familyTypes.add(createFamilyType(publicService, FamilyTypeEnum.IS_NOT_APPLICABLE));
-        }
+        }*/
         if ("Y".equals(data.getJA0411())) {
             familyTypes.add(createFamilyType(publicService, FamilyTypeEnum.IS_MULTI_CHILDREN_FAMILY));
         }

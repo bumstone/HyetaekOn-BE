@@ -24,7 +24,7 @@ public enum UserInterestEnum {
     IS_CHRONIC_ILLNESS("질병/질환자"),
 
     // FamilyType 관련 관심사
-    IS_NOT_APPLICABLE("해당사항 없음"),
+    // IS_NOT_APPLICABLE("해당사항 없음"),
     IS_MULTI_CHILDREN_FAMILY("다자녀가구"),
     IS_NON_HOUSING_HOUSEHOLD("무주택세대"),
     IS_NEW_RESIDENCE("신규전입"),
