@@ -53,7 +53,7 @@ public class PublicServiceDataValidate {
     public boolean validatePublicServiceData(PublicServiceDataDto.Data data) {
         if (data.getServiceName() == null || data.getServiceName().isEmpty() ||
             data.getServiceCategory() == null || data.getServiceCategory().isEmpty() ||
-            data.getGoverningAgency() == null || data.getGoverningAgency().isEmpty()) {
+            data.getSummaryPurpose() == null || data.getSummaryPurpose().isEmpty()) {
             log.warn("⚠️ 공공 서비스 ID {}에 필수 데이터가 누락되었습니다.", data.getServiceId());
             return false;
         }
@@ -64,7 +64,10 @@ public class PublicServiceDataValidate {
         if (data.getServicePurpose() == null || data.getServicePurpose().isEmpty() ||
             data.getSupportTarget() == null || data.getSupportTarget().isEmpty() ||
             data.getSupportDetail() == null || data.getSupportDetail().isEmpty() ||
-            data.getSupportType() == null || data.getSupportType().isEmpty()) {
+            data.getSupportType() == null || data.getSupportType().isEmpty() ||
+            data.getApplicationMethod() == null || data.getApplicationMethod().isEmpty() ||
+            data.getApplicationDeadline() == null || data.getApplicationDeadline().isEmpty() ||
+            data.getGoverningAgency() == null || data.getGoverningAgency().isEmpty()) {
             log.warn("⚠️ 공공 서비스 상세내용 ID {}에 필수 데이터가 누락되었습니다.", data.getServiceId());
             return false;
         }
@@ -72,8 +75,14 @@ public class PublicServiceDataValidate {
     }
 
     public boolean validatePublicServiceConditionsData(PublicServiceConditionsDataDto.Data data) {
-        // 성별 조건 확인
+        // 성별 조건 확인 (필수)
         boolean hasGenderCondition = "Y".equals(data.getTargetGenderMale()) || "Y".equals(data.getTargetGenderFemale());
+
+        // 성별 정보가 없으면 유효하지 않은 데이터로 간주
+        if (!hasGenderCondition) {
+            log.warn("⚠️ 공공 서비스 지원조건 ID {}에 성별 지원 조건이 없습니다.", data.getServiceId());
+            return false;
+        }
 
         // 특수 그룹 조건 확인
         boolean hasSpecialGroupCondition =
@@ -85,7 +94,7 @@ public class PublicServiceDataValidate {
         // 가족 유형 조건 확인
         boolean hasFamilyTypeCondition =
             "Y".equals(data.getJA0411()) || "Y".equals(data.getJA0412()) ||
-            "Y".equals(data.getJA0413()) || "Y".equals(data.getJA0414());
+                "Y".equals(data.getJA0413()) || "Y".equals(data.getJA0414());
 
         // 직업 유형 조건 확인
         boolean hasOccupationCondition =
@@ -105,10 +114,10 @@ public class PublicServiceDataValidate {
                 "Y".equals(data.getJA2202()) || "Y".equals(data.getJA2203()) ||
                 "Y".equals(data.getJA2299());
 
-        // 지원 조건이 전혀 없는 경우는 유효하지 않은 데이터로 간주
-        if (!(hasGenderCondition || hasSpecialGroupCondition || hasFamilyTypeCondition ||
+        // 성별 외에 다른 지원 조건이 하나라도 있어야 함
+        if (!(hasSpecialGroupCondition || hasFamilyTypeCondition ||
             hasOccupationCondition || hasBusinessTypeCondition)) {
-            log.warn("⚠️ 공공 서비스 지원조건 ID {}에 유효한 지원 조건이 없습니다.", data.getServiceId());
+            log.warn("⚠️ 공공 서비스 지원조건 ID {}에 성별 외 다른 지원 조건이 없습니다.", data.getServiceId());
             return false;
         }
 

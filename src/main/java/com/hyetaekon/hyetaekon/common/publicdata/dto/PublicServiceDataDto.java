@@ -40,7 +40,7 @@ public class PublicServiceDataDto {
         @JsonProperty("서비스목적요약")
         private String summaryPurpose;
 
-        @JsonProperty("소관기관명")
+        /*@JsonProperty("소관기관명")
         private String governingAgency;
 
         @JsonProperty("부서명")
@@ -50,6 +50,6 @@ public class PublicServiceDataDto {
         private String userType;
 
         @JsonProperty("신청기한")
-        private String applicationDeadline;
+        private String applicationDeadline;*/
     }
 }
