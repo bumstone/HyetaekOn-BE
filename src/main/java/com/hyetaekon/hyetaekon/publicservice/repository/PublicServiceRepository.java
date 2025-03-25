@@ -1,8 +1,10 @@
 package com.hyetaekon.hyetaekon.publicservice.repository;
 
 
+import com.hyetaekon.hyetaekon.publicservice.entity.FamilyTypeEnum;
 import com.hyetaekon.hyetaekon.publicservice.entity.PublicService;
 import com.hyetaekon.hyetaekon.publicservice.entity.ServiceCategory;
+import com.hyetaekon.hyetaekon.publicservice.entity.SpecialGroupEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,12 +29,12 @@ public interface PublicServiceRepository extends JpaRepository<PublicService, Lo
         "LEFT JOIN ps.specialGroups sg " +
         "LEFT JOIN ps.familyTypes ft " +
         "WHERE (:categories IS NULL OR :categories IS EMPTY OR ps.serviceCategory IN :categories) " +
-        "AND (:specialGroupCodes IS NULL OR :specialGroupCodes IS EMPTY OR sg.code IN :specialGroupCodes) " +
-        "AND (:familyTypeCodes IS NULL OR :familyTypeCodes IS EMPTY OR ft.code IN :familyTypeCodes)")
+        "AND (:specialGroupEnums IS NULL OR :specialGroupEnums IS EMPTY OR sg.specialGroupEnum IN :specialGroupEnums) " +
+        "AND (:familyTypeEnums IS NULL OR :familyTypeEnums IS EMPTY OR ft.familyTypeEnum IN :familyTypeEnums)")
     Page<PublicService> findWithFilters(
         @Param("categories") List<ServiceCategory> categories,
-        @Param("specialGroupCodes") List<String> specialGroupCodes,
-        @Param("familyTypeCodes") List<String> familyTypeCodes,
+        @Param("specialGroupEnums") List<SpecialGroupEnum> specialGroupEnums,
+        @Param("familyTypeEnums") List<FamilyTypeEnum> familyTypeEnums,
         Pageable pageable
     );
 }

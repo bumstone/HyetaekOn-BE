@@ -26,6 +26,21 @@ public class PublicServiceController {
     private final PublicServiceHandler publicServiceHandler;
     private final AuthenticateUser authenticateUser;
 
+    // 전체 공공서비스 목록 조회(페이징, 정렬, 필터링)
+    @GetMapping
+    public ResponseEntity<Page<PublicServiceListResponseDto>> getAllServices(
+        @RequestParam(required = false) String sort,
+        @RequestParam(required = false) List<String> specialGroups,
+        @RequestParam(required = false) List<String> familyTypes,
+        @RequestParam(required = false) List<String> categories,
+        @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
+        @RequestParam(name = "size", defaultValue = "9") @Positive @Max(30) int size) {
+
+        Long userId = authenticateUser.authenticateUserId();
+
+        return ResponseEntity.ok(publicServiceHandler.getAllServices(
+            sort, specialGroups, familyTypes, categories, PageRequest.of(page, size), userId));
+    }
 
     // 서비스 분야별 공공서비스 목록 조회
     @GetMapping("/category/{category}")
