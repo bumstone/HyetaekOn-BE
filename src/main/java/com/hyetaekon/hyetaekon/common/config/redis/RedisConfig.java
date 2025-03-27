@@ -1,4 +1,4 @@
-package com.hyetaekon.hyetaekon.common.config;
+package com.hyetaekon.hyetaekon.common.config.redis;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
