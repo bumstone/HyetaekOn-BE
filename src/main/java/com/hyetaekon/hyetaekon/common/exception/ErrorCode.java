@@ -27,7 +27,7 @@ public enum ErrorCode {
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "ACCOUNT-005", "현재 비밀번호가 일치하지 않습니다."),
     PASSWORD_SAME_AS_OLD(HttpStatus.BAD_REQUEST, "ACCOUNT-006", "새로운 비밀번호는 현재 비밀번호와 달라야 합니다."),
     CURRENT_PASSWORD_REQUIRED(HttpStatus.BAD_REQUEST, "ACCOUNT-007", "현재 비밀번호를 입력해야 합니다."),
-    FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "미완", "잘못된 접근입니다."),
+    FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "AUTH-011", "잘못된 접근입니다."),
     NOT_SUSPENDED_USER(HttpStatus.BAD_REQUEST, "ACCOUNT-008", "정지 상태가 아닌 회원입니다."),
     INVALID_SUSPEND_TIME(HttpStatus.BAD_REQUEST, "ACCOUNT-009", "정지 기간이 유효하지 않습니다."),
 
