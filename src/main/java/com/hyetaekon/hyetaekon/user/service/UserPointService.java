@@ -28,7 +28,7 @@ public class UserPointService {
 
         // 게시글 작성인 경우 첫 게시글 여부 확인
         if (actionType == PointActionType.POST_CREATION) {
-            boolean isFirstPost = !postRepository.existsByUserIdAndDeletedAtIsNull(userId);
+            boolean isFirstPost = !postRepository.existsByUser_IdAndDeletedAtIsNull(userId);
             if (isFirstPost) {
                 // 첫 게시글인 경우 FIRST_POST_CREATION 포인트 적용
                 pointToAdd = PointActionType.FIRST_POST_CREATION.getPoints();

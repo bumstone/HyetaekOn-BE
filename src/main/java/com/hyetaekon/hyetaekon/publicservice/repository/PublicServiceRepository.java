@@ -28,15 +28,16 @@ public interface PublicServiceRepository extends JpaRepository<PublicService, Lo
     @Query("SELECT DISTINCT ps FROM PublicService ps " +
         "LEFT JOIN ps.specialGroups sg " +
         "LEFT JOIN ps.familyTypes ft " +
-        "WHERE (:categories IS NULL OR :categories IS EMPTY OR ps.serviceCategory IN :categories) " +
-        "AND (:specialGroupEnums IS NULL OR :specialGroupEnums IS EMPTY OR sg.specialGroupEnum IN :specialGroupEnums) " +
-        "AND (:familyTypeEnums IS NULL OR :familyTypeEnums IS EMPTY OR ft.familyTypeEnum IN :familyTypeEnums)")
+        "WHERE (:#{#categories == null || #categories.isEmpty()} = true OR ps.serviceCategory IN :categories) " +
+        "AND (:#{#specialGroupEnums == null || #specialGroupEnums.isEmpty()} = true OR sg.specialGroupEnum IN :specialGroupEnums) " +
+        "AND (:#{#familyTypeEnums == null || #familyTypeEnums.isEmpty()} = true OR ft.familyTypeEnum IN :familyTypeEnums)")
     Page<PublicService> findWithFilters(
         @Param("categories") List<ServiceCategory> categories,
         @Param("specialGroupEnums") List<SpecialGroupEnum> specialGroupEnums,
         @Param("familyTypeEnums") List<FamilyTypeEnum> familyTypeEnums,
         Pageable pageable
     );
+
     // 사용자의 북마크 공공서비스 목록 페이지
     @Query("SELECT p FROM PublicService p JOIN p.bookmarks b WHERE b.user.id = :userId ORDER BY b.createdAt DESC")
     Page<PublicService> findByBookmarks_User_Id(@Param("userId") Long userId, Pageable pageable);

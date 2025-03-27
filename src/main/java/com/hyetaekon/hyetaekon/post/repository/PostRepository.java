@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    boolean existsByUserIdAndDeletedAtIsNull(Long userId);
+    boolean existsByUser_IdAndDeletedAtIsNull(Long userId);
 }
