@@ -37,4 +37,8 @@ public interface PublicServiceRepository extends JpaRepository<PublicService, Lo
         @Param("familyTypeEnums") List<FamilyTypeEnum> familyTypeEnums,
         Pageable pageable
     );
+    // 사용자의 북마크 공공서비스 목록 페이지
+    @Query("SELECT p FROM PublicService p JOIN p.bookmarks b WHERE b.user.id = :userId ORDER BY b.createdAt DESC")
+    Page<PublicService> findByBookmarks_User_Id(@Param("userId") Long userId, Pageable pageable);
+
 }

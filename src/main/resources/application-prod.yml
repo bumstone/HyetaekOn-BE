@@ -2,10 +2,8 @@
 #  data:
 #    redis:
 #      password: ${REDIS_PASSWORD:}
-#
-#app:
-#  front-url: https://hyetaek-on.site
-#
-#jwt:
-#  access-expired: 1800 # 30분
-#  refresh-expired: 432000 # 5일
+
+
+jwt:
+  access-expired: 1800 # 30분
+  refresh-expired: 432000 # 5일

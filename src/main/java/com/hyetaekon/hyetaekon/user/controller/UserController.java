@@ -1,26 +1,35 @@
 package com.hyetaekon.hyetaekon.user.controller;
 
 import com.hyetaekon.hyetaekon.common.jwt.CustomUserDetails;
-import com.hyetaekon.hyetaekon.common.jwt.CustomUserPrincipal;
+import com.hyetaekon.hyetaekon.publicservice.dto.PublicServiceListResponseDto;
+import com.hyetaekon.hyetaekon.publicservice.service.PublicServiceHandler;
 import com.hyetaekon.hyetaekon.user.dto.UserResponseDto;
 import com.hyetaekon.hyetaekon.user.dto.UserSignUpRequestDto;
 import com.hyetaekon.hyetaekon.user.dto.UserSignUpResponseDto;
 import com.hyetaekon.hyetaekon.user.dto.UserUpdateRequestDto;
 import com.hyetaekon.hyetaekon.user.service.UserService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
+@Validated
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class UserController {
   private final UserService userService;
+  private final PublicServiceHandler publicServiceHandler;
 
   // 회원 가입 api
   @PostMapping("/signup")
@@ -74,21 +83,20 @@ public class UserController {
     return userService.checkDuplicate(type, value);
   }
 
-//    /**
-//     * 북마크한 서비스 목록 조회
-//     */
-//    @GetMapping("/me/bookmarked")
-//    @PreAuthorize("hasRole('USER')")
-//    public ResponseEntity<ApiResponseDto<Page<BookmarkResponseDto>>> getBookmarkedServices(
-//        @RequestParam(defaultValue = "0") int page,
-//        @RequestParam(defaultValue = "10") int size) {
-//        Page<BookmarkResponseDto> bookmarks = userService.getBookmarkedServices(PageRequest.of(page, size));
-//        return ResponseEntity.ok(ApiResponseDto.success(bookmarks));
-//    }
-//
-//    /**
-//     * 작성한 게시글 목록 조회
-//     */
+  // 북마크한 서비스 목록 조회
+  @GetMapping("/users/me/bookmarked")
+  public ResponseEntity<Page<PublicServiceListResponseDto>> getBookmarkedServices(
+      @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
+      @RequestParam(name = "size", defaultValue = "9") @Positive @Max(30) int size,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+    return ResponseEntity.ok(publicServiceHandler.getBookmarkedServices(
+        userDetails.getId(), PageRequest.of(page, size))
+    );
+  }
+
+    /**
+     * 작성한 게시글 목록 조회
+     */
 //    @GetMapping("/me/posts")
 //    @PreAuthorize("hasRole('USER')")
 //    public ResponseEntity<ApiResponseDto<Page<PostResponseDto>>> getMyPosts(
@@ -99,9 +107,9 @@ public class UserController {
 //        return ResponseEntity.ok(ApiResponseDto.success(posts));
 //    }
 //
-//    /**
-//     * 작성한 댓글 목록 조회
-//     */
+    /**
+     * 작성한 댓글 목록 조회
+     */
 //    @GetMapping("/me/comments")
 //    @PreAuthorize("hasRole('USER')")
 //    public ResponseEntity<ApiResponseDto<Page<CommentResponseDto>>> getMyComments(

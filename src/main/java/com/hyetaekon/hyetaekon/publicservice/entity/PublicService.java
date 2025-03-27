@@ -1,5 +1,6 @@
 package com.hyetaekon.hyetaekon.publicservice.entity;
 
+import com.hyetaekon.hyetaekon.bookmark.entity.Bookmark;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -133,6 +134,9 @@ public class PublicService {
     @Builder.Default
     private List<BusinessType> businessTypes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "publicService", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Bookmark> bookmarks = new ArrayList<>();
 
     public void increaseBookmarkCount() {
         bookmarkCnt++;

@@ -14,6 +14,7 @@ import com.hyetaekon.hyetaekon.publicservice.repository.PublicServiceRepository;
 import com.hyetaekon.hyetaekon.publicservice.util.PublicServiceValidate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -182,4 +183,19 @@ public class PublicServiceHandler {
             return dto;
         });
     }
+
+  public Page<PublicServiceListResponseDto> getBookmarkedServices(Long userId, Pageable pageable) {
+      Page<PublicService> bookmarkedServices = publicServiceRepository.findByBookmarks_User_Id(userId, pageable);
+
+      List<PublicServiceListResponseDto> serviceDtos = bookmarkedServices.getContent().stream()
+          .map(service -> {
+              PublicServiceListResponseDto dto = publicServiceMapper.toListDto(service);
+              dto.setBookmarked(true);
+              return dto;
+          })
+          .collect(Collectors.toList());
+
+      return new PageImpl<>(serviceDtos, pageable, bookmarkedServices.getTotalElements());
+
+  }
 }
