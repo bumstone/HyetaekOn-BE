@@ -3,8 +3,8 @@
       build:
         context: .
         dockerfile: Dockerfile
-      image: hyetaek-on:latest
-      container_name: hyetaek-on
+      image: hyetaekon:latest
+      container_name: hyetaekon
       ports:
         - "8080:8080"
       restart: always
@@ -26,7 +26,9 @@
       container_name: hyetaekon-redis
       ports:
         - "6379:6379"
-      command: [ "redis-server" ]
+      volumes:
+        - redis-data:/data  # 데이터 지속성을 위한 볼륨 추가
+      command: redis-server --appendonly yes
       healthcheck:
         test: ["CMD", "redis-cli", "ping"]
         interval: 30s
@@ -35,6 +37,25 @@
         start_period: 10s
       networks:
         - app-network
+
+    nginx:
+      image: nginx:latest
+      container_name: hyetaekon-nginx
+      ports:
+        - "80:80"
+        - "443:443"
+      volumes:
+        - ./nginx/conf.d:/etc/nginx/conf.d
+        - ./nginx/ssl:/etc/nginx/ssl
+        - ./nginx/logs:/var/log/nginx
+      depends_on:
+        - app
+      networks:
+        - app-network
+
+
+  volumes:
+    redis-data:
 
   networks:
     app-network:

@@ -1,7 +1,10 @@
-#spring:
+spring:
+  datasource:
+    url: ${MYSQL_PROD_URL}  # MySQL 데이터베이스 URL
 #  data:
 #    redis:
-#      password: ${REDIS_PASSWORD:}
+#      host: hyetaekon-redis
+#      password: ${REDIS_PASSWORD}
 
 
 jwt:

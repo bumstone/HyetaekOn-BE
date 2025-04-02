@@ -4,15 +4,12 @@ spring:
 #      uri: mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_URL}/${MONGODB_NAME}?retryWrites=true&w=majority&appName=HyetaekOn
 #      auto-index-creation: true
     redis:
-      host: hyetaekon-redis
       port: 6379
       timeout: 2000
       password:
   datasource:
-    url: jdbc:h2:mem:testdb  # H2 인메모리 데이터베이스 (테스트용)
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ''
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
   h2:
     console:
       enabled: true  # H2 웹 콘솔 활성화
