@@ -10,17 +10,19 @@ spring:
   datasource:
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
-  h2:
-    console:
-      enabled: true  # H2 웹 콘솔 활성화
-      path: /h2-console  # H2 콘솔 URL 경로 (기본값: /h2-console)
+    hikari:
+      connection-timeout: 30000  # 30초 연결 제한
+#  h2:
+#    console:
+#      enabled: true  # H2 웹 콘솔 활성화
+#      path: /h2-console  # H2 콘솔 URL 경로 (기본값: /h2-console)
   jpa:
-    defer-datasource-initialization: true
     show-sql: true  # SQL 로그 출력
     hibernate:
-      ddl-auto: update
+      ddl-auto: create # update
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true  # SQL 로그를 보기 좋게 포맷
         auto_quote_keyword: true  # 예약어를 자동으로 따옴표 처리
         order_inserts: true
