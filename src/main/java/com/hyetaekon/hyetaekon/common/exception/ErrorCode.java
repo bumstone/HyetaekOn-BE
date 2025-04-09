@@ -43,6 +43,7 @@ public enum ErrorCode {
 
     // 관심사 선택 제한
     INTEREST_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "INTEREST-001", "관심사는 최대 6개까지만 등록 가능합니다."),
+    INVALID_INTEREST(HttpStatus.BAD_REQUEST, "INTEREST-002", "유효하지 않은 관심사입니다."),
 
     // 공공서비스
     // 유효 JACODE 확인

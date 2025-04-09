@@ -126,13 +126,13 @@ public class UserService {
             user.updateGender(newGender);
         }
 
-        // 지역 변경
+        // 지역 변경 city
         String newCity = userUpdateRequestDto.getCity();
         if (newCity != null && !newCity.isBlank()) {
             user.updateCity(newCity);
         }
 
-        // 지역 변경
+        // 지역 변경 state
         String newState = userUpdateRequestDto.getState();
         if (newState != null && !newState.isBlank()) {
             user.updateState(newState);

@@ -5,6 +5,6 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class UserInterestRequestDto {
-    private List<String> interests;
+public class InterestSelectionRequestDto {
+    private List<String> selectedInterests;
 }

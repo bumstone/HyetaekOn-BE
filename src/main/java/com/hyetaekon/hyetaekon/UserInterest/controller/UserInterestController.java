@@ -1,7 +1,8 @@
 package com.hyetaekon.hyetaekon.UserInterest.controller;
 
-import com.hyetaekon.hyetaekon.UserInterest.dto.UserInterestRequestDto;
-import com.hyetaekon.hyetaekon.UserInterest.dto.UserInterestResponseDto;
+import com.hyetaekon.hyetaekon.UserInterest.dto.CategorizedInterestsResponseDto;
+import com.hyetaekon.hyetaekon.UserInterest.dto.CategorizedInterestsWithSelectionDto;
+import com.hyetaekon.hyetaekon.UserInterest.dto.InterestSelectionRequestDto;
 import com.hyetaekon.hyetaekon.UserInterest.entity.UserInterestEnum;
 import com.hyetaekon.hyetaekon.UserInterest.service.UserInterestService;
 import com.hyetaekon.hyetaekon.common.jwt.CustomUserDetails;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -24,31 +26,32 @@ public class UserInterestController {
 
     // 선택할 키워드 목록 조회
     @GetMapping
-    public ResponseEntity<UserInterestResponseDto> getAvailableInterests() {
-        // Enum에서 displayName 값 추출
-        List<String> Interests = Arrays.stream(UserInterestEnum.values())
-            .map(UserInterestEnum::getDisplayName)
-            .collect(Collectors.toList());
-        return ResponseEntity.ok(new UserInterestResponseDto(Interests));
+    public ResponseEntity<CategorizedInterestsResponseDto> getAvailableInterests() {
+        // Enum에서 카테고리별 displayName 값 추출
+        Map<String, List<String>> categorizedInterests = Arrays.stream(UserInterestEnum.values())
+            .collect(Collectors.groupingBy(
+                UserInterestEnum::getCategory,
+                Collectors.mapping(UserInterestEnum::getDisplayName, Collectors.toList())
+            ));
+        return ResponseEntity.ok(new CategorizedInterestsResponseDto(categorizedInterests));
     }
 
-
-    // 개인 키워드 목록 조회
+    // 모든 관심사와 사용자 선택 여부 조회
     @GetMapping("/me")
-    public ResponseEntity<UserInterestResponseDto> getMyInterest(@AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<CategorizedInterestsWithSelectionDto> getMyInterestsWithSelection(
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long userId = userDetails.getId();
-        return ResponseEntity.ok(userInterestService.getUserInterestsByUserId(userId));
+        return ResponseEntity.ok(userInterestService.getUserInterestsWithSelection(userId));
     }
 
-    // 선택한 키워드 목록 저장
+    // 선택한 관심사 저장
     @PostMapping("/me")
-    public ResponseEntity<Void> replaceInterests(
+    public ResponseEntity<Void> saveInterests(
         @AuthenticationPrincipal CustomUserDetails userDetails,
-        @RequestBody UserInterestRequestDto UserInterestRequest
+        @RequestBody InterestSelectionRequestDto requestDto
     ) {
         Long userId = userDetails.getId();
-        List<String> Interests = UserInterestRequest.getInterests();
-        userInterestService.replaceUserInterests(userId, Interests);
+        userInterestService.saveUserInterests(userId, requestDto.getSelectedInterests());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
