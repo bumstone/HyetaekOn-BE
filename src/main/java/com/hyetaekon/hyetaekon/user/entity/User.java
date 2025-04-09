@@ -134,6 +134,11 @@ public class User {
         this.state = newState;
     }
 
+    // 회원 직업 정보 변경
+    public void updateJob(String newJob) {
+        this.job = newJob;
+    }
+
     // 회원 등급 Enum 변경
     public void updateLevel(UserLevel level) {
         this.level = level;

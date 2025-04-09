@@ -20,6 +20,7 @@ public class UserResponseDto {
     private String gender;    // 성별
     private String city;    // 시/도
     private String state;   // 시/군/구
+    private String job;     // 직업
 
     private String levelName;   // 회원 등급
     private int point;   // 회원 포인트
