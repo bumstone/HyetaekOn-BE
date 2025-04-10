@@ -30,7 +30,7 @@ public class PublicServiceDetailDataDto {
     @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
     public static class Data {
         @JsonProperty("서비스ID")
-        private long serviceId;
+        private String serviceId;
 
         @JsonProperty("서비스명")
         private String serviceName;

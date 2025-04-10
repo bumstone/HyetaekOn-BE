@@ -36,7 +36,7 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
     private final PublicServiceDataValidate validator;
 
     private static final int DEFAULT_PAGE_SIZE = 1000; // 기본 페이지 크기를 1000으로 설정
-    private final Set<Long> currentServiceIds = ConcurrentHashMap.newKeySet(); // 현재 동기화된 서비스 ID 저장
+    private final Set<String> currentServiceIds = ConcurrentHashMap.newKeySet(); // 현재 동기화된 서비스 ID 저장
 
     /**
      * 공공서비스 목록 데이터 호출 (페이징 처리)
@@ -145,7 +145,7 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
     /**
      * 공통 데이터 동기화 메서드 - 중복 코드 제거를 위한 템플릿 메서드
      */
-    private <T, D> long syncDataWithPaging(
+    private <T, D> void syncDataWithPaging(
         PublicDataPath apiPath,
         BiFunction<PublicDataPath, Integer, List<T>> fetcher, // 데이터 조회 함수
         Function<T, List<D>> dataExtractor, // DTO에서 데이터 추출 함수
@@ -204,7 +204,6 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
         }
 
         log.info("{} 전체 동기화 완료: 총 {}건", operationName, totalProcessed);
-        return totalProcessed;
     }
 
     /**
@@ -260,12 +259,12 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
         List<PublicService> entitiesToSave = new ArrayList<>();
 
         // 서비스 ID 목록 생성
-        Set<Long> serviceIds = dataList.stream()
+        Set<String> serviceIds = dataList.stream()
             .map(PublicServiceDetailDataDto.Data::getServiceId)
             .collect(Collectors.toSet());
 
         // 서비스 ID로 한 번에 조회 (N+1 문제 방지)
-        Map<Long, PublicService> serviceMap = publicServiceRepository.findAllById(serviceIds)
+        Map<String, PublicService> serviceMap = publicServiceRepository.findAllById(serviceIds)
             .stream()
             .collect(Collectors.toMap(PublicService::getId, service -> service));
 
@@ -312,12 +311,12 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
         List<PublicService> entitiesToSave = new ArrayList<>();
 
         // 서비스 ID 목록 생성
-        Set<Long> serviceIds = dataList.stream()
+        Set<String> serviceIds = dataList.stream()
             .map(PublicServiceConditionsDataDto.Data::getServiceId)
             .collect(Collectors.toSet());
 
         // 서비스 ID로 한 번에 조회 (N+1 문제 방지)
-        Map<Long, PublicService> serviceMap = publicServiceRepository.findAllById(serviceIds)
+        Map<String, PublicService> serviceMap = publicServiceRepository.findAllById(serviceIds)
             .stream()
             .collect(Collectors.toMap(PublicService::getId, service -> service));
 

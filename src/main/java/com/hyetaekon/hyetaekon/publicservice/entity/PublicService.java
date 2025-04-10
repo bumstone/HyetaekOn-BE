@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PublicService {
     @Id
-    private Long id;
+    private String id;
 
     @Column(name = "service_name", nullable = false, length = 255)
     private String serviceName;  // 서비스명

@@ -56,7 +56,7 @@ public class PublicServiceController {
 
     // 공공서비스 상세 조회
     @GetMapping("/detail/{serviceId}")
-    public ResponseEntity<PublicServiceDetailResponseDto> getServiceDetail (@PathVariable("serviceId") Long serviceId) {
+    public ResponseEntity<PublicServiceDetailResponseDto> getServiceDetail (@PathVariable("serviceId") String serviceId) {
         Long userId = authenticateUser.authenticateUserId();
 
         return ResponseEntity.ok(publicServiceHandler.getServiceDetail(serviceId, userId));

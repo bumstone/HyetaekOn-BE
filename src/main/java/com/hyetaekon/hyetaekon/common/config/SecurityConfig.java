@@ -50,7 +50,7 @@ public class SecurityConfig {
     http
         .authorizeHttpRequests((auth) -> auth
             .requestMatchers(SecurityPath.ADMIN_ENDPOINTS).hasRole("ADMIN")
-            .requestMatchers(SecurityPath.USER_ENDPOINTS).hasRole("USER")
+            .requestMatchers(SecurityPath.USER_ENDPOINTS).hasAnyRole("USER", "ADMIN")
             .requestMatchers(SecurityPath.PUBLIC_ENDPOINTS).permitAll()
             .anyRequest().permitAll()
         );

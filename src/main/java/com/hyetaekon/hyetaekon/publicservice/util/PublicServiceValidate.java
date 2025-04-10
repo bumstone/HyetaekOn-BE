@@ -17,7 +17,7 @@ public class PublicServiceValidate {
     public final PublicServiceRepository publicServiceRepository;
     public final UserRepository userRepository;
 
-    public PublicService validateServiceById(Long serviceId) {
+    public PublicService validateServiceById(String serviceId) {
         return publicServiceRepository.findById(serviceId)
             .orElseThrow(() -> new GlobalException(ErrorCode.SERVICE_NOT_FOUND_BY_ID));
     }

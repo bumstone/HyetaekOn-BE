@@ -21,7 +21,7 @@ public class BookmarkService {
     private final UserRepository userRepository;
     private final PublicServiceRepository publicServiceRepository;
 
-    public void addBookmark(Long serviceId, Long userId) {
+    public void addBookmark(String serviceId, Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new GlobalException(BOOKMARK_USER_NOT_FOUND));
 
@@ -45,7 +45,7 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void removeBookmark(Long serviceId, Long userId) {
+    public void removeBookmark(String serviceId, Long userId) {
         Bookmark bookmark = bookmarkRepository.findByUserIdAndPublicServiceId(userId, serviceId)
             .orElseThrow(() -> new GlobalException(BOOKMARK_NOT_FOUND));
 

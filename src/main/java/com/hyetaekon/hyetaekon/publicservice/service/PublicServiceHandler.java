@@ -50,7 +50,7 @@ public class PublicServiceHandler {
 
     // 서비스 상세 조회
     @Transactional
-    public PublicServiceDetailResponseDto getServiceDetail(Long serviceId, Long userId) {
+    public PublicServiceDetailResponseDto getServiceDetail(String serviceId, Long userId) {
         PublicService service = publicServiceValidate.validateServiceById(serviceId);
 
         // 조회수 증가
