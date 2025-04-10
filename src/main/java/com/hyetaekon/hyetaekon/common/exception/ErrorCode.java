@@ -30,6 +30,7 @@ public enum ErrorCode {
     FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "AUTH-011", "잘못된 접근입니다."),
     NOT_SUSPENDED_USER(HttpStatus.BAD_REQUEST, "ACCOUNT-008", "정지 상태가 아닌 회원입니다."),
     INVALID_SUSPEND_TIME(HttpStatus.BAD_REQUEST, "ACCOUNT-009", "정지 기간이 유효하지 않습니다."),
+    PASSWORD_CONFIRM_MISMATCH(HttpStatus.BAD_REQUEST, "ACCOUNT-010", "새 비밀번호와 확인 비밀번호가 일치하지 않습니다."),
 
     // 북마크
     BOOKMARK_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "BOOKMARK-001", "북마크한 유저를 찾을 수 없습니다."),
@@ -43,6 +44,7 @@ public enum ErrorCode {
 
     // 관심사 선택 제한
     INTEREST_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "INTEREST-001", "관심사는 최대 6개까지만 등록 가능합니다."),
+    INVALID_INTEREST(HttpStatus.BAD_REQUEST, "INTEREST-002", "유효하지 않은 관심사입니다."),
 
     // 공공서비스
     // 유효 JACODE 확인

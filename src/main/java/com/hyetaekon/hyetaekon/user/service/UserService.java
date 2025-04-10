@@ -4,12 +4,10 @@ import com.hyetaekon.hyetaekon.common.exception.ErrorCode;
 import com.hyetaekon.hyetaekon.common.exception.GlobalException;
 import com.hyetaekon.hyetaekon.common.jwt.BlacklistService;
 import com.hyetaekon.hyetaekon.common.jwt.RefreshTokenService;
-import com.hyetaekon.hyetaekon.user.dto.UserResponseDto;
-import com.hyetaekon.hyetaekon.user.dto.UserSignUpRequestDto;
-import com.hyetaekon.hyetaekon.user.dto.UserSignUpResponseDto;
-import com.hyetaekon.hyetaekon.user.dto.UserUpdateRequestDto;
+import com.hyetaekon.hyetaekon.user.dto.*;
 import com.hyetaekon.hyetaekon.user.entity.Role;
 import com.hyetaekon.hyetaekon.user.entity.User;
+import com.hyetaekon.hyetaekon.user.entity.UserLevel;
 import com.hyetaekon.hyetaekon.user.mapper.UserMapper;
 import com.hyetaekon.hyetaekon.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +31,7 @@ public class UserService {
 
 
     // 회원 가입
-    // TODO: Occupation, BusinessType 재확인
+    // TODO: Occupation, BusinessType 직업 정보 재확인
     @Transactional
     public UserSignUpResponseDto registerUser(UserSignUpRequestDto userSignUpRequestDto) {
         // 이메일 또는 닉네임 중복 검사
@@ -41,6 +39,11 @@ public class UserService {
             userSignUpRequestDto.getRealId(),
             userSignUpRequestDto.getNickname()
         );
+
+        // 비밀번호와 비밀번호 확인 일치 여부 검사
+        if (!userSignUpRequestDto.getPassword().equals(userSignUpRequestDto.getConfirmPassword())) {
+            throw new GlobalException(ErrorCode.PASSWORD_CONFIRM_MISMATCH);
+        }
 
         if (existingUser.isPresent()) {
             User user = existingUser.get(); // NPE 방지
@@ -64,7 +67,9 @@ public class UserService {
             .gender(userSignUpRequestDto.getGender())
             .city(userSignUpRequestDto.getCity())
             .state(userSignUpRequestDto.getState())
+            .job(userSignUpRequestDto.getJob())
             .role(Role.ROLE_USER)
+            .level(UserLevel.QUESTION_MARK)
             .point(0) // 초기 포인트 설정
             .createdAt(LocalDateTime.now()) // 생성 시간 설정
             .build();
@@ -93,79 +98,82 @@ public class UserService {
     }
 
 
-    // 회원 정보 수정(닉네임, 비밀번호, 이름, 성별, 생년월일, 지역)
+    // 회원 정보 수정(닉네임, 이름, 성별, 생년월일, 지역, 직업)
     @Transactional
-    public UserResponseDto updateUser(Long userId, UserUpdateRequestDto userUpdateRequestDto) {
-        // 사용자 정보 조회
+    public UserResponseDto updateUserProfile(Long userId, UserProfileUpdateDto profileUpdateDto) {
         User user = userRepository.findByIdAndDeletedAtIsNull(userId)
             .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND_BY_ID));
 
-        // 닉네임 변경
-        String newNickname = userUpdateRequestDto.getNickname();
-        if (newNickname != null && !newNickname.isBlank()) { // 닉네임이 null 또는 공백이 아닐 때만 처리
-            if (userRepository.existsByNickname(newNickname)) {
+        // 닉네임 업데이트
+        if (profileUpdateDto.getNickname() != null && !profileUpdateDto.getNickname().isBlank()) {
+            // 현재 닉네임과 다를 경우에만 중복 체크
+            if (!user.getNickname().equals(profileUpdateDto.getNickname()) &&
+                userRepository.existsByNickname(profileUpdateDto.getNickname())) {
                 throw new GlobalException(ErrorCode.DUPLICATED_NICKNAME);
             }
-            user.updateNickname(newNickname); // 닉네임 변경
+            user.updateNickname(profileUpdateDto.getNickname());
         }
 
-        // 이름 변경
-        String newName = userUpdateRequestDto.getName();
-        if (newName != null && !newName.isBlank()) {
-            user.updateName(newName);
+        // 이름 업데이트
+        if (profileUpdateDto.getName() != null && !profileUpdateDto.getName().isBlank()) {
+            user.updateName(profileUpdateDto.getName());
         }
 
-        // 생년월일 변경
-        if (userUpdateRequestDto.getBirthAt() != null) {
-            user.updateBirthAt(userUpdateRequestDto.getBirthAt());
+        // 생년월일 업데이트
+        if (profileUpdateDto.getBirthAt() != null) {
+            user.updateBirthAt(profileUpdateDto.getBirthAt());
         }
 
-        // 성별 변경
-        String newGender = userUpdateRequestDto.getGender();
-        if (newGender != null && !newGender.isBlank()) {
-            user.updateGender(newGender);
+        // 성별 업데이트
+        if (profileUpdateDto.getGender() != null && !profileUpdateDto.getGender().isBlank()) {
+            user.updateGender(profileUpdateDto.getGender());
         }
 
-        // 지역 변경
-        String newCity = userUpdateRequestDto.getCity();
-        if (newCity != null && !newCity.isBlank()) {
-            user.updateCity(newCity);
+        // 지역(시/도) 업데이트
+        if (profileUpdateDto.getCity() != null && !profileUpdateDto.getCity().isBlank()) {
+            user.updateCity(profileUpdateDto.getCity());
         }
 
-        // 지역 변경
-        String newState = userUpdateRequestDto.getState();
-        if (newState != null && !newState.isBlank()) {
-            user.updateState(newState);
+        // 지역(시/군/구) 업데이트
+        if (profileUpdateDto.getState() != null && !profileUpdateDto.getState().isBlank()) {
+            user.updateState(profileUpdateDto.getState());
         }
 
-        // 비밀번호 변경
-        String currentPassword = userUpdateRequestDto.getCurrentPassword();
-        String newPassword = userUpdateRequestDto.getNewPassword();
-
-        // 새 비밀번호가 있을 때만 비밀번호 변경 로직 실행
-        if (newPassword != null && !newPassword.isBlank()) {
-            // 현재 비밀번호가 입력되지 않았으면 에러 발생
-            if (currentPassword == null || currentPassword.isBlank()) {
-                throw new GlobalException(ErrorCode.CURRENT_PASSWORD_REQUIRED);
-            }
-
-            // 현재 비밀번호가 맞는지 확인
-            if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-                throw new GlobalException(ErrorCode.PASSWORD_MISMATCH);
-            }
-
-            // 새 비밀번호가 기존 비밀번호와 같으면 에러 발생
-            if (currentPassword.equals(newPassword)) {
-                throw new GlobalException(ErrorCode.PASSWORD_SAME_AS_OLD);
-            }
-
-            user.updatePassword(passwordEncoder.encode(newPassword)); // 비밀번호 변경
+        // 직업 업데이트 (필요시)
+        if (profileUpdateDto.getJob() != null && !profileUpdateDto.getJob().isBlank()) {
+            user.updateJob(profileUpdateDto.getJob());
         }
 
-        // 변경된 사용자 정보 저장
         User updatedUser = userRepository.save(user);
-        log.debug("회원 정보 업데이트 - 이메일: {}", updatedUser.getRealId());
+        log.debug("회원 프로필 정보 업데이트 - ID: {}", userId);
         return userMapper.toResponseDto(updatedUser);
+    }
+
+    // 비밀번호 변경
+    @Transactional
+    public void updateUserPassword(Long userId, UserPasswordUpdateDto passwordUpdateDto) {
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND_BY_ID));
+
+        // 현재 비밀번호 검증
+        if (!passwordEncoder.matches(passwordUpdateDto.getCurrentPassword(), user.getPassword())) {
+            throw new GlobalException(ErrorCode.PASSWORD_MISMATCH);
+        }
+
+        // 새 비밀번호와 확인 비밀번호 일치 여부 확인
+        if (!passwordUpdateDto.getNewPassword().equals(passwordUpdateDto.getConfirmPassword())) {
+            throw new GlobalException(ErrorCode.PASSWORD_CONFIRM_MISMATCH);
+        }
+
+        // 새 비밀번호가 현재 비밀번호와 같은지 확인
+        if (passwordEncoder.matches(passwordUpdateDto.getNewPassword(), user.getPassword())) {
+            throw new GlobalException(ErrorCode.PASSWORD_SAME_AS_OLD);
+        }
+
+        // 비밀번호 업데이트
+        user.updatePassword(passwordEncoder.encode(passwordUpdateDto.getNewPassword()));
+        userRepository.save(user);
+        log.debug("회원 비밀번호 변경 완료 - ID: {}", userId);
     }
 
     // 회원 탈퇴

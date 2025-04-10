@@ -24,6 +24,9 @@ public class UserSignUpRequestDto {
         message = "비밀번호는 8자 이상 20자 이하여야 하며, 알파벳, 숫자, 특수문자를 포함해야 합니다.")
     private String password; // 평문 비밀번호
 
+    @NotBlank(message = "비밀번호 확인은 공백일 수 없습니다.")
+    private String confirmPassword;
+
     @NotBlank(message = "이름은 공백일 수 없습니다.")
     private String name;
 
@@ -42,4 +45,6 @@ public class UserSignUpRequestDto {
     private String city;
     @NotNull(message = "지역(시/군/구)은 공백일 수 없습니다.")
     private String state;
+
+    private String job; // 직업
 }

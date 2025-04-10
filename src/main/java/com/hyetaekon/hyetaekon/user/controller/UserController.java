@@ -3,10 +3,7 @@ package com.hyetaekon.hyetaekon.user.controller;
 import com.hyetaekon.hyetaekon.common.jwt.CustomUserDetails;
 import com.hyetaekon.hyetaekon.publicservice.dto.PublicServiceListResponseDto;
 import com.hyetaekon.hyetaekon.publicservice.service.PublicServiceHandler;
-import com.hyetaekon.hyetaekon.user.dto.UserResponseDto;
-import com.hyetaekon.hyetaekon.user.dto.UserSignUpRequestDto;
-import com.hyetaekon.hyetaekon.user.dto.UserSignUpResponseDto;
-import com.hyetaekon.hyetaekon.user.dto.UserUpdateRequestDto;
+import com.hyetaekon.hyetaekon.user.dto.*;
 import com.hyetaekon.hyetaekon.user.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -44,20 +41,28 @@ public class UserController {
   public ResponseEntity<UserResponseDto> getMyInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
     Long userId = userDetails.getId();
     UserResponseDto userInfo = userService.getMyInfo(userId);
-
     return ResponseEntity.ok(userInfo);
   }
 
   // 회원 정보 수정 api
-  @PutMapping("/users/me")
-  public ResponseEntity<UserResponseDto> updateMyInfo(
+  @PutMapping("/users/me/profile")
+  public ResponseEntity<UserResponseDto> updateMyProfile(
       @AuthenticationPrincipal CustomUserDetails userDetails,
-      @RequestBody @Valid UserUpdateRequestDto userUpdateRequestDto
+      @RequestBody @Valid UserProfileUpdateDto profileUpdateDto
   ) {
-
     Long userId = userDetails.getId();
+    return ResponseEntity.ok(userService.updateUserProfile(userId, profileUpdateDto));
+  }
 
-    return ResponseEntity.ok(userService.updateUser(userId, userUpdateRequestDto));
+  // 비밀번호 변경 API
+  @PutMapping("/users/me/password")
+  public ResponseEntity<Void> updateMyPassword(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @RequestBody @Valid UserPasswordUpdateDto passwordUpdateDto
+  ) {
+    Long userId = userDetails.getId();
+    userService.updateUserPassword(userId, passwordUpdateDto);
+    return ResponseEntity.ok().build();
   }
 
   // 회원 탈퇴

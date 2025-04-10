@@ -12,7 +12,8 @@ public class SecurityPath {
       "/",
       "/api/services",
       "/api/services/category/*",
-      "/api/services/detail/*"
+      "/api/services/detail/*",
+      "/api/public-data/serviceList/test"
   };
 
 
@@ -32,7 +33,7 @@ public class SecurityPath {
       "/api/admin/users/**",
       "/api/public-data/serviceDetailList",
       "/api/public-data/supportConditionsList",
-      "/api/public-data/serviceList/**"
+      "/api/public-data/serviceList"
   };
 }
 
