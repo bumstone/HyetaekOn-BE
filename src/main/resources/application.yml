@@ -29,9 +29,6 @@ spring:
         order_updates: true
         jdbc:
           batch_size: 1000
-  sql:
-    init:
-      mode: always  # data.sql 실행
   profiles:
     active: dev, s3Bucket  # logback-spring SpringProfile 설정 및 AWS S3 Bucket 설정
 
