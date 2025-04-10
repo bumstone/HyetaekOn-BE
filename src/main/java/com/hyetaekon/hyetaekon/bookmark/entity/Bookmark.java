@@ -1,6 +1,9 @@
 package com.hyetaekon.hyetaekon.bookmark.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hyetaekon.hyetaekon.common.util.BaseEntity;
+import com.hyetaekon.hyetaekon.publicservice.entity.PublicService;
+import com.hyetaekon.hyetaekon.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,15 +16,18 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(
-        indexes = {
-            @Index(name = "idx_id", columnList = "id")
-        }
-)
-public class Bookmark {
+public class Bookmark extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @ManyToOne
+  @JsonIgnore
+  @JoinColumn(name = "public_service_id", nullable = false)
+  private PublicService publicService;
+
+  @ManyToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
 }

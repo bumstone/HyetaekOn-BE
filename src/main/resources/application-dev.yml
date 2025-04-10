@@ -1,14 +1,11 @@
-#spring:
-#  data:
-#    redis:
-#      host: localhost
-#      port: 6379
-#      timeout: 2000
-#      password:
-#
-#app:
-#  front-url: http://localhost:3000
-#
-#jwt:
-#  access-expired: 3600  # 1시간
-#  refresh-expired: 86400  # 1일
+spring:
+  datasource:
+    url: ${MYSQL_DEV_URL}  # MySQL 데이터베이스 URL
+  data:
+    redis:
+      host: localhost
+
+jwt:
+  access-expired: 3600  # 1시간
+  refresh-expired: 86400  # 1일
+
