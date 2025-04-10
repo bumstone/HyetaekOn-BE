@@ -51,7 +51,7 @@ public class UserInterestController {
         @RequestBody InterestSelectionRequestDto requestDto
     ) {
         Long userId = userDetails.getId();
-        userInterestService.saveUserInterests(userId, requestDto.getSelectedInterests());
+        userInterestService.saveUserInterests(userId, requestDto.getAllInterests());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

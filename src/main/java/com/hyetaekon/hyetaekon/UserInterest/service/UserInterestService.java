@@ -58,6 +58,10 @@ public class UserInterestService {
     // 선택한 관심사 저장
     @Transactional
     public void saveUserInterests(Long userId, List<String> selectedInterests) {
+        if (selectedInterests == null) {
+            selectedInterests = new ArrayList<>(); // 빈 리스트로 초기화
+        }
+
         // 최대 선택 개수 검증
         if (selectedInterests.size() > 5) {
             throw new GlobalException(ErrorCode.INTEREST_LIMIT_EXCEEDED);

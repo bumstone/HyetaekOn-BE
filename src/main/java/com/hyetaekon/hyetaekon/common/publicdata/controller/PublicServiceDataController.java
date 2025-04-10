@@ -69,7 +69,7 @@ public class PublicServiceDataController {
   /**
    * 페이지 단위 공공서비스 목록 조회 (테스트용)
    */
-  @GetMapping("/serviceList")
+  @GetMapping("/serviceList/test")
   public ResponseEntity<List<PublicServiceDataDto.Data>> getServiceListByPage(
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(defaultValue = "100") int perPage) {

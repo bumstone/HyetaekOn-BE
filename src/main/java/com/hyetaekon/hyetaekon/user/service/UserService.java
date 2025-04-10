@@ -7,6 +7,7 @@ import com.hyetaekon.hyetaekon.common.jwt.RefreshTokenService;
 import com.hyetaekon.hyetaekon.user.dto.*;
 import com.hyetaekon.hyetaekon.user.entity.Role;
 import com.hyetaekon.hyetaekon.user.entity.User;
+import com.hyetaekon.hyetaekon.user.entity.UserLevel;
 import com.hyetaekon.hyetaekon.user.mapper.UserMapper;
 import com.hyetaekon.hyetaekon.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -68,6 +69,7 @@ public class UserService {
             .state(userSignUpRequestDto.getState())
             .job(userSignUpRequestDto.getJob())
             .role(Role.ROLE_USER)
+            .level(UserLevel.QUESTION_MARK)
             .point(0) // 초기 포인트 설정
             .createdAt(LocalDateTime.now()) // 생성 시간 설정
             .build();

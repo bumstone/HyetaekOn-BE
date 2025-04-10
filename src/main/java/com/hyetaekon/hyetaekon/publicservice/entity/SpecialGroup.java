@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "spcial_group")
+@Table(name = "special_group")
 public class SpecialGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
