@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -16,13 +17,40 @@ public class Post {
     private Long id;  // 게시글 ID
 
     private Long userId;  // 회원 ID
-    private Long publicServiceId; // 공공서비스 ID
-    private String title;  // 제목
-    private String content; // 내용
 
-    private LocalDateTime createdAt;  // 생성일
-    private String postType;  // 게시글 구분
-    private LocalDateTime deletedAt;  // 삭제일
-    private String serviceUrl;  // 서비스 상세경로
+    private Long publicServiceId; // 공공서비스 ID
+
+    @Column(length = 20, nullable = false)  // ✅ 제목 20자 제한
+    private String title;
+
+    @Column(length = 500, nullable = false)  // ✅ 내용 500자 제한
+    private String content;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    private LocalDateTime deletedAt;
+
     private int recommendCnt;  // 추천수
+
+    private int viewCount;  // 조회수
+
+    @Column(name = "post_type")
+    @Enumerated(EnumType.STRING)  // ✅ ENUM 타입으로 저장 (질문, 자유, 인사)
+    private PostType postType;
+
+    private String serviceUrl;
+
+    @Column(length = 12)  // ✅ 관련 링크 제목 12자 제한
+    private String urlTitle;
+
+    private String urlPath;
+
+    @Column(length = 255)
+    private String tags; // ✅ 태그는 최대 3개 (쉼표 구분)
+
+    @Column(name = "category_id")
+    private Long categoryId;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostImage> postImages;  // ✅ 게시글 이미지와 연결
 }

@@ -4,11 +4,9 @@ import com.hyetaekon.hyetaekon.post.dto.PostDto;
 import com.hyetaekon.hyetaekon.post.entity.Post;
 import com.hyetaekon.hyetaekon.post.mapper.PostMapper;
 import com.hyetaekon.hyetaekon.post.repository.PostRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,49 +15,53 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final PostMapper postMapper;
+    private final PostMapper postMapper = PostMapper.INSTANCE;
 
-    // 게시글 생성
-    public PostDto createPost(PostDto postDto) {
-        Post post = postMapper.toEntity(postDto);
-        post = postRepository.save(post);
-        return postMapper.toDto(post);
-    }
-
-    // 게시글 단건 조회
-    public PostDto getPostById(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
-        return postMapper.toDto(post);
-    }
-
-    // 모든 게시글 조회
     public List<PostDto> getAllPosts() {
-        return postRepository.findAll().stream()
+        return postRepository.findAll()
+                .stream()
                 .map(postMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    // 게시글 수정
-    public PostDto updatePost(Long postId, PostDto postDto) {
-        Post existingPost = postRepository.findById(postId)
-                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
-
-        existingPost.setTitle(postDto.getTitle());
-        existingPost.setContent(postDto.getContent());
-        existingPost.setPostType(postDto.getPostType());
-        existingPost.setServiceUrl(postDto.getServiceUrl());
-        existingPost.setRecommendCnt(postDto.getRecommendCnt());
-
-        existingPost = postRepository.save(existingPost);
-        return postMapper.toDto(existingPost);
+    public PostDto getPostById(Long id) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+        return postMapper.toDto(post);
     }
 
-    // 게시글 삭제 (soft delete)
-    public void deletePost(Long postId) {
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new EntityNotFoundException("Post not found"));
-        post.setDeletedAt(LocalDateTime.now());
-        postRepository.save(post);
+    public List<PostDto> getPostsByCategoryId(Long categoryId) { // 추가됨
+        return postRepository.findByCategoryId(categoryId)
+                .stream()
+                .map(postMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    public PostDto createPost(PostDto postDto) {
+        Post post = postMapper.toEntity(postDto);
+        Post savedPost = postRepository.save(post);
+        return postMapper.toDto(savedPost);
+    }
+
+    public PostDto updatePost(Long id, PostDto postDto) {
+        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+        post.setUserId(postDto.getUserId());
+        post.setPublicServiceId(postDto.getPublicServiceId());
+        post.setTitle(postDto.getTitle());
+        post.setContent(postDto.getContent());
+        post.setPostType(postDto.getPostType());
+        post.setDeletedAt(postDto.getDeletedAt());
+        post.setServiceUrl(postDto.getServiceUrl());
+        post.setRecommendCnt(postDto.getRecommendCnt());
+        post.setViewCount(postDto.getViewCount());
+        post.setUrlTitle(postDto.getUrlTitle());
+        post.setUrlPath(postDto.getUrlPath());
+        post.setTags(postDto.getTags());
+        post.setCategoryId(postDto.getCategoryId()); // 추가됨
+        Post updatedPost = postRepository.save(post);
+        return postMapper.toDto(updatedPost);
+    }
+
+    public void deletePost(Long id) {
+        postRepository.deleteById(id);
     }
 }
