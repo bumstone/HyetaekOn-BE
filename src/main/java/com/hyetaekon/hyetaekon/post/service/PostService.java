@@ -5,6 +5,8 @@ import com.hyetaekon.hyetaekon.post.entity.Post;
 import com.hyetaekon.hyetaekon.post.entity.PostType;
 import com.hyetaekon.hyetaekon.post.mapper.PostMapper;
 import com.hyetaekon.hyetaekon.post.repository.PostRepository;
+import com.hyetaekon.hyetaekon.publicservice.entity.PublicService;
+import com.hyetaekon.hyetaekon.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -45,8 +47,14 @@ public class PostService {
 
     public PostDto updatePost(Long id, PostDto postDto) {
         Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
-        post.setUserId(postDto.getUserId());
-        post.setPublicServiceId(postDto.getPublicServiceId());
+        User user = new User();
+        user.setId(postDto.getUserId());
+        post.setUser(user);
+
+        PublicService publicService = new PublicService();
+        publicService.setId(postDto.getPublicServiceId());
+        post.setPublicService(publicService);
+
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
         post.setPostType(PostType.valueOf(postDto.getPostType()));
