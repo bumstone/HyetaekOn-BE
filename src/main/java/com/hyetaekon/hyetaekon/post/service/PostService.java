@@ -2,6 +2,7 @@ package com.hyetaekon.hyetaekon.post.service;
 
 import com.hyetaekon.hyetaekon.post.dto.PostDto;
 import com.hyetaekon.hyetaekon.post.entity.Post;
+import com.hyetaekon.hyetaekon.post.entity.PostType;
 import com.hyetaekon.hyetaekon.post.mapper.PostMapper;
 import com.hyetaekon.hyetaekon.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final PostMapper postMapper = PostMapper.INSTANCE;
+    private final PostMapper postMapper;
 
     public List<PostDto> getAllPosts() {
         return postRepository.findAll()
@@ -48,7 +49,7 @@ public class PostService {
         post.setPublicServiceId(postDto.getPublicServiceId());
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());
-        post.setPostType(postDto.getPostType());
+        post.setPostType(PostType.valueOf(postDto.getPostType()));
         post.setDeletedAt(postDto.getDeletedAt());
         post.setServiceUrl(postDto.getServiceUrl());
         post.setRecommendCnt(postDto.getRecommendCnt());
