@@ -1,47 +1,40 @@
 spring:
-#  data:
+  data:
 #    mongodb:
 #      uri: mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_URL}/${MONGODB_NAME}?retryWrites=true&w=majority&appName=HyetaekOn
 #      auto-index-creation: true
-#    redis:
-#      host: hyetaekon-redis
-#      port: 6379
-#      timeout: 2000
-#      password:
+    redis:
+      port: 6379
+      timeout: 2000
+      password:
   datasource:
-    url: jdbc:h2:mem:testdb  # H2 인메모리 데이터베이스 (테스트용)
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ''
-  h2:
-    console:
-      enabled: true  # H2 웹 콘솔 활성화
-      path: /h2-console  # H2 콘솔 URL 경로 (기본값: /h2-console)
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
+    hikari:
+      connection-timeout: 30000  # 30초 연결 제한
+#  h2:
+#    console:
+#      enabled: true  # H2 웹 콘솔 활성화
+#      path: /h2-console  # H2 콘솔 URL 경로 (기본값: /h2-console)
   jpa:
-    defer-datasource-initialization: true
     show-sql: true  # SQL 로그 출력
     hibernate:
-      ddl-auto: update
+      ddl-auto: update # create # update
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true  # SQL 로그를 보기 좋게 포맷
         auto_quote_keyword: true  # 예약어를 자동으로 따옴표 처리
         order_inserts: true
         order_updates: true
         jdbc:
           batch_size: 1000
-  sql:
-    init:
-      mode: always  # data.sql 실행
-
-  servlet:
-    multipart:
-      max-file-size: 10MB      # 단일 파일의 최대 크기
-      max-request-size: 100MB   # 전체 요청의 최대 크기
-
   profiles:
     active: dev, s3Bucket  # logback-spring SpringProfile 설정 및 AWS S3 Bucket 설정
 
 
 public-data:
   public-service: ${PUBLIC_SERVICE_INFO_KEY}
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}

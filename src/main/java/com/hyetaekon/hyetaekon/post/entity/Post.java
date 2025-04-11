@@ -1,5 +1,7 @@
 package com.hyetaekon.hyetaekon.post.entity;
 
+import com.hyetaekon.hyetaekon.publicservice.entity.PublicService;
+import com.hyetaekon.hyetaekon.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,9 +18,13 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;  // 게시글 ID
 
-    private Long userId;  // 회원 ID
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    private Long publicServiceId; // 공공서비스 ID
+    @ManyToOne
+    @JoinColumn(name = "public_service_id")
+    private PublicService publicService;
 
     @Column(length = 20, nullable = false)  // ✅ 제목 20자 제한
     private String title;

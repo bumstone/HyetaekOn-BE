@@ -19,7 +19,7 @@ public class BusinessType {
     @JoinColumn(name = "public_service_id", nullable = false)
     private PublicService publicService;
 
-    // TODO: 사업체 형태 - 회원 정보
+    // 사업체 형태 - 회원 정보
     @Convert(converter = BusinessTypeConverter.class)
     private BusinessTypeEnum businessTypeEnum;
 }

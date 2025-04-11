@@ -20,16 +20,31 @@ public enum ErrorCode {
     BLACKLIST_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH-010", "사용할 수 없는 액세스 토큰입니다."),
 
     // 계정 관련
-    DUPLICATED_EMAIL(HttpStatus.CONFLICT, "ACCOUNT-001", "이미 존재하는 이메일입니다."),
-    USER_NOT_FOUND_BY_EMAIL(HttpStatus.NOT_FOUND, "ACCOUNT-002", "해당 이메일의 회원을 찾을 수 없습니다."),
+    DUPLICATED_REAL_ID(HttpStatus.CONFLICT, "ACCOUNT-001", "이미 존재하는 아이디입니다."),
+    USER_NOT_FOUND_BY_REAL_ID(HttpStatus.NOT_FOUND, "ACCOUNT-002", "해당 아이디의 회원을 찾을 수 없습니다."),
     USER_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND, "ACCOUNT-003", "해당 아이디의 회원을 찾을 수 없습니다."),
     DUPLICATED_NICKNAME(HttpStatus.CONFLICT, "ACCOUNT-004", "이미 사용 중인 닉네임입니다."),
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "ACCOUNT-005", "현재 비밀번호가 일치하지 않습니다."),
     PASSWORD_SAME_AS_OLD(HttpStatus.BAD_REQUEST, "ACCOUNT-006", "새로운 비밀번호는 현재 비밀번호와 달라야 합니다."),
     CURRENT_PASSWORD_REQUIRED(HttpStatus.BAD_REQUEST, "ACCOUNT-007", "현재 비밀번호를 입력해야 합니다."),
+    FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "AUTH-011", "잘못된 접근입니다."),
+    NOT_SUSPENDED_USER(HttpStatus.BAD_REQUEST, "ACCOUNT-008", "정지 상태가 아닌 회원입니다."),
+    INVALID_SUSPEND_TIME(HttpStatus.BAD_REQUEST, "ACCOUNT-009", "정지 기간이 유효하지 않습니다."),
+    PASSWORD_CONFIRM_MISMATCH(HttpStatus.BAD_REQUEST, "ACCOUNT-010", "새 비밀번호와 확인 비밀번호가 일치하지 않습니다."),
+
+    // 북마크
+    BOOKMARK_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "BOOKMARK-001", "북마크한 유저를 찾을 수 없습니다."),
+    BOOKMARK_ALREADY_EXISTS(HttpStatus.CONFLICT, "BOOKMARK-002", "이미 북마크한 서비스입니다."),
+    BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND, "BOOKMARK-003", "북마크 정보를 찾을 수 없습니다."),
+
+    // 좋아요
+    RECOMMEND_ALREADY_EXISTS(HttpStatus.CONFLICT, "RECOMMEND-001", "이미 좋아요를 누른 게시글입니다."),
+    RECOMMEND_NOT_FOUND(HttpStatus.NOT_FOUND, "RECOMMEND-002", "좋아요 정보를 찾을 수 없습니다."),
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST-001", "해당 게시글을 찾을 수 없습니다."),
 
     // 관심사 선택 제한
     INTEREST_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "INTEREST-001", "관심사는 최대 6개까지만 등록 가능합니다."),
+    INVALID_INTEREST(HttpStatus.BAD_REQUEST, "INTEREST-002", "유효하지 않은 관심사입니다."),
 
     // 공공서비스
     // 유효 JACODE 확인

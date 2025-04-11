@@ -16,21 +16,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PublicServiceDetailDataDto {
-    private Response response;
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-    public static class Response {
-        private List<Data> data;
-        private long totalCount;
-        private long currentCount;
-        private long matchCount;
-        private long page;
-        private long perPage;
-    }
+    private List<Data> data;
+    private long totalCount;
+    private long currentCount;
+    private long matchCount;
+    private long page;
+    private long perPage;
 
     @Getter
     @NoArgsConstructor
@@ -40,6 +31,9 @@ public class PublicServiceDetailDataDto {
     public static class Data {
         @JsonProperty("서비스ID")
         private long serviceId;
+
+        @JsonProperty("서비스명")
+        private String serviceName;
 
         @JsonProperty("서비스목적")
         private String servicePurpose;
@@ -59,8 +53,11 @@ public class PublicServiceDetailDataDto {
         @JsonProperty("신청방법")
         private String applicationMethod;
 
-        @JsonProperty("구비서류")
-        private String requiredDocuments;
+        @JsonProperty("신청기한")
+        private String applicationDeadline;
+
+        /*@JsonProperty("구비서류")
+        private String requiredDocuments;*/
 
         @JsonProperty("문의처")
         private String contactInfo;
@@ -68,7 +65,10 @@ public class PublicServiceDetailDataDto {
         @JsonProperty("온라인신청사이트URL")
         private String onlineApplicationUrl;
 
-        @JsonProperty("법령")
-        private String relatedLaws;
+        @JsonProperty("소관기관명")
+        private String governingAgency;
+
+        /*@JsonProperty("법령")
+        private String relatedLaws;*/
     }
 }

@@ -1,5 +1,6 @@
 package com.hyetaekon.hyetaekon.publicservice.entity;
 
+import com.hyetaekon.hyetaekon.bookmark.entity.Bookmark;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +14,6 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "public_service")
 public class PublicService {
     @Id
     private Long id;
@@ -21,7 +21,7 @@ public class PublicService {
     @Column(name = "service_name", nullable = false, length = 255)
     private String serviceName;  // 서비스명
 
-    // TODO: 서비스 분야 - 카테고리 + 해시태그
+    // 서비스 분야 - 카테고리 + 해시태그
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ServiceCategory serviceCategory;   // 서비스 분야
@@ -134,14 +134,18 @@ public class PublicService {
     @Builder.Default
     private List<BusinessType> businessTypes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "publicService", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Bookmark> bookmarks = new ArrayList<>();
 
-    public void updateBookmarkCntUp() {
+    public void increaseBookmarkCount() {
         bookmarkCnt++;
     }
 
-    public void updateBookmarkCntDown() {
+    public void decreaseBookmarkCount() {
         bookmarkCnt--;
     }
 
     public void updateViewsUp() { views++; }
+
 }

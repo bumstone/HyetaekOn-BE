@@ -15,21 +15,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PublicServiceConditionsDataDto {
-    private Response response;
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-    public static class Response {
-        private List<Data> data;
-        private long totalCount;
-        private long currentCount;
-        private long matchCount;
-        private long page;
-        private long perPage;
-    }
+    private List<Data> data;
+    private long totalCount;
+    private long currentCount;
+    private long matchCount;
+    private long page;
+    private long perPage;
 
     @Getter
     @NoArgsConstructor
@@ -72,7 +63,7 @@ public class PublicServiceConditionsDataDto {
         private String JA0330;  // 질병/질환자
 
         // Family Type
-        private String JA0410;  // 해당사항 없음
+        // private String JA0410;  // 해당사항 없음
         private String JA0411;  // 다자녀가구
         private String JA0412;  // 무주택세대
         private String JA0413;  // 신규전입
