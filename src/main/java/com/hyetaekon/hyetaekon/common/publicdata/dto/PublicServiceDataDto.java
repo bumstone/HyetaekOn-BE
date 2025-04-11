@@ -15,21 +15,12 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PublicServiceDataDto {
-    private Response response;
-
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Builder
-    @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
-    public static class Response {
-        private List<Data> data;
-        private long totalCount;
-        private long currentCount;
-        private long matchCount;
-        private long page;
-        private long perPage;
-    }
+    private List<Data> data;
+    private long totalCount;
+    private long currentCount;
+    private long matchCount;
+    private long page;
+    private long perPage;
 
     @Getter
     @NoArgsConstructor
@@ -49,7 +40,7 @@ public class PublicServiceDataDto {
         @JsonProperty("서비스목적요약")
         private String summaryPurpose;
 
-        @JsonProperty("소관기관명")
+        /*@JsonProperty("소관기관명")
         private String governingAgency;
 
         @JsonProperty("부서명")
@@ -59,6 +50,6 @@ public class PublicServiceDataDto {
         private String userType;
 
         @JsonProperty("신청기한")
-        private String applicationDeadline;
+        private String applicationDeadline;*/
     }
 }

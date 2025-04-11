@@ -10,22 +10,22 @@ import com.hyetaekon.hyetaekon.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.NoSuchElementException;
 
 @Component
 @RequiredArgsConstructor
 public class PublicServiceValidate {
     public final PublicServiceRepository publicServiceRepository;
+    public final UserRepository userRepository;
 
     public PublicService validateServiceById(Long serviceId) {
         return publicServiceRepository.findById(serviceId)
             .orElseThrow(() -> new GlobalException(ErrorCode.SERVICE_NOT_FOUND_BY_ID));
     }
 
-    /*public User validateUserById(Long userId) {
+    public User validateUserById(Long userId) {
         return userRepository.findById(userId)
             .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND_BY_ID));
-    }*/
+    }
 
     public ServiceCategory validateServiceCategory(String categoryName) {
         try {

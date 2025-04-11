@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum FamilyTypeEnum implements CodeEnum {
-    IS_NOT_APPLICABLE("해당사항 없음", "JA0410"),
+    // IS_NOT_APPLICABLE("해당사항 없음", "JA0410"),
     IS_MULTI_CHILDREN_FAMILY("다자녀가구", "JA0411"),
     IS_NON_HOUSING_HOUSEHOLD("무주택세대", "JA0412"),
     IS_NEW_RESIDENCE("신규전입", "JA0413"),

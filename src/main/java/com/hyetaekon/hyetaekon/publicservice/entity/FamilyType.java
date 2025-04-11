@@ -19,7 +19,7 @@ public class FamilyType {
     @JoinColumn(name = "public_service_id", nullable = false)
     private PublicService publicService;
 
-    // TODO: 가구 형태 - 검색 + 해시태그
+    // 가구 형태 - 검색 + 해시태그
     @Convert(converter = FamilyTypeConverter.class)
     private FamilyTypeEnum familyTypeEnum;
 }

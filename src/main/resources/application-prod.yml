@@ -1,11 +1,12 @@
-#spring:
-#  data:
-#    redis:
-#      password: ${REDIS_PASSWORD:}
-#
-#app:
-#  front-url: https://hyetaek-on.site
-#
-#jwt:
-#  access-expired: 1800 # 30분
-#  refresh-expired: 432000 # 5일
+spring:
+  datasource:
+    url: ${MYSQL_PROD_URL}  # MySQL 데이터베이스 URL
+  data:
+    redis:
+      host: hyetaekon-redis
+      password: ${REDIS_PASSWORD}
+
+
+jwt:
+  access-expired: 1800 # 30분
+  refresh-expired: 432000 # 5일
