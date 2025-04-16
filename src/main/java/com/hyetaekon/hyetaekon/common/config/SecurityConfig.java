@@ -72,8 +72,8 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
     configuration.addAllowedOrigin("http://localhost:3000"); // 개발 환경
-    configuration.addAllowedOrigin("https://hyetaek-on.site"); // 혜택온 도메인
-    configuration.addAllowedOrigin("https://www.hyetaek-on.site");
+    configuration.addAllowedOrigin("https://hyetaek-on.co.kr"); // 혜택온 도메인
+    configuration.addAllowedOrigin("https://www.hyetaek-on.co.kr");
     configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
     configuration.addAllowedHeader("*"); // 모든 헤더 허용
     configuration.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type"));
