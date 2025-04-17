@@ -16,14 +16,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PublicServiceRepository extends JpaRepository<PublicService, Long> {
+public interface PublicServiceRepository extends JpaRepository<PublicService, String> {
     Page<PublicService> findByServiceCategory(ServiceCategory category, Pageable pageable);
 
     List<PublicService> findTop6ByOrderByBookmarkCntDesc();
 
-    Optional<PublicService> findById(long serviceId);
+    Optional<PublicService> findById(String serviceId);
 
-    int deleteByIdNotIn(List<Long> Ids);
+    int deleteByIdNotIn(List<String> Ids);
 
     @Query("SELECT DISTINCT ps FROM PublicService ps " +
         "LEFT JOIN ps.specialGroups sg " +

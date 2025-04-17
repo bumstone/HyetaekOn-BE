@@ -29,7 +29,7 @@ public class PublicServiceConditionsDataDto {
     @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
     public static class Data {
         @JsonProperty("서비스ID")
-        private long serviceId;
+        private String serviceId;
 
         @JsonProperty("JA0101")
         private String targetGenderMale;

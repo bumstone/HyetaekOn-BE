@@ -13,6 +13,8 @@ public enum UserInterestEnum {
     HEALTH_MEDICAL("보건·의료", "관심주제"),
     CULTURE_ENVIRONMENT("문화·환경", "관심주제"),
     LIFE_STABILITY("생활안정", "관심주제"),
+    PROTECTION_CARE("보호·돌봄", "관심주제"),  // 새로 추가된 카테고리
+    OTHER("기타", "관심주제"),
 
     // SpecialGroup 관련 관심사
     IS_MULTI_CULTURAL("다문화가족", "가구형태"),
