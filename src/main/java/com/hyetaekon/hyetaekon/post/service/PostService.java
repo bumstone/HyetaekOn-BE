@@ -47,13 +47,18 @@ public class PostService {
 
     public PostDto updatePost(Long id, PostDto postDto) {
         Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
         User user = new User();
         user.setId(postDto.getUserId());
         post.setUser(user);
 
-        PublicService publicService = new PublicService();
-        publicService.setId(postDto.getPublicServiceId());
-        post.setPublicService(publicService);
+        if (postDto.getPublicServiceId() != null) {
+            PublicService publicService = new PublicService();
+            publicService.setId(postDto.getPublicServiceId()); // String 타입으로 변환됨
+            post.setPublicService(publicService);
+        } else {
+            post.setPublicService(null);
+        }
 
         post.setTitle(postDto.getTitle());
         post.setContent(postDto.getContent());

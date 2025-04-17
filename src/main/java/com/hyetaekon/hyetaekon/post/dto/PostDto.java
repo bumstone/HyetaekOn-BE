@@ -10,7 +10,7 @@ import java.util.List;
 public class PostDto {
     private Long id;
     private Long userId;
-    private Long publicServiceId;
+    private String publicServiceId;
     private String title;
     private String content;
     private LocalDateTime createdAt;
