@@ -12,6 +12,7 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PublicServiceMapper {
     @Mapping(source = "id", target = "publicServiceId")
+    @Mapping(target = "serviceCategory", expression = "java(publicService.getServiceCategory().getType())")
     PublicServiceListResponseDto toListDto(PublicService publicService);
 
     @Mapping(source = "id", target = "publicServiceId")
