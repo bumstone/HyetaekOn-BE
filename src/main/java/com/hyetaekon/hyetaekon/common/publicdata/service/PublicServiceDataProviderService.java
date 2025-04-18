@@ -33,24 +33,31 @@ public class PublicServiceDataProviderService {
         List<SpecialGroup> specialGroups = new ArrayList<>();
 
         if ("Y".equals(data.getJA0401())) {
+            log.debug("다문화가족 특수 그룹 추가");
             specialGroups.add(createSpecialGroup(publicService, SpecialGroupEnum.IS_MULTI_CULTURAL));
         }
         if ("Y".equals(data.getJA0402())) {
+            log.debug("북한이탈주민 특수 그룹 추가");
             specialGroups.add(createSpecialGroup(publicService, SpecialGroupEnum.IS_NORTH_KOREAN_DEFECTOR));
         }
         if ("Y".equals(data.getJA0403())) {
+            log.debug("한부모가정/조손가정 특수 그룹 추가");
             specialGroups.add(createSpecialGroup(publicService, SpecialGroupEnum.IS_SINGLE_PARENT_FAMILY));
         }
         if ("Y".equals(data.getJA0404())) {
+            log.debug("1인가구 특수 그룹 추가");
             specialGroups.add(createSpecialGroup(publicService, SpecialGroupEnum.IS_SINGLE_MEMBER_HOUSEHOLD));
         }
         if ("Y".equals(data.getJA0328())) {
+            log.debug("장애인 특수 그룹 추가");
             specialGroups.add(createSpecialGroup(publicService, SpecialGroupEnum.IS_DISABLED));
         }
         if ("Y".equals(data.getJA0329())) {
+            log.debug("국가보훈대상자 특수 그룹 추가");
             specialGroups.add(createSpecialGroup(publicService, SpecialGroupEnum.IS_NATIONAL_MERIT_RECIPIENT));
         }
         if ("Y".equals(data.getJA0330())) {
+            log.debug("질병/질환자 특수 그룹 추가");
             specialGroups.add(createSpecialGroup(publicService, SpecialGroupEnum.IS_CHRONIC_ILLNESS));
         }
 

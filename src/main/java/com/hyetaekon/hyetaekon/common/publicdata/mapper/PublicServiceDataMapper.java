@@ -30,6 +30,8 @@ public interface PublicServiceDataMapper {
     PublicService updateFromDetailData(@MappingTarget PublicService publicService, PublicServiceDetailDataDto.Data data);
 
     // 공공서비스 지원조건 데이터 매핑
+    @Mapping(target = "targetGenderMale", source = "targetGenderMale")
+    @Mapping(target = "targetGenderFemale", source = "targetGenderFemale")
     @Mapping(target = "incomeLevel", expression = "java(mapIncomeLevel(data))")
     PublicService updateFromConditionsData(@MappingTarget PublicService publicService, PublicServiceConditionsDataDto.Data data);
 

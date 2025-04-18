@@ -35,7 +35,7 @@ public class PublicServiceHandler {
     private final BookmarkRepository bookmarkRepository;
 
     // 서비스분야별 서비스목록 조회(페이지)
-    public Page<PublicServiceListResponseDto> getServicesByCategory(ServiceCategory category, Pageable pageable, Long userId) {
+    /*public Page<PublicServiceListResponseDto> getServicesByCategory(ServiceCategory category, Pageable pageable, Long userId) {
         Page<PublicService> services = publicServiceRepository.findByServiceCategory(category, pageable);
 
         return services.map(service -> {
@@ -46,7 +46,7 @@ public class PublicServiceHandler {
             }
             return dto;
         });
-    }
+    }*/
 
     // 서비스 상세 조회
     @Transactional
@@ -99,18 +99,17 @@ public class PublicServiceHandler {
         Long userId) {
 
         // 정렬 기준 설정 (기본값: 가나다순)
-        Sort.Direction direction = Sort.Direction.ASC;
-        String sortField = "serviceName";
+        Sort sorts = Sort.by(Sort.Order.asc("serviceName"));
 
         if (sort != null) {
             switch (sort.toLowerCase()) {
                 case "bookmark":
-                    sortField = "bookmarkCnt";
-                    direction = Sort.Direction.DESC;
+                    // 북마크 수 기준 내림차순 정렬, 동일하면 서비스명 오름차순
+                    sorts = Sort.by(Sort.Order.desc("bookmarkCnt"), Sort.Order.asc("serviceName"));
                     break;
                 case "view":
-                    sortField = "views";
-                    direction = Sort.Direction.DESC;
+                    // 조회수 기준 내림차순 정렬, 동일하면 서비스명 오름차순
+                    sorts = Sort.by(Sort.Order.desc("views"), Sort.Order.asc("serviceName"));
                     break;
                 default:
                     // 기본 가나다순 유지
@@ -122,7 +121,7 @@ public class PublicServiceHandler {
         PageRequest pageRequest = PageRequest.of(
             pageable.getPageNumber(),
             pageable.getPageSize(),
-            Sort.by(direction, sortField)
+            sorts
         );
 
         // 필터링 조건에 따른 서비스 조회
@@ -184,7 +183,7 @@ public class PublicServiceHandler {
         });
     }
 
-  public Page<PublicServiceListResponseDto> getBookmarkedServices(Long userId, Pageable pageable) {
+    public Page<PublicServiceListResponseDto> getBookmarkedServices(Long userId, Pageable pageable) {
       Page<PublicService> bookmarkedServices = publicServiceRepository.findByBookmarks_User_Id(userId, pageable);
 
       List<PublicServiceListResponseDto> serviceDtos = bookmarkedServices.getContent().stream()
@@ -197,5 +196,5 @@ public class PublicServiceHandler {
 
       return new PageImpl<>(serviceDtos, pageable, bookmarkedServices.getTotalElements());
 
-  }
+    }
 }

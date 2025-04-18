@@ -28,10 +28,16 @@ public class PublicServiceValidate {
     }
 
     public ServiceCategory validateServiceCategory(String categoryName) {
-        try {
+        /*try {
             return ServiceCategory.valueOf(categoryName);
         } catch (IllegalArgumentException e) {
             throw new GlobalException(ErrorCode.SERVICE_CATEGORY_NOT_FOUND);
+        }*/
+        for (ServiceCategory category : ServiceCategory.values()) {
+            if (category.getType().equals(categoryName)) {
+                return category;
+            }
         }
+        throw new GlobalException(ErrorCode.SERVICE_CATEGORY_NOT_FOUND);
     }
 }
