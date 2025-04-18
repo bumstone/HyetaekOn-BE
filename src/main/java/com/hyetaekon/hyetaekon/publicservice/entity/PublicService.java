@@ -29,62 +29,62 @@ public class PublicService {
     @Column(name = "summary_purpose", columnDefinition = "TEXT")
     private String summaryPurpose;  // 서비스 목적 요약
 
-    @Column(name = "governing_agency", nullable = false, length = 100)
+    @Column(name = "governing_agency", length = 100)
     private String governingAgency;  // 소관기관명
 
-    @Column(name = "department", nullable = false, length = 100)
+    @Column(name = "department", length = 100)
     private String department;  // 부서명
 
-    @Column(name = "user_type", nullable = false, length = 50)
+    @Column(name = "user_type", length = 50)
     private String userType;  // 사용자 구분
 
 
     // 지원 대상 필드
-    @Column(name = "support_target", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "support_target", columnDefinition = "TEXT")
     private String supportTarget;  // 지원 대상
 
-    @Column(name = "selection_criteria", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "selection_criteria", columnDefinition = "TEXT")
     private String selectionCriteria;  // 선정 기준
 
 
     // 지원 관련 필드
-    @Column(name = "service_purpose", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "service_purpose", columnDefinition = "TEXT")
     private String servicePurpose;  // 서비스 목적
 
-    @Column(name = "support_detail", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "support_detail", columnDefinition = "TEXT")
     private String supportDetail;  // 지원 내용
 
-    @Column(name = "support_type", nullable = false, length = 100)
+    @Column(name = "support_type", length = 100)
     private String supportType;  // 지원 유형
 
 
     // 신청 내용 필드
-    @Column(name = "application_method", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "application_method", columnDefinition = "TEXT")
     private String applicationMethod;  // 신청 방법(상세)
 
-    @Column(name = "application_deadline", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "application_deadline", columnDefinition = "TEXT")
     private String applicationDeadline;  // 신청 기한(상세)
 
 
     // 추가정보 필드
-    @Column(name = "required_documents", columnDefinition = "TEXT")
-    private String requiredDocuments;  // 구비 서류
+//    @Column(name = "required_documents", columnDefinition = "TEXT")
+//    private String requiredDocuments;  // 구비 서류
 
-    @Column(name = "contact_info", length = 255)
+    @Column(name = "contact_info", columnDefinition = "TEXT")
     private String contactInfo;  // 문의처
 
     @Column(name = "online_application_url", columnDefinition = "TEXT")
     private String onlineApplicationUrl;  // 온라인 경로 url
 
-    @Column(name = "related_laws", columnDefinition = "TEXT")
-    private String relatedLaws;  // 관련 법률
+//    @Column(name = "related_laws", columnDefinition = "TEXT")
+//    private String relatedLaws;  // 관련 법률
 
 
     // 지원조건 필드 - 유저 정보 비교용
-    @Column(name = "target_gender_male", nullable = false)
+    @Column(name = "target_gender_male")
     private String targetGenderMale;
 
-    @Column(name = "target_gender_Female", nullable = false)
+    @Column(name = "target_gender_female")
     private String targetGenderFemale;
 
     @Column(name = "target_age_start")
@@ -118,19 +118,23 @@ public class PublicService {
     private Integer bookmarkCnt = 0;
 
 
-    @OneToMany(mappedBy = "publicService",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "publicService", cascade = {CascadeType.ALL},
+        orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<SpecialGroup> specialGroups = new ArrayList<>();
 
-    @OneToMany(mappedBy = "publicService",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "publicService", cascade = {CascadeType.ALL},
+        orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<FamilyType> familyTypes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "publicService",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "publicService", cascade = {CascadeType.ALL},
+        orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<Occupation> occupations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "publicService",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "publicService", cascade = {CascadeType.ALL},
+        orphanRemoval = true, fetch = FetchType.LAZY)
     @Builder.Default
     private List<BusinessType> businessTypes = new ArrayList<>();
 

@@ -75,28 +75,28 @@ public class PublicServiceDataValidate {
     }
 
     public boolean validatePublicServiceConditionsData(PublicServiceConditionsDataDto.Data data) {
-        // 성별 조건 확인 (필수)
+        // 성별 조건 확인
         boolean hasGenderCondition = "Y".equals(data.getTargetGenderMale()) || "Y".equals(data.getTargetGenderFemale());
 
-        // 성별 정보가 없으면 유효하지 않은 데이터로 간주
+        // 성별 조건이 없는 경우, 기본값으로 모두 Y 설정
         if (!hasGenderCondition) {
-            log.warn("⚠️ 공공 서비스 지원조건 ID {}에 성별 지원 조건이 없습니다.", data.getServiceId());
-            return false;
+            log.info("ℹ️ 공공 서비스 지원조건 ID {}에 성별 지원 조건이 없습니다. 기본값으로 남성/여성 모두 Y로 설정합니다.", data.getServiceId());
+            data.setTargetGenderMale("Y");
+            data.setTargetGenderFemale("Y");
+            // hasGenderCondition = true;
         }
 
-        // 특수 그룹 조건 확인
+        // 다른 조건들 검사 (경고만 로깅하고 실제로는 모든 데이터 허용)
         boolean hasSpecialGroupCondition =
             "Y".equals(data.getJA0401()) || "Y".equals(data.getJA0402()) ||
                 "Y".equals(data.getJA0403()) || "Y".equals(data.getJA0404()) ||
                 "Y".equals(data.getJA0328()) || "Y".equals(data.getJA0329()) ||
                 "Y".equals(data.getJA0330());
 
-        // 가족 유형 조건 확인
         boolean hasFamilyTypeCondition =
             "Y".equals(data.getJA0411()) || "Y".equals(data.getJA0412()) ||
                 "Y".equals(data.getJA0413()) || "Y".equals(data.getJA0414());
 
-        // 직업 유형 조건 확인
         boolean hasOccupationCondition =
             "Y".equals(data.getJA0313()) || "Y".equals(data.getJA0314()) ||
                 "Y".equals(data.getJA0315()) || "Y".equals(data.getJA0316()) ||
@@ -104,7 +104,6 @@ public class PublicServiceDataValidate {
                 "Y".equals(data.getJA0319()) || "Y".equals(data.getJA0320()) ||
                 "Y".equals(data.getJA0326()) || "Y".equals(data.getJA0327());
 
-        // 사업체 유형 조건 확인
         boolean hasBusinessTypeCondition =
             "Y".equals(data.getJA1101()) || "Y".equals(data.getJA1102()) ||
                 "Y".equals(data.getJA1103()) || "Y".equals(data.getJA1201()) ||
@@ -114,13 +113,13 @@ public class PublicServiceDataValidate {
                 "Y".equals(data.getJA2202()) || "Y".equals(data.getJA2203()) ||
                 "Y".equals(data.getJA2299());
 
-        // 성별 외에 다른 지원 조건이 하나라도 있어야 함
         if (!(hasSpecialGroupCondition || hasFamilyTypeCondition ||
             hasOccupationCondition || hasBusinessTypeCondition)) {
             log.warn("⚠️ 공공 서비스 지원조건 ID {}에 성별 외 다른 지원 조건이 없습니다.", data.getServiceId());
-            return false;
+            // 경고만 로깅하고 데이터는 허용
         }
 
+        // 항상 true 반환하여 모든 데이터 허용
         return true;
     }
 

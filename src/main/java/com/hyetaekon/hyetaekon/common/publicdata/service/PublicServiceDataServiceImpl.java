@@ -8,11 +8,13 @@ import com.hyetaekon.hyetaekon.common.publicdata.util.PublicDataPath;
 import com.hyetaekon.hyetaekon.common.publicdata.util.PublicServiceDataValidate;
 import com.hyetaekon.hyetaekon.publicservice.entity.*;
 import com.hyetaekon.hyetaekon.publicservice.repository.PublicServiceRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.web.client.RestTemplate;
 
 
@@ -305,7 +307,7 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
     /**
      * 공공서비스 지원조건 데이터 저장 (배치 처리)
      */
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public List<PublicServiceConditionsDataDto.Data> upsertSupportConditionsData(List<PublicServiceConditionsDataDto.Data> dataList) {
         List<PublicServiceConditionsDataDto.Data> validatedData = new ArrayList<>();
         List<PublicService> entitiesToSave = new ArrayList<>();

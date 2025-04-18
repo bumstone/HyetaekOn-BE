@@ -32,11 +32,11 @@ public class PublicServiceDataScheduler {
 
             // 2. 공공서비스 상세정보 동기화
             log.info("2. 공공서비스 상세정보 동기화 시작");
-            publicServiceDataService.syncPublicServiceDetailData(PublicDataPath.SERVICE_DETAIL_LIST);
+            publicServiceDataService.syncPublicServiceDetailData(PublicDataPath.SERVICE_DETAIL);
 
             // 3. 공공서비스 지원조건 동기화
             log.info("3. 공공서비스 지원조건 동기화 시작");
-            publicServiceDataService.syncPublicServiceConditionsData(PublicDataPath.SERVICE_CONDITIONS_LIST);
+            publicServiceDataService.syncPublicServiceConditionsData(PublicDataPath.SERVICE_CONDITIONS);
 
             // 4. 미사용 데이터 정리
             log.info("미사용 공공서비스 데이터 정리 시작");

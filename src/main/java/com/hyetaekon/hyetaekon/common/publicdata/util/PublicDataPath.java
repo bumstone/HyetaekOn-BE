@@ -7,8 +7,8 @@ import lombok.Getter;
 @Getter
 public enum PublicDataPath {
     SERVICE_LIST("/serviceList"),
-    SERVICE_DETAIL_LIST("/serviceDetailList"),
-    SERVICE_CONDITIONS_LIST("/supportConditionsList");
+    SERVICE_DETAIL("/serviceDetail"),
+    SERVICE_CONDITIONS("/supportConditions");
 
     private final String path;
 }
