@@ -1,8 +1,7 @@
 package com.hyetaekon.hyetaekon.post.controller;
 
-import com.hyetaekon.hyetaekon.post.dto.PostDetailReponseDto;
-import com.hyetaekon.hyetaekon.post.dto.PostDto;
-import com.hyetaekon.hyetaekon.post.dto.PostListResponseDto;
+import com.hyetaekon.hyetaekon.common.jwt.CustomUserDetails;
+import com.hyetaekon.hyetaekon.post.dto.*;
 import com.hyetaekon.hyetaekon.post.entity.PostType;
 import com.hyetaekon.hyetaekon.post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -39,29 +39,37 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
-    // ✅ 특정 게시글 조회
+    // User, Admin에 따라 다른 접근 가능
+    // ✅ 특정 게시글 상세 조회
     @GetMapping("/{postId}")
-    public ResponseEntity<PostDetailReponseDto> getPost(@PathVariable Long postId) {
-        return ResponseEntity.ok(postService.getPostById(postId));
+    public ResponseEntity<PostDetailReponseDto> getPost(
+        @PathVariable Long postId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(postService.getPostById(postId, userDetails.getId()));
     }
 
-    // User, Admin에 따라 다른 접근 가능
     // ✅ 게시글 생성
     @PostMapping
-    public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto) {
-        return ResponseEntity.ok(postService.createPost(postDto));
+    public ResponseEntity<PostDetailReponseDto> createPost(
+        @RequestBody PostCreateRequestDto requestDto,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(postService.createPost(requestDto, userDetails.getId()));
     }
 
-    // ✅ 게시글 수정
+    // ✅ 게시글 수정 - 본인
     @PutMapping("/{postId}")
-    public ResponseEntity<PostDto> updatePost(@PathVariable Long postId, @RequestBody PostDto postDto) {
-        return ResponseEntity.ok(postService.updatePost(postId, postDto));
+    public ResponseEntity<PostDetailReponseDto> updatePost(
+        @PathVariable Long postId,
+        @RequestBody PostUpdateRequestDto updateDto,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(postService.updatePost(postId, updateDto, userDetails.getId()));
     }
 
-    // ✅ 게시글 삭제 (soft delete 방식 사용 가능)
+    // ✅ 게시글 삭제 (soft delete 방식 사용 가능) - 본인 혹은 관리자
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
-        postService.deletePost(postId);
+    public ResponseEntity<Void> deletePost(
+        @PathVariable Long postId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        postService.deletePost(postId, userDetails.getId(), userDetails.getRole());
         return ResponseEntity.noContent().build();
     }
 }

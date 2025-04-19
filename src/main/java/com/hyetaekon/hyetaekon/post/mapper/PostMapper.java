@@ -1,57 +1,50 @@
 package com.hyetaekon.hyetaekon.post.mapper;
 
-import com.hyetaekon.hyetaekon.post.dto.PostDto;
+import com.hyetaekon.hyetaekon.post.dto.*;
 import com.hyetaekon.hyetaekon.post.entity.Post;
 import com.hyetaekon.hyetaekon.post.entity.PostImage;
 import com.hyetaekon.hyetaekon.post.entity.PostType;
 import com.hyetaekon.hyetaekon.publicservice.entity.PublicService;
 import com.hyetaekon.hyetaekon.user.entity.User;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PostMapper {
 
-    @Mapping(target = "imageUrls", expression = "java(mapPostImages(post))")
-    @Mapping(target = "postType", expression = "java(post.getPostType() != null ? post.getPostType().name() : null)")
-    PostDto toDto(Post post);
+    // Post -> PostListResponseDto 변환
+    @Mapping(source = "id", target = "postId")
+    @Mapping(source = "user.nickname", target = "nickName")
+    @Mapping(source = "postType.koreanName", target = "postType")
+    PostListResponseDto toPostListDto(Post post);
 
-    default Post toEntity(PostDto dto) {
-        Post post = new Post();
-        // 👇 User 객체 세팅
-        User user = new User();
-        user.setId(dto.getUserId());
-        post.setUser(user);
+    // Post -> PostDetailResponseDto 변환
+    @Mapping(source = "id", target = "postId")
+    @Mapping(source = "user.nickname", target = "nickName")
+    @Mapping(source = "postType.koreanName", target = "postType")
+    @Mapping(target = "imageUrls", expression = "java(mapImageUrls(post.getPostImages()))")
+    PostDetailReponseDto toPostDetailDto(Post post);
 
-        // 👇 PublicService 객체 세팅
-        PublicService publicService = new PublicService();
-        publicService.setId(dto.getPublicServiceId());
-        post.setPublicService(publicService);
-        post.setTitle(dto.getTitle());
-        post.setContent(dto.getContent());
-        post.setPostType(dto.getPostType() != null ? PostType.valueOf(dto.getPostType()) : null);
-        post.setServiceUrl(dto.getServiceUrl());
-        post.setUrlTitle(dto.getUrlTitle());
-        post.setUrlPath(dto.getUrlPath());
-        post.setTags(dto.getTags());
-        post.setCategoryId(dto.getCategoryId());
+    // PostCreateRequestDto -> Post 변환 (새 게시글 생성)
+    @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
+    Post toEntity(PostCreateRequestDto createDto);
 
-        if (dto.getImageUrls() != null) {
-            List<PostImage> images = dto.getImageUrls().stream()
-                    .map(url -> {
-                        PostImage img = new PostImage();
-                        img.setImageUrl(url);
-                        img.setPost(post);
-                        return img;
-                    }).collect(Collectors.toList());
-            post.setPostImages(images);
+    // 이미지 URL 목록 매핑을 위한 기본 메서드
+    default List<String> mapImageUrls(List<com.hyetaekon.hyetaekon.post.entity.PostImage> postImages) {
+        if (postImages == null) {
+            return java.util.Collections.emptyList();
         }
-
-        return post;
+        return postImages.stream()
+            .map(com.hyetaekon.hyetaekon.post.entity.PostImage::getImageUrl)
+            .filter(java.util.Objects::nonNull)
+            .collect(java.util.stream.Collectors.toList());
     }
+
+    // PostUpdateRequestDto로 Post 업데이트
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updatePostFromDto(PostUpdateRequestDto updateDto, @MappingTarget Post post);
 
     default List<String> mapPostImages(Post post) {
         if (post.getPostImages() == null) return null;
