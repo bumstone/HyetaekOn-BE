@@ -23,7 +23,7 @@ public class PublicService {
 
     // 서비스 분야 - 카테고리 + 해시태그
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "public_category", nullable = false)
     private ServiceCategory serviceCategory;   // 서비스 분야
 
     @Column(name = "summary_purpose", columnDefinition = "TEXT")

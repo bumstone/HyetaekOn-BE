@@ -3,14 +3,18 @@ package com.hyetaekon.hyetaekon.post.entity;
 import com.hyetaekon.hyetaekon.publicservice.entity.PublicService;
 import com.hyetaekon.hyetaekon.user.entity.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "post")
 public class Post {
 
@@ -26,10 +30,10 @@ public class Post {
     @JoinColumn(name = "public_service_id")
     private PublicService publicService;
 
-    @Column(length = 20, nullable = false)  // ✅ 제목 20자 제한
+    @Column(length = 50, nullable = false)  // ✅ 제목 25자 제한
     private String title;
 
-    @Column(length = 500, nullable = false)  // ✅ 내용 500자 제한
+    @Column(columnDefinition = "VARCHAR(500) CHARACTER SET utf8mb4", nullable = false)  // ✅ 내용 500자 제한
     private String content;
 
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -38,15 +42,18 @@ public class Post {
 
     private int recommendCnt;  // 추천수
 
-    private int viewCount;  // 조회수
+    private int viewCnt;  // 조회수
 
-    @Column(name = "post_type")
+    // TODO: 댓글 생성/수정 시 업데이트
+    private int commentCnt;   // 댓글수
+
+    @Column(name = "post_type", nullable = false)
     @Enumerated(EnumType.STRING)  // ✅ ENUM 타입으로 저장 (질문, 자유, 인사)
     private PostType postType;
 
     private String serviceUrl;
 
-    @Column(length = 12)  // ✅ 관련 링크 제목 12자 제한
+    @Column(length = 100)
     private String urlTitle;
 
     private String urlPath;
@@ -57,6 +64,15 @@ public class Post {
     @Column(name = "category_id")
     private Long categoryId;
 
+    @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PostImage> postImages;  // ✅ 게시글 이미지와 연결
+    private List<PostImage> postImages = new ArrayList<>();  // ✅ 게시글 이미지와 연결
+
+    public void incrementCommentCnt() {
+        this.commentCnt++;
+    }
+
+    public void decrementCommentCnt() {
+        this.commentCnt = Math.max(0, this.commentCnt - 1);
+    }
 }
