@@ -1,10 +1,8 @@
 package com.hyetaekon.hyetaekon.recommend.service;
 
-import com.hyetaekon.hyetaekon.bookmark.entity.Bookmark;
 import com.hyetaekon.hyetaekon.common.exception.GlobalException;
 import com.hyetaekon.hyetaekon.post.entity.Post;
 import com.hyetaekon.hyetaekon.post.repository.PostRepository;
-import com.hyetaekon.hyetaekon.publicservice.entity.PublicService;
 import com.hyetaekon.hyetaekon.recommend.entity.Recommend;
 import com.hyetaekon.hyetaekon.recommend.repository.RecommendRepository;
 import com.hyetaekon.hyetaekon.user.entity.User;
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.hyetaekon.hyetaekon.common.exception.ErrorCode.*;
-import static com.hyetaekon.hyetaekon.common.exception.ErrorCode.BOOKMARK_NOT_FOUND;
 
 @Service
 @Transactional
