@@ -105,23 +105,11 @@ public class UserController {
 //    @GetMapping("/me/posts")
 //    @PreAuthorize("hasRole('USER')")
 //    public ResponseEntity<ApiResponseDto<Page<PostResponseDto>>> getMyPosts(
-//        @RequestParam(required = false) String postType,
-//        @RequestParam(defaultValue = "0") int page,
-//        @RequestParam(defaultValue = "10") int size) {
+//        @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
+  //      @RequestParam(name = "size", defaultValue = "5") @Positive @Max(30) int size,
+  //      @AuthenticationPrincipal CustomUserDetails userDetails) {
 //        Page<PostResponseDto> posts = userService.getMyPosts(postType, PageRequest.of(page, size));
 //        return ResponseEntity.ok(ApiResponseDto.success(posts));
-//    }
-//
-    /**
-     * 작성한 댓글 목록 조회
-     */
-//    @GetMapping("/me/comments")
-//    @PreAuthorize("hasRole('USER')")
-//    public ResponseEntity<ApiResponseDto<Page<CommentResponseDto>>> getMyComments(
-//        @RequestParam(defaultValue = "0") int page,
-//        @RequestParam(defaultValue = "10") int size) {
-//        Page<CommentResponseDto> comments = userService.getMyComments(PageRequest.of(page, size));
-//        return ResponseEntity.ok(ApiResponseDto.success(comments));
 //    }
 
 
