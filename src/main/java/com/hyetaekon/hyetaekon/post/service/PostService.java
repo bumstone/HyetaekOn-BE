@@ -66,7 +66,7 @@ public class PostService {
         post.setDeletedAt(postDto.getDeletedAt());
         post.setServiceUrl(postDto.getServiceUrl());
         post.setRecommendCnt(postDto.getRecommendCnt());
-        post.setViewCount(postDto.getViewCount());
+        post.setViewCnt(postDto.getViewCnt());
         post.setUrlTitle(postDto.getUrlTitle());
         post.setUrlPath(postDto.getUrlPath());
         post.setTags(postDto.getTags());
