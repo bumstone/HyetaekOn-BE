@@ -1,6 +1,7 @@
 package com.hyetaekon.hyetaekon.post.dto;
 
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,5 +20,5 @@ public class PostCreateRequestDto {
     private String urlTitle;
     private String urlPath;
     private String tags;
-    private List<String> imageUrls; // ✅ 이미지 URL 리스트
+    private List<MultipartFile> images;  // 이미지 파일
 }

@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostDetailReponseDto {
+public class PostDetailResponseDto {
     private Long postId;
     private Long nickName;  // 작성자 닉네임
     private String title;

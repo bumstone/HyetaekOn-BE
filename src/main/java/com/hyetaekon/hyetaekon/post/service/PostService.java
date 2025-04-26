@@ -1,10 +1,14 @@
 package com.hyetaekon.hyetaekon.post.service;
 
+import com.hyetaekon.hyetaekon.common.exception.GlobalException;
+import com.hyetaekon.hyetaekon.common.s3bucket.service.S3BucketService;
 import com.hyetaekon.hyetaekon.post.dto.*;
 import com.hyetaekon.hyetaekon.post.entity.Post;
 import com.hyetaekon.hyetaekon.post.entity.PostImage;
 import com.hyetaekon.hyetaekon.post.entity.PostType;
+import com.hyetaekon.hyetaekon.post.mapper.PostImageMapper;
 import com.hyetaekon.hyetaekon.post.mapper.PostMapper;
+import com.hyetaekon.hyetaekon.post.repository.PostImageRepository;
 import com.hyetaekon.hyetaekon.post.repository.PostRepository;
 import com.hyetaekon.hyetaekon.recommend.repository.RecommendRepository;
 import com.hyetaekon.hyetaekon.user.entity.User;
@@ -18,10 +22,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
+
+import static com.hyetaekon.hyetaekon.common.exception.ErrorCode.*;
 
 @Slf4j
 @Service
@@ -29,9 +37,21 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final PostImageRepository postImageRepository;
     private final UserRepository userRepository;
     private final RecommendRepository recommendRepository;
     private final PostMapper postMapper;
+    private final PostImageMapper postImageMapper;
+    private final S3BucketService s3BucketService;
+
+    // 이미지 업로드 제한 설정
+    private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    private static final int MAX_FILES_COUNT = 5; // 최대 5개 이미지
+    private static final Set<String> ALLOWED_TYPES = Set.of(
+        "image/jpeg",
+        "image/png",
+        "image/gif"
+    );
 
     /**
      * 전체 게시글 목록 조회 (페이징)
@@ -53,7 +73,7 @@ public class PostService {
      * 특정 게시글 상세 조회(로그인 시)
      */
     @Transactional
-    public PostDetailReponseDto getPostById(Long postId, Long userId) {
+    public PostDetailResponseDto getPostById(Long postId, Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + userId));
 
@@ -67,17 +87,17 @@ public class PostService {
         boolean recommended = recommendRepository.existsByUserIdAndPostId(userId, postId);
 
         // DTO 변환 및 추천 여부 설정
-        PostDetailReponseDto responseDto = postMapper.toPostDetailDto(post);
-        responseDto.setRecommended(recommended); // DTO에 isRecommended 필드 추가 필요
+        PostDetailResponseDto responseDto = postMapper.toPostDetailDto(post);
+        responseDto.setRecommended(recommended);
 
-        return postMapper.toPostDetailDto(post);
+        return responseDto;
     }
 
     /**
      * 게시글 생성(로그인 시)
      */
     @Transactional
-    public PostDetailReponseDto createPost(PostCreateRequestDto requestDto, Long userId) {
+    public PostDetailResponseDto createPost(PostCreateRequestDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + userId));
 
@@ -89,22 +109,17 @@ public class PostService {
         post.setUser(user);
         post.setPostType(postType);
 
-        // 이미지 URL 처리
-        if (requestDto.getImageUrls() != null && !requestDto.getImageUrls().isEmpty()) {
-            List<PostImage> postImages = new ArrayList<>();
+        // 게시글 저장
+        Post savedPost = postRepository.save(post);
 
-            for (String imageUrl : requestDto.getImageUrls()) {
-                PostImage postImage = PostImage.builder()
-                    .post(post)
-                    .imageUrl(imageUrl)
-                    .build();
-                postImages.add(postImage);
+        // 이미지 처리
+        if (requestDto.getImages() != null && !requestDto.getImages().isEmpty()) {
+            List<PostImage> postImages = processPostImages(requestDto.getImages(), savedPost);
+            if (!postImages.isEmpty()) {
+                postImageRepository.saveAll(postImages);
             }
-
-            post.setPostImages(postImages);
         }
 
-        Post savedPost = postRepository.save(post);
         return postMapper.toPostDetailDto(savedPost);
     }
 
@@ -112,7 +127,7 @@ public class PostService {
      * 게시글 수정 (본인만 가능)
      */
     @Transactional
-    public PostDetailReponseDto updatePost(Long postId, PostUpdateRequestDto updateDto, Long userId) {
+    public PostDetailResponseDto updatePost(Long postId, PostUpdateRequestDto updateDto, Long userId) {
         Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
             .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다: " + postId));
 
@@ -131,19 +146,18 @@ public class PostService {
         postMapper.updatePostFromDto(updateDto, post);
 
         // 이미지 업데이트 처리
-        if (updateDto.getImageUrls() != null) {
-            // 기존 이미지 제거
-            post.getPostImages().clear();
+        if (updateDto.getImages() != null && !updateDto.getImages().isEmpty()) {
+            // 기존 이미지 soft delete 처리
+            List<PostImage> existingImages = postImageRepository.findByPostAndDeletedAtIsNull(post);
+            for (PostImage image : existingImages) {
+                image.softDelete();
+            }
 
             // 새 이미지 추가
-            List<PostImage> postImages = updateDto.getImageUrls().stream()
-                .map(imageUrl -> PostImage.builder()
-                    .post(post)
-                    .imageUrl(imageUrl)
-                    .build())
-                .collect(Collectors.toList());
-
-            post.getPostImages().addAll(postImages);
+            List<PostImage> newImages = processPostImages(updateDto.getImages(), post);
+            if (!newImages.isEmpty()) {
+                postImageRepository.saveAll(newImages);
+            }
         }
 
         return postMapper.toPostDetailDto(post);
@@ -167,26 +181,75 @@ public class PostService {
 
         // Soft Delete 처리
         post.setDeletedAt(LocalDateTime.now());
+
+        // 모든 이미지 soft delete 처리
+        List<PostImage> images = postImageRepository.findByPostAndDeletedAtIsNull(post);
+        for (PostImage image : images) {
+            image.softDelete();
+        }
+    }
+
+    /**
+     * 이미지 처리를 위한 private 메서드
+     */
+    private List<PostImage> processPostImages(List<MultipartFile> images, Post post) {
+        if (images == null || images.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // 이미지 유효성 검증
+        validateImages(images);
+
+        // 이미지 업로드 및 엔티티 변환
+        try {
+            List<String> uploadedUrls = s3BucketService.upload(images, "posts/" + post.getId());
+            return postImageMapper.toEntityList(uploadedUrls, post);
+        } catch (Exception e) {
+            log.error("이미지 업로드 실패: ", e);
+            throw new GlobalException(FILE_UPLOAD_FAILED);
+        }
+    }
+
+    /**
+     * 이미지 유효성 검증
+     */
+    private void validateImages(List<MultipartFile> images) {
+        // 이미지 파일 개수 제한
+        if (images.size() > MAX_FILES_COUNT) {
+            throw new GlobalException(FILE_COUNT_EXCEEDED);
+        }
+
+        for (MultipartFile image : images) {
+            // 파일 크기 검증
+            if (image.getSize() > MAX_FILE_SIZE) {
+                throw new GlobalException(FILE_SIZE_EXCEEDED);
+            }
+
+            // 파일 타입 검증
+            String contentType = image.getContentType();
+            if (contentType == null || !ALLOWED_TYPES.contains(contentType)) {
+                throw new GlobalException(INVALID_FILE_TYPE);
+            }
+        }
     }
 
     /**
      * 게시글 타입명으로 Enum 조회
      */
     private PostType findPostTypeByName(String postTypeName) {
-        try {
-            // 한글명으로 찾기
-            for (PostType type : PostType.values()) {
-                if (type.getKoreanName().equals(postTypeName)) {
-                    return type;
-                }
+        // 한글명으로 찾기
+        for (PostType type : PostType.values()) {
+            if (type.getKoreanName().equals(postTypeName)) {
+                return type;
             }
+        }
 
-            // Enum 상수명으로 찾기
+        try {
+            // 한글명으로 찾지 못한 경우 Enum 상수명으로 시도
             return PostType.valueOf(postTypeName);
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("유효하지 않은 게시글 타입입니다: " + postTypeName);
         }
     }
-
 
 }

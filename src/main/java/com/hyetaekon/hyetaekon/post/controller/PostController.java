@@ -42,7 +42,7 @@ public class PostController {
     // User, Admin에 따라 다른 접근 가능
     // ✅ 특정 게시글 상세 조회
     @GetMapping("/{postId}")
-    public ResponseEntity<PostDetailReponseDto> getPost(
+    public ResponseEntity<PostDetailResponseDto> getPost(
         @PathVariable Long postId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(postService.getPostById(postId, userDetails.getId()));
@@ -50,7 +50,7 @@ public class PostController {
 
     // ✅ 게시글 생성
     @PostMapping
-    public ResponseEntity<PostDetailReponseDto> createPost(
+    public ResponseEntity<PostDetailResponseDto> createPost(
         @RequestBody PostCreateRequestDto requestDto,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(postService.createPost(requestDto, userDetails.getId()));
@@ -58,7 +58,7 @@ public class PostController {
 
     // ✅ 게시글 수정 - 본인
     @PutMapping("/{postId}")
-    public ResponseEntity<PostDetailReponseDto> updatePost(
+    public ResponseEntity<PostDetailResponseDto> updatePost(
         @PathVariable Long postId,
         @RequestBody PostUpdateRequestDto updateDto,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
