@@ -12,9 +12,13 @@ public class SecurityPath {
       "/",
       "/api/services",
       "/api/services/category/*",
-      "/api/services/detail/*",
+      "/api/services/detail/*"
+  };
+
+  // GET 메소드에 대해 permitAll
+  public static final String[] PUBLIC_GET_ENDPOINTS = {
       "/api/public-data/serviceList/test",
-      "/api/posts/type/*",
+      "/api/posts",
       "/api/posts/search"
   };
 
