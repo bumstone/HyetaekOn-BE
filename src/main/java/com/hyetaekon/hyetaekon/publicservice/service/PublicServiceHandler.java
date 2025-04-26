@@ -77,7 +77,7 @@ public class PublicServiceHandler {
             .map(service -> {
                 PublicServiceListResponseDto dto = publicServiceMapper.toListDto(service);
                 // 로그인한 사용자는 북마크 여부 확인
-                if (userId == 0L) {
+                if (userId != 0L) {
                     dto.setBookmarked(bookmarkRepository.existsByUserIdAndPublicServiceId(userId, service.getId()));
                 }
                 return dto;
@@ -141,10 +141,16 @@ public class PublicServiceHandler {
             List<SpecialGroupEnum> specialGroupEnums = new ArrayList<>();
             if (specialGroups != null) {
                 for (String group : specialGroups) {
-                    try {
-                        SpecialGroupEnum enumValue = SpecialGroupEnum.valueOf(group);
-                        specialGroupEnums.add(enumValue);
-                    } catch (IllegalArgumentException e) {
+                    // type 값으로 Enum 찾기
+                    boolean found = false;
+                    for (SpecialGroupEnum enumValue : SpecialGroupEnum.values()) {
+                        if (enumValue.getType().equals(group)) {
+                            specialGroupEnums.add(enumValue);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
                         throw new GlobalException(ErrorCode.INVALID_ENUM_CODE);
                     }
                 }
@@ -153,10 +159,16 @@ public class PublicServiceHandler {
             List<FamilyTypeEnum> familyTypeEnums = new ArrayList<>();
             if (familyTypes != null) {
                 for (String type : familyTypes) {
-                    try {
-                        FamilyTypeEnum enumValue = FamilyTypeEnum.valueOf(type);
-                        familyTypeEnums.add(enumValue);
-                    } catch (IllegalArgumentException e) {
+                    // type 값으로 Enum 찾기
+                    boolean found = false;
+                    for (FamilyTypeEnum enumValue : FamilyTypeEnum.values()) {
+                        if (enumValue.getType().equals(type)) {
+                            familyTypeEnums.add(enumValue);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
                         throw new GlobalException(ErrorCode.INVALID_ENUM_CODE);
                     }
                 }

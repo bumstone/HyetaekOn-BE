@@ -1,6 +1,8 @@
 package com.hyetaekon.hyetaekon.user.controller;
 
 import com.hyetaekon.hyetaekon.common.jwt.CustomUserDetails;
+import com.hyetaekon.hyetaekon.post.dto.MyPostListResponseDto;
+import com.hyetaekon.hyetaekon.post.service.PostService;
 import com.hyetaekon.hyetaekon.publicservice.dto.PublicServiceListResponseDto;
 import com.hyetaekon.hyetaekon.publicservice.service.PublicServiceHandler;
 import com.hyetaekon.hyetaekon.user.dto.*;
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
   private final UserService userService;
   private final PublicServiceHandler publicServiceHandler;
+  private final PostService postService;
 
   // 회원 가입 api
   @PostMapping("/signup")
@@ -89,28 +92,45 @@ public class UserController {
   }
 
   // 북마크한 서비스 목록 조회
-  @GetMapping("/users/me/bookmarked")
+  @GetMapping("/users/me/bookmarked/posts")
   public ResponseEntity<Page<PublicServiceListResponseDto>> getBookmarkedServices(
       @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
-      @RequestParam(name = "size", defaultValue = "9") @Positive @Max(30) int size,
+      @RequestParam(name = "size", defaultValue = "10") @Positive @Max(30) int size,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
     return ResponseEntity.ok(publicServiceHandler.getBookmarkedServices(
         userDetails.getId(), PageRequest.of(page, size))
     );
   }
 
-    /**
-     * 작성한 게시글 목록 조회
-     */
-//    @GetMapping("/me/posts")
-//    @PreAuthorize("hasRole('USER')")
-//    public ResponseEntity<ApiResponseDto<Page<PostResponseDto>>> getMyPosts(
-//        @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
-  //      @RequestParam(name = "size", defaultValue = "5") @Positive @Max(30) int size,
-  //      @AuthenticationPrincipal CustomUserDetails userDetails) {
-//        Page<PostResponseDto> posts = userService.getMyPosts(postType, PageRequest.of(page, size));
-//        return ResponseEntity.ok(ApiResponseDto.success(posts));
-//    }
+  /**
+   * 내가 작성한 게시글 목록 조회
+   */
+  @GetMapping("/users/me/posts")
+  public ResponseEntity<Page<MyPostListResponseDto>> getMyPosts(
+      @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
+      @RequestParam(name = "size", defaultValue = "10") @Positive @Max(30) int size,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+    Page<MyPostListResponseDto> posts = postService.getPostsByUserId(
+        userDetails.getId(), PageRequest.of(page, size));
+
+    return ResponseEntity.ok(posts);
+  }
+
+  /**
+   * 내가 추천한 게시글 목록 조회
+   */
+  @GetMapping("/users/me/recommended/posts")
+  public ResponseEntity<Page<MyPostListResponseDto>> getMyRecommendedPosts(
+      @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
+      @RequestParam(name = "size", defaultValue = "10") @Positive @Max(30) int size,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+    Page<MyPostListResponseDto> posts = postService.getRecommendedPostsByUserId(
+        userDetails.getId(), PageRequest.of(page, size));
+
+    return ResponseEntity.ok(posts);
+  }
 
 
 }

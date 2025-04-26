@@ -22,4 +22,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Optional<Post> findByIdAndDeletedAtIsNull(Long id);
 
     boolean existsByUser_IdAndDeletedAtIsNull(Long userId);
+
+    // 특정 사용자가 작성한 게시글 조회
+    Page<Post> findByUserIdAndDeletedAtIsNull(Long userId, Pageable pageable);
+
+    // 특정 사용자가 추천한 게시글 조회
+    Page<Post> findByRecommendsUserIdAndDeletedAtIsNull(Long userId, Pageable pageable);
 }

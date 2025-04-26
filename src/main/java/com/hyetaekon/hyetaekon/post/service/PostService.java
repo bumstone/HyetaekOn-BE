@@ -252,4 +252,19 @@ public class PostService {
         }
     }
 
+    /**
+     * 사용자가 작성한 게시글 목록 조회
+     */
+    public Page<MyPostListResponseDto> getPostsByUserId(Long userId, Pageable pageable) {
+        return postRepository.findByUserIdAndDeletedAtIsNull(userId, pageable)
+            .map(postMapper::toMyPostListDto);
+    }
+
+    /**
+     * 사용자가 추천한 게시글 목록 조회
+     */
+    public Page<MyPostListResponseDto> getRecommendedPostsByUserId(Long userId, Pageable pageable) {
+        return postRepository.findByRecommendsUserIdAndDeletedAtIsNull(userId, pageable)
+            .map(postMapper::toMyPostListDto);
+    }
 }
