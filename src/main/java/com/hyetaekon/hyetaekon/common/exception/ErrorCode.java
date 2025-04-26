@@ -40,7 +40,10 @@ public enum ErrorCode {
     // 좋아요
     RECOMMEND_ALREADY_EXISTS(HttpStatus.CONFLICT, "RECOMMEND-001", "이미 좋아요를 누른 게시글입니다."),
     RECOMMEND_NOT_FOUND(HttpStatus.NOT_FOUND, "RECOMMEND-002", "좋아요 정보를 찾을 수 없습니다."),
-    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST-001", "해당 게시글을 찾을 수 없습니다."),
+    RECOMMEND_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "RECOMMEND-003", "추천한 유저를 찾을 수 없습니다."),
+
+    // 게시글
+    POST_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND,"POST-001", "해당 아이디의 게시글을 찾을 수 없습니다"),
 
     // 관심사 선택 제한
     INTEREST_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "INTEREST-001", "관심사는 최대 6개까지만 등록 가능합니다."),

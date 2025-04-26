@@ -1,81 +1,255 @@
 package com.hyetaekon.hyetaekon.post.service;
 
-import com.hyetaekon.hyetaekon.post.dto.PostDto;
+import com.hyetaekon.hyetaekon.common.exception.GlobalException;
+import com.hyetaekon.hyetaekon.common.s3bucket.service.S3BucketService;
+import com.hyetaekon.hyetaekon.post.dto.*;
 import com.hyetaekon.hyetaekon.post.entity.Post;
+import com.hyetaekon.hyetaekon.post.entity.PostImage;
 import com.hyetaekon.hyetaekon.post.entity.PostType;
+import com.hyetaekon.hyetaekon.post.mapper.PostImageMapper;
 import com.hyetaekon.hyetaekon.post.mapper.PostMapper;
+import com.hyetaekon.hyetaekon.post.repository.PostImageRepository;
 import com.hyetaekon.hyetaekon.post.repository.PostRepository;
-import com.hyetaekon.hyetaekon.publicservice.entity.PublicService;
+import com.hyetaekon.hyetaekon.recommend.repository.RecommendRepository;
 import com.hyetaekon.hyetaekon.user.entity.User;
+import com.hyetaekon.hyetaekon.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
+import static com.hyetaekon.hyetaekon.common.exception.ErrorCode.*;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostRepository postRepository;
+    private final PostImageRepository postImageRepository;
+    private final UserRepository userRepository;
+    private final RecommendRepository recommendRepository;
     private final PostMapper postMapper;
+    private final PostImageMapper postImageMapper;
+    private final S3BucketService s3BucketService;
 
-    public List<PostDto> getAllPosts() {
-        return postRepository.findAll()
-                .stream()
-                .map(postMapper::toDto)
-                .collect(Collectors.toList());
+    // 이미지 업로드 제한 설정
+    private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    private static final int MAX_FILES_COUNT = 5; // 최대 5개 이미지
+    private static final Set<String> ALLOWED_TYPES = Set.of(
+        "image/jpeg",
+        "image/png",
+        "image/gif"
+    );
+
+    /**
+     * 전체 게시글 목록 조회 (페이징)
+     */
+    public Page<PostListResponseDto> getAllPosts(Pageable pageable) {
+        return postRepository.findByDeletedAtIsNull(pageable)
+            .map(postMapper::toPostListDto);
     }
 
-    public PostDto getPostById(Long id) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
-        return postMapper.toDto(post);
+    /**
+     * 특정 타입의 게시글 목록 조회 (페이징)
+     */
+    public Page<PostListResponseDto> getPostsByType(PostType postType, Pageable pageable) {
+        return postRepository.findByPostTypeAndDeletedAtIsNull(postType, pageable)
+            .map(postMapper::toPostListDto);
     }
 
-    public List<PostDto> getPostsByCategoryId(Long categoryId) { // 추가됨
-        return postRepository.findByCategoryId(categoryId)
-                .stream()
-                .map(postMapper::toDto)
-                .collect(Collectors.toList());
+    /**
+     * 특정 게시글 상세 조회(로그인 시)
+     */
+    @Transactional
+    public PostDetailResponseDto getPostById(Long postId, Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + userId));
+
+        Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
+            .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다: " + postId));
+
+        // 조회수 증가
+        post.incrementViewCnt();
+
+        // 사용자의 추천 여부 확인
+        boolean recommended = recommendRepository.existsByUserIdAndPostId(userId, postId);
+
+        // DTO 변환 및 추천 여부 설정
+        PostDetailResponseDto responseDto = postMapper.toPostDetailDto(post);
+        responseDto.setRecommended(recommended);
+
+        return responseDto;
     }
 
-    public PostDto createPost(PostDto postDto) {
-        Post post = postMapper.toEntity(postDto);
-        Post savedPost = postRepository.save(post);
-        return postMapper.toDto(savedPost);
-    }
+    /**
+     * 게시글 생성(로그인 시)
+     */
+    @Transactional
+    public PostDetailResponseDto createPost(PostCreateRequestDto requestDto, Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + userId));
 
-    public PostDto updatePost(Long id, PostDto postDto) {
-        Post post = postRepository.findById(id).orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+        // PostType Enum 변환
+        PostType postType = findPostTypeByName(requestDto.getPostType());
 
-        User user = new User();
-        user.setId(postDto.getUserId());
+        // DTO -> Entity 변환
+        Post post = postMapper.toEntity(requestDto);
         post.setUser(user);
+        post.setPostType(postType);
 
-        if (postDto.getPublicServiceId() != null) {
-            PublicService publicService = new PublicService();
-            publicService.setId(postDto.getPublicServiceId()); // String 타입으로 변환됨
-            post.setPublicService(publicService);
-        } else {
-            post.setPublicService(null);
+        // 게시글 저장
+        Post savedPost = postRepository.save(post);
+
+        // 이미지 처리
+        if (requestDto.getImages() != null && !requestDto.getImages().isEmpty()) {
+            List<PostImage> postImages = processPostImages(requestDto.getImages(), savedPost);
+            if (!postImages.isEmpty()) {
+                postImageRepository.saveAll(postImages);
+            }
         }
 
-        post.setTitle(postDto.getTitle());
-        post.setContent(postDto.getContent());
-        post.setPostType(PostType.valueOf(postDto.getPostType()));
-        post.setDeletedAt(postDto.getDeletedAt());
-        post.setServiceUrl(postDto.getServiceUrl());
-        post.setRecommendCnt(postDto.getRecommendCnt());
-        post.setViewCount(postDto.getViewCount());
-        post.setUrlTitle(postDto.getUrlTitle());
-        post.setUrlPath(postDto.getUrlPath());
-        post.setTags(postDto.getTags());
-        post.setCategoryId(postDto.getCategoryId()); // 추가됨
-        Post updatedPost = postRepository.save(post);
-        return postMapper.toDto(updatedPost);
+        return postMapper.toPostDetailDto(savedPost);
     }
 
-    public void deletePost(Long id) {
-        postRepository.deleteById(id);
+    /**
+     * 게시글 수정 (본인만 가능)
+     */
+    @Transactional
+    public PostDetailResponseDto updatePost(Long postId, PostUpdateRequestDto updateDto, Long userId) {
+        Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
+            .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다: " + postId));
+
+        // 작성자 확인
+        if (!post.getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("게시글 수정 권한이 없습니다");
+        }
+
+        // PostType 변환
+        if (updateDto.getPostType() != null) {
+            PostType postType = findPostTypeByName(updateDto.getPostType());
+            post.setPostType(postType);
+        }
+
+        // 기본 정보 업데이트
+        postMapper.updatePostFromDto(updateDto, post);
+
+        // 이미지 업데이트 처리
+        if (updateDto.getImages() != null && !updateDto.getImages().isEmpty()) {
+            // 기존 이미지 soft delete 처리
+            List<PostImage> existingImages = postImageRepository.findByPostAndDeletedAtIsNull(post);
+            for (PostImage image : existingImages) {
+                image.softDelete();
+            }
+
+            // 새 이미지 추가
+            List<PostImage> newImages = processPostImages(updateDto.getImages(), post);
+            if (!newImages.isEmpty()) {
+                postImageRepository.saveAll(newImages);
+            }
+        }
+
+        return postMapper.toPostDetailDto(post);
     }
+
+    /**
+     * 게시글 삭제 (본인 또는 관리자만 가능)
+     */
+    @Transactional
+    public void deletePost(Long postId, Long userId, String role) {
+        Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
+            .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다: " + postId));
+
+        // 작성자 또는 관리자 확인
+        boolean isOwner = post.getUser().getId().equals(userId);
+        boolean isAdmin = "ROLE_ADMIN".equals(role);
+
+        if (!isOwner && !isAdmin) {
+            throw new AccessDeniedException("게시글 삭제 권한이 없습니다");
+        }
+
+        // Soft Delete 처리
+        post.setDeletedAt(LocalDateTime.now());
+
+        // 모든 이미지 soft delete 처리
+        List<PostImage> images = postImageRepository.findByPostAndDeletedAtIsNull(post);
+        for (PostImage image : images) {
+            image.softDelete();
+        }
+    }
+
+    /**
+     * 이미지 처리를 위한 private 메서드
+     */
+    private List<PostImage> processPostImages(List<MultipartFile> images, Post post) {
+        if (images == null || images.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // 이미지 유효성 검증
+        validateImages(images);
+
+        // 이미지 업로드 및 엔티티 변환
+        try {
+            List<String> uploadedUrls = s3BucketService.upload(images, "posts/" + post.getId());
+            return postImageMapper.toEntityList(uploadedUrls, post);
+        } catch (Exception e) {
+            log.error("이미지 업로드 실패: ", e);
+            throw new GlobalException(FILE_UPLOAD_FAILED);
+        }
+    }
+
+    /**
+     * 이미지 유효성 검증
+     */
+    private void validateImages(List<MultipartFile> images) {
+        // 이미지 파일 개수 제한
+        if (images.size() > MAX_FILES_COUNT) {
+            throw new GlobalException(FILE_COUNT_EXCEEDED);
+        }
+
+        for (MultipartFile image : images) {
+            // 파일 크기 검증
+            if (image.getSize() > MAX_FILE_SIZE) {
+                throw new GlobalException(FILE_SIZE_EXCEEDED);
+            }
+
+            // 파일 타입 검증
+            String contentType = image.getContentType();
+            if (contentType == null || !ALLOWED_TYPES.contains(contentType)) {
+                throw new GlobalException(INVALID_FILE_TYPE);
+            }
+        }
+    }
+
+    /**
+     * 게시글 타입명으로 Enum 조회
+     */
+    private PostType findPostTypeByName(String postTypeName) {
+        // 한글명으로 찾기
+        for (PostType type : PostType.values()) {
+            if (type.getKoreanName().equals(postTypeName)) {
+                return type;
+            }
+        }
+
+        try {
+            // 한글명으로 찾지 못한 경우 Enum 상수명으로 시도
+            return PostType.valueOf(postTypeName);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("유효하지 않은 게시글 타입입니다: " + postTypeName);
+        }
+    }
+
 }
