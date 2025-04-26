@@ -22,21 +22,19 @@ public class PostController {
 
     private final PostService postService;
 
-    // 전체 게시글 목록 조회
-    @GetMapping
-    public ResponseEntity<Page<PostListResponseDto>> getAllPosts(
-        @PageableDefault(page = 0, size = 10) Pageable pageable) {
-        Page<PostListResponseDto> posts = postService.getAllPosts(pageable);
-        return ResponseEntity.ok(posts);
-    }
-
     // PostType에 해당하는 게시글 목록 조회
-    @GetMapping("/type/{postType}")
-    public ResponseEntity<Page<PostListResponseDto>> getPostsByType(
-        @PathVariable PostType postType,
+    @GetMapping
+    public ResponseEntity<Page<PostListResponseDto>> getPosts(
+        @RequestParam(required = false, defaultValue = "전체") String postType,
         @PageableDefault(page = 0, size = 10) Pageable pageable) {
-        Page<PostListResponseDto> posts = postService.getPostsByType(postType, pageable);
-        return ResponseEntity.ok(posts);
+
+        PostType type = PostType.fromKoreanName(postType);
+
+        if (type == PostType.ALL) {
+            return ResponseEntity.ok(postService.getAllPosts(pageable));
+        } else {
+            return ResponseEntity.ok(postService.getPostsByType(type, pageable));
+        }
     }
 
     // User, Admin에 따라 다른 접근 가능

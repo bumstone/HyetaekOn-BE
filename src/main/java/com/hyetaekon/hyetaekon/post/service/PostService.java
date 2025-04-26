@@ -237,19 +237,8 @@ public class PostService {
      * 게시글 타입명으로 Enum 조회
      */
     private PostType findPostTypeByName(String postTypeName) {
-        // 한글명으로 찾기
-        for (PostType type : PostType.values()) {
-            if (type.getKoreanName().equals(postTypeName)) {
-                return type;
-            }
-        }
-
-        try {
-            // 한글명으로 찾지 못한 경우 Enum 상수명으로 시도
-            return PostType.valueOf(postTypeName);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("유효하지 않은 게시글 타입입니다: " + postTypeName);
-        }
+        // 한글명으로 PostType 찾기
+        return PostType.fromKoreanName(postTypeName);
     }
 
     /**
