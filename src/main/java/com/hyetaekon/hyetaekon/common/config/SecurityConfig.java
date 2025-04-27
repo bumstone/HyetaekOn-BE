@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -51,6 +52,7 @@ public class SecurityConfig {
         .authorizeHttpRequests((auth) -> auth
             .requestMatchers(SecurityPath.ADMIN_ENDPOINTS).hasRole("ADMIN")
             .requestMatchers(SecurityPath.USER_ENDPOINTS).hasAnyRole("USER", "ADMIN")
+            .requestMatchers(HttpMethod.GET, SecurityPath.PUBLIC_GET_ENDPOINTS).permitAll()
             .requestMatchers(SecurityPath.PUBLIC_ENDPOINTS).permitAll()
             .anyRequest().permitAll()
         );

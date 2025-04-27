@@ -21,6 +21,10 @@ public interface PostMapper {
     @Mapping(source = "postType.koreanName", target = "postType")
     PostListResponseDto toPostListDto(Post post);
 
+    @Mapping(source = "id", target = "postId")
+    @Mapping(source = "user.nickname", target = "nickName")
+    MyPostListResponseDto toMyPostListDto(Post post);
+
     // Post -> PostDetailResponseDto 변환
     @Mapping(source = "id", target = "postId")
     @Mapping(source = "user.nickname", target = "nickName")

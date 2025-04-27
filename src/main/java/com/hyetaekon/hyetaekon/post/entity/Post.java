@@ -38,7 +38,8 @@ public class Post {
     @Column(columnDefinition = "VARCHAR(500) CHARACTER SET utf8mb4", nullable = false)  // ✅ 내용 500자 제한
     private String content;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Builder.Default
+    private LocalDateTime createdAt = null;  // 빌더 사용 시 null로 초기화
 
     private LocalDateTime deletedAt;
 
@@ -80,6 +81,14 @@ public class Post {
     @Builder.Default
     private List<Recommend> recommends = new ArrayList<>();
 
+    // 저장 시점에 현재 시간으로 설정
+    @PrePersist
+    public void prePersist() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+    }
+
     // 조회수 증가
     public void incrementViewCnt() {
         this.viewCnt++;
@@ -102,4 +111,6 @@ public class Post {
     public void decrementCommentCnt() {
         this.commentCnt = Math.max(0, this.commentCnt - 1);
     }
+
+
 }
