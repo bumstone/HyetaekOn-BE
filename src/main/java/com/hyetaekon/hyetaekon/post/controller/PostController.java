@@ -23,7 +23,7 @@ public class PostController {
     private final PostService postService;
 
     // PostType에 해당하는 게시글 목록 조회
-    @GetMapping
+    @GetMapping("/type")
     public ResponseEntity<Page<PostListResponseDto>> getPosts(
         @RequestParam(required = false, defaultValue = "전체") String postType,
         @PageableDefault(page = 0, size = 10) Pageable pageable) {

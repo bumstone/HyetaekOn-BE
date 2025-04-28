@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring",
-    unmappedTargetPolicy = ReportingPolicy.IGNORE,
-    uses = {PostImageMapper.class})
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PostMapper {
 
     // Post -> PostListResponseDto 변환
@@ -34,10 +32,12 @@ public interface PostMapper {
 
     // PostCreateRequestDto -> Post 변환 (새 게시글 생성)
     @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
+    @Mapping(target = "postType", ignore = true)
     Post toEntity(PostCreateRequestDto createDto);
 
     // null 아닌 값만 업데이트
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "postType", ignore = true)
     void updatePostFromDto(PostUpdateRequestDto updateDto, @MappingTarget Post post);
 
     // 이미지만 URL 리스트로 변환 (soft delete 처리된 것 제외)

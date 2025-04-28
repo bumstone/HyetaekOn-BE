@@ -50,9 +50,9 @@ public class SecurityConfig {
     // 경로별 인가 작업
     http
         .authorizeHttpRequests((auth) -> auth
+            .requestMatchers("/api/posts/type", "/api/posts/type/**", "/api/posts/search").permitAll()
             .requestMatchers(SecurityPath.ADMIN_ENDPOINTS).hasRole("ADMIN")
             .requestMatchers(SecurityPath.USER_ENDPOINTS).hasAnyRole("USER", "ADMIN")
-            .requestMatchers(HttpMethod.GET, SecurityPath.PUBLIC_GET_ENDPOINTS).permitAll()
             .requestMatchers(SecurityPath.PUBLIC_ENDPOINTS).permitAll()
             .anyRequest().permitAll()
         );
