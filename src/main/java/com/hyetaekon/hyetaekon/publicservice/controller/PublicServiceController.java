@@ -1,5 +1,6 @@
 package com.hyetaekon.hyetaekon.publicservice.controller;
 
+import com.hyetaekon.hyetaekon.publicservice.dto.FilterOptionDto;
 import com.hyetaekon.hyetaekon.publicservice.dto.PublicServiceDetailResponseDto;
 import com.hyetaekon.hyetaekon.publicservice.dto.PublicServiceListResponseDto;
 import com.hyetaekon.hyetaekon.publicservice.service.PublicServiceHandler;
@@ -15,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Validated
@@ -39,6 +41,11 @@ public class PublicServiceController {
 
         return ResponseEntity.ok(publicServiceHandler.getAllServices(
             sort, specialGroups, familyTypes, categories, PageRequest.of(page, size), userId));
+    }
+
+    @GetMapping("/filters")
+    public ResponseEntity<Map<String, List<FilterOptionDto>>> getFilterOptions() {
+        return ResponseEntity.ok(publicServiceHandler.getFilterOptions());
     }
 
     // 서비스 분야별 공공서비스 목록 조회
