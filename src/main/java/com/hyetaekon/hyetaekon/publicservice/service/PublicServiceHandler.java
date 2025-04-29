@@ -3,6 +3,7 @@ package com.hyetaekon.hyetaekon.publicservice.service;
 import com.hyetaekon.hyetaekon.bookmark.repository.BookmarkRepository;
 import com.hyetaekon.hyetaekon.common.exception.ErrorCode;
 import com.hyetaekon.hyetaekon.common.exception.GlobalException;
+import com.hyetaekon.hyetaekon.publicservice.dto.FilterOptionDto;
 import com.hyetaekon.hyetaekon.publicservice.dto.PublicServiceDetailResponseDto;
 import com.hyetaekon.hyetaekon.publicservice.dto.PublicServiceListResponseDto;
 import com.hyetaekon.hyetaekon.publicservice.entity.FamilyTypeEnum;
@@ -21,8 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -198,6 +198,31 @@ public class PublicServiceHandler {
             }
             return dto;
         });
+    }
+
+    // 기존 코드에 아래 메서드 추가
+    public Map<String, List<FilterOptionDto>> getFilterOptions() {
+        Map<String, List<FilterOptionDto>> filterOptions = new HashMap<>();
+
+        // 서비스 분야 (카테고리) 옵션
+        List<FilterOptionDto> categoryOptions = Arrays.stream(ServiceCategory.values())
+            .map(category -> new FilterOptionDto(category.name(), category.getType()))
+            .collect(Collectors.toList());
+        filterOptions.put("categories", categoryOptions);
+
+        // 특수 그룹 (가구형태) 옵션
+        List<FilterOptionDto> specialGroupOptions = Arrays.stream(SpecialGroupEnum.values())
+            .map(group -> new FilterOptionDto(group.name(), group.getType()))
+            .collect(Collectors.toList());
+        filterOptions.put("specialGroups", specialGroupOptions);
+
+        // 가족 유형 (가구상황) 옵션
+        List<FilterOptionDto> familyTypeOptions = Arrays.stream(FamilyTypeEnum.values())
+            .map(type -> new FilterOptionDto(type.name(), type.getType()))
+            .collect(Collectors.toList());
+        filterOptions.put("familyTypes", familyTypeOptions);
+
+        return filterOptions;
     }
 
     public Page<PublicServiceListResponseDto> getBookmarkedServices(Long userId, Pageable pageable) {
