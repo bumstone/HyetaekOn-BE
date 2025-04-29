@@ -24,4 +24,14 @@ public class PublicData {
     private String serviceCategory;
     private List<String> specialGroup;
     private List<String> familyType;
+
+    private List<String> occupations;
+    private List<String> businessTypes;
+
+    // Support conditions fields
+    private String targetGenderMale;
+    private String targetGenderFemale;
+    private Integer targetAgeStart;
+    private Integer targetAgeEnd;
+    private String incomeLevel;
 }
