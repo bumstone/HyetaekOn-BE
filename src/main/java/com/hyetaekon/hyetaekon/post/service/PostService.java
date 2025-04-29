@@ -16,7 +16,9 @@ import com.hyetaekon.hyetaekon.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,19 +56,41 @@ public class PostService {
     );
 
     /**
-     * 전체 게시글 목록 조회 (페이징)
+     * 전체 게시글 목록 조회 (제목 검색 + 정렬)
      */
-    public Page<PostListResponseDto> getAllPosts(Pageable pageable) {
-        return postRepository.findByDeletedAtIsNull(pageable)
-            .map(postMapper::toPostListDto);
+    public Page<PostListResponseDto> getAllPosts(String keyword, String sortBy, String direction, Pageable pageable) {
+        Pageable sortedPageable = createSortedPageable(pageable, sortBy, direction);
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return postRepository.findByTitleContainingAndDeletedAtIsNull(keyword, sortedPageable)
+                    .map(postMapper::toPostListDto);
+        } else {
+            return postRepository.findByDeletedAtIsNull(sortedPageable)
+                    .map(postMapper::toPostListDto);
+        }
     }
 
     /**
-     * 특정 타입의 게시글 목록 조회 (페이징)
+     * 특정 타입 게시글 목록 조회 (제목 검색 + 정렬)
      */
-    public Page<PostListResponseDto> getPostsByType(PostType postType, Pageable pageable) {
-        return postRepository.findByPostTypeAndDeletedAtIsNull(postType, pageable)
-            .map(postMapper::toPostListDto);
+    public Page<PostListResponseDto> getPostsByType(PostType postType, String keyword, String sortBy, String direction, Pageable pageable) {
+        Pageable sortedPageable = createSortedPageable(pageable, sortBy, direction);
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            return postRepository.findByPostTypeAndTitleContainingAndDeletedAtIsNull(postType, keyword, sortedPageable)
+                    .map(postMapper::toPostListDto);
+        } else {
+            return postRepository.findByPostTypeAndDeletedAtIsNull(postType, sortedPageable)
+                    .map(postMapper::toPostListDto);
+        }
+    }
+
+    /**
+     * 정렬 기준을 적용한 Pageable 생성
+     */
+    private Pageable createSortedPageable(Pageable pageable, String sortBy, String direction) {
+        Sort sort = Sort.by(Sort.Direction.fromString(direction), sortBy);
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
     }
 
     /**

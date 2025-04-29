@@ -28,4 +28,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     // 특정 사용자가 추천한 게시글 조회
     Page<Post> findByRecommendsUserIdAndDeletedAtIsNull(Long userId, Pageable pageable);
+
+    // 제목 검색 + 삭제되지 않은 게시글
+    Page<Post> findByTitleContainingAndDeletedAtIsNull(String keyword, Pageable pageable);
+
+    // 제목 검색 + 특정 타입 + 삭제되지 않은 게시글
+    Page<Post> findByPostTypeAndTitleContainingAndDeletedAtIsNull(PostType postType, String keyword, Pageable pageable);
+
 }
