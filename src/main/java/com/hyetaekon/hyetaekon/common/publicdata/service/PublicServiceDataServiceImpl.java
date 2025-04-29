@@ -4,6 +4,7 @@ import com.hyetaekon.hyetaekon.common.publicdata.dto.PublicServiceConditionsData
 import com.hyetaekon.hyetaekon.common.publicdata.dto.PublicServiceDataDto;
 import com.hyetaekon.hyetaekon.common.publicdata.dto.PublicServiceDetailDataDto;
 import com.hyetaekon.hyetaekon.common.publicdata.mapper.PublicServiceDataMapper;
+import com.hyetaekon.hyetaekon.common.publicdata.mongodb.service.PublicDataMongoService;
 import com.hyetaekon.hyetaekon.common.publicdata.util.PublicDataPath;
 import com.hyetaekon.hyetaekon.common.publicdata.util.PublicServiceDataValidate;
 import com.hyetaekon.hyetaekon.publicservice.entity.*;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class PublicServiceDataServiceImpl implements PublicServiceDataService {
-
+    private final PublicDataMongoService publicDataMongoService;
     private final PublicServiceRepository publicServiceRepository;
     private final PublicServiceDataMapper publicServiceDataMapper;
     private final PublicServiceDataProviderService publicServiceDataProviderService;
@@ -238,14 +239,18 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
 
             // 배치 처리 최적화: 1000개 단위로 저장
             if (entitiesToSave.size() >= 1000) {
-                publicServiceRepository.saveAll(entitiesToSave);
+                List<PublicService> savedEntities = publicServiceRepository.saveAll(entitiesToSave);
+
+                publicDataMongoService.saveAllToMongo(savedEntities);
                 entitiesToSave.clear();
             }
         }
 
         // 나머지 데이터 저장
         if (!entitiesToSave.isEmpty()) {
-            publicServiceRepository.saveAll(entitiesToSave);
+            List<PublicService> savedEntities = publicServiceRepository.saveAll(entitiesToSave);
+
+            publicDataMongoService.saveAllToMongo(savedEntities);
         }
 
         log.info("공공서비스 목록 데이터 {}건 저장 완료", validatedData.size());
@@ -290,14 +295,18 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
 
             // 배치 처리 최적화: 1000개 단위로 저장
             if (entitiesToSave.size() >= 1000) {
-                publicServiceRepository.saveAll(entitiesToSave);
+                List<PublicService> savedEntities = publicServiceRepository.saveAll(entitiesToSave);
+
+                publicDataMongoService.saveAllToMongo(savedEntities);
                 entitiesToSave.clear();
             }
         }
 
         // 나머지 데이터 저장
         if (!entitiesToSave.isEmpty()) {
-            publicServiceRepository.saveAll(entitiesToSave);
+            List<PublicService> savedEntities = publicServiceRepository.saveAll(entitiesToSave);
+
+            publicDataMongoService.saveAllToMongo(savedEntities);
         }
 
         log.info("공공서비스 상세정보 데이터 {}건 저장 완료", validatedData.size());
@@ -346,14 +355,18 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
 
             // 배치 처리 최적화: 1000개 단위로 저장
             if (entitiesToSave.size() >= 1000) {
-                publicServiceRepository.saveAll(entitiesToSave);
+                List<PublicService> savedEntities = publicServiceRepository.saveAll(entitiesToSave);
+
+                publicDataMongoService.saveAllToMongo(savedEntities);
                 entitiesToSave.clear();
             }
         }
 
         // 나머지 데이터 저장
         if (!entitiesToSave.isEmpty()) {
-            publicServiceRepository.saveAll(entitiesToSave);
+            List<PublicService> savedEntities = publicServiceRepository.saveAll(entitiesToSave);
+
+            publicDataMongoService.saveAllToMongo(savedEntities);
         }
 
         log.info("공공서비스 지원조건 데이터 {}건 저장 완료", validatedData.size());

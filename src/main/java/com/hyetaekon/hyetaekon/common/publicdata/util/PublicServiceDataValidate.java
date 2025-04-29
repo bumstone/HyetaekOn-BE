@@ -60,14 +60,19 @@ public class PublicServiceDataValidate {
         return true;
     }
 
+    // PublicServiceDataValidate.java 수정
     public boolean validatePublicServiceDetailData(PublicServiceDetailDataDto.Data data) {
-        if (data.getServicePurpose() == null || data.getServicePurpose().isEmpty() ||
-            data.getSupportTarget() == null || data.getSupportTarget().isEmpty() ||
-            data.getSupportDetail() == null || data.getSupportDetail().isEmpty() ||
-            data.getSupportType() == null || data.getSupportType().isEmpty() ||
-            data.getApplicationMethod() == null || data.getApplicationMethod().isEmpty() ||
-            data.getApplicationDeadline() == null || data.getApplicationDeadline().isEmpty() ||
-            data.getGoverningAgency() == null || data.getGoverningAgency().isEmpty()) {
+        // 필수 필드 리스트를 먼저 확인
+        boolean isValid = data.getServicePurpose() != null && !data.getServicePurpose().isEmpty() &&
+            data.getSupportTarget() != null && !data.getSupportTarget().isEmpty() &&
+            data.getSupportDetail() != null && !data.getSupportDetail().isEmpty() &&
+            data.getSupportType() != null && !data.getSupportType().isEmpty() &&
+            data.getApplicationMethod() != null && !data.getApplicationMethod().isEmpty() &&
+            data.getApplicationDeadline() != null && !data.getApplicationDeadline().isEmpty() &&
+            data.getGoverningAgency() != null && !data.getGoverningAgency().isEmpty() &&
+            data.getContactInfo() != null && !data.getContactInfo().isEmpty();
+
+        if (!isValid) {
             log.warn("⚠️ 공공 서비스 상세내용 ID {}에 필수 데이터가 누락되었습니다.", data.getServiceId());
             return false;
         }

@@ -13,6 +13,8 @@ import org.mapstruct.ReportingPolicy;
 public interface PublicServiceMapper {
     @Mapping(source = "id", target = "publicServiceId")
     @Mapping(target = "serviceCategory", expression = "java(publicService.getServiceCategory().getType())")
+    @Mapping(target = "specialGroup", expression = "java(publicService.getSpecialGroups().stream().map(sg -> sg.getSpecialGroupEnum().getType()).collect(java.util.stream.Collectors.toList()))")
+    @Mapping(target = "familyType", expression = "java(publicService.getFamilyTypes().stream().map(ft -> ft.getFamilyTypeEnum().getType()).collect(java.util.stream.Collectors.toList()))")
     PublicServiceListResponseDto toListDto(PublicService publicService);
 
     @Mapping(source = "id", target = "publicServiceId")

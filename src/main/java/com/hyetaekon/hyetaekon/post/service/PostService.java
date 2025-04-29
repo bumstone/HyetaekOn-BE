@@ -102,7 +102,7 @@ public class PostService {
             .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + userId));
 
         // PostType Enum 변환
-        PostType postType = findPostTypeByName(requestDto.getPostType());
+        PostType postType = PostType.fromKoreanName(requestDto.getPostType());
 
         // DTO -> Entity 변환
         Post post = postMapper.toEntity(requestDto);
@@ -138,7 +138,7 @@ public class PostService {
 
         // PostType 변환
         if (updateDto.getPostType() != null) {
-            PostType postType = findPostTypeByName(updateDto.getPostType());
+            PostType postType = PostType.fromKoreanName(updateDto.getPostType());
             post.setPostType(postType);
         }
 
@@ -231,14 +231,6 @@ public class PostService {
                 throw new GlobalException(INVALID_FILE_TYPE);
             }
         }
-    }
-
-    /**
-     * 게시글 타입명으로 Enum 조회
-     */
-    private PostType findPostTypeByName(String postTypeName) {
-        // 한글명으로 PostType 찾기
-        return PostType.fromKoreanName(postTypeName);
     }
 
     /**

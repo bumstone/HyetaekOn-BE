@@ -53,6 +53,11 @@ public class PublicServiceHandler {
     public PublicServiceDetailResponseDto getServiceDetail(String serviceId, Long userId) {
         PublicService service = publicServiceValidate.validateServiceById(serviceId);
 
+        // 필수 필드가 null인지 검증하는 로직 추가
+        if (publicServiceValidate.isDetailInformationIncomplete(service)) {
+            throw new GlobalException(ErrorCode.INCOMPLETE_SERVICE_DETAIL);
+        }
+
         // 조회수 증가
         service.updateViewsUp();
         publicServiceRepository.save(service);

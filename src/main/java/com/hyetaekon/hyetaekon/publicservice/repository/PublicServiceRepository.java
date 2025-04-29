@@ -29,8 +29,8 @@ public interface PublicServiceRepository extends JpaRepository<PublicService, St
         "LEFT JOIN ps.specialGroups sg " +
         "LEFT JOIN ps.familyTypes ft " +
         "WHERE (:#{#categories == null || #categories.isEmpty()} = true OR ps.serviceCategory IN :categories) " +
-        "AND (:#{#specialGroupEnums == null || #specialGroupEnums.isEmpty()} = true OR sg.specialGroupEnum IN :specialGroupEnums) " +
-        "AND (:#{#familyTypeEnums == null || #familyTypeEnums.isEmpty()} = true OR ft.familyTypeEnum IN :familyTypeEnums)")
+        "AND (:#{#specialGroupEnums == null || #specialGroupEnums.isEmpty()} = true OR (sg IS NOT NULL AND sg.specialGroupEnum IN :specialGroupEnums)) " +
+        "AND (:#{#familyTypeEnums == null || #familyTypeEnums.isEmpty()} = true OR (ft IS NOT NULL AND ft.familyTypeEnum IN :familyTypeEnums))")
     Page<PublicService> findWithFilters(
         @Param("categories") List<ServiceCategory> categories,
         @Param("specialGroupEnums") List<SpecialGroupEnum> specialGroupEnums,

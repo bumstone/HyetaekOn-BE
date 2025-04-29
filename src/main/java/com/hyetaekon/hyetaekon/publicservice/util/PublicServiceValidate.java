@@ -40,4 +40,26 @@ public class PublicServiceValidate {
         }
         throw new GlobalException(ErrorCode.SERVICE_CATEGORY_NOT_FOUND);
     }
+
+    /**
+     * 서비스 상세 정보의 완전성 검증
+     * @param service 검증할 공공서비스 객체
+     * @return 상세 정보가 불완전하면 true, 충분히 완전하면 false 반환
+     */
+    public boolean isDetailInformationIncomplete(PublicService service) {
+        // 필수 필드 중 일정 개수 이상 누락된 경우 true 반환
+        int nullCount = 0;
+
+        if (service.getServicePurpose() == null || service.getServicePurpose().isEmpty()) nullCount++;
+        if (service.getSupportTarget() == null || service.getSupportTarget().isEmpty()) nullCount++;
+        if (service.getSupportDetail() == null || service.getSupportDetail().isEmpty()) nullCount++;
+        if (service.getSupportType() == null || service.getSupportType().isEmpty()) nullCount++;
+        if (service.getApplicationMethod() == null || service.getApplicationMethod().isEmpty()) nullCount++;
+        if (service.getApplicationDeadline() == null || service.getApplicationDeadline().isEmpty()) nullCount++;
+        if (service.getGoverningAgency() == null || service.getGoverningAgency().isEmpty()) nullCount++;
+        if (service.getContactInfo() == null || service.getContactInfo().isEmpty()) nullCount++;
+
+        // 필수 필드 중 3개 이상 누락되면 불완전한 데이터로 판단
+        return nullCount >= 3;
+    }
 }
