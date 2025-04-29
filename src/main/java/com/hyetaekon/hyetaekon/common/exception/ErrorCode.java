@@ -51,7 +51,8 @@ public enum ErrorCode {
 
     // 공공서비스
     // 유효 JACODE 확인
-    INVALID_ENUM_CODE(HttpStatus.BAD_REQUEST, "ENUM-001", "유효하지 않은 코드 값입니다."),
+    INVALID_ENUM_CODE(HttpStatus.BAD_REQUEST, "SERVICE-001", "유효하지 않은 코드 값입니다."),
+    INCOMPLETE_SERVICE_DETAIL(HttpStatus.BAD_REQUEST, "SERVICE-002","서비스 상세 정보가 불완전합니다."),
 
     SERVICE_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-001", "해당 서비스 분야를 찾을 수 없습니다."),
     SERVICE_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND,"SERVICE-002", "해당 아이디의 서비스를 찾을 수 없습니다"),
