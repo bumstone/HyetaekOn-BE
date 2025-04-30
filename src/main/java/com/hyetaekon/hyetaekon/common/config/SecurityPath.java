@@ -33,7 +33,7 @@ public class SecurityPath {
 
   // hasRole("ADMIN")
   public static final String[] ADMIN_ENDPOINTS = {
-      "/api/admin/users/**",
+      "/api/admin/**",
       "/api/public-data/serviceDetailList",
       "/api/public-data/supportConditionsList",
       "/api/public-data/serviceList"

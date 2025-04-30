@@ -3,10 +3,14 @@ package com.hyetaekon.hyetaekon.common.publicdata.mongodb.service;
 import com.hyetaekon.hyetaekon.common.publicdata.mongodb.document.PublicData;
 import com.hyetaekon.hyetaekon.common.publicdata.mongodb.repository.PublicDataMongoRepository;
 import com.hyetaekon.hyetaekon.publicservice.entity.PublicService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -27,17 +31,6 @@ public class PublicDataMongoService {
     public PublicData saveToMongo(PublicService publicService) {
         PublicData document = convertToDocument(publicService);
         return mongoRepository.save(document);
-    }
-
-    /**
-     * 여러 공공서비스 엔티티를 MongoDB에 저장
-     */
-    public List<PublicData> saveAllToMongo(List<PublicService> publicServices) {
-        List<PublicData> documents = publicServices.stream()
-            .map(this::convertToDocument)
-            .collect(Collectors.toList());
-
-        return mongoRepository.saveAll(documents);
     }
 
     /**
@@ -109,29 +102,76 @@ public class PublicDataMongoService {
     /**
      * 여러 서비스 문서 업데이트 또는 생성
      */
-    public List<PublicData> updateOrCreateBulkDocuments(List<PublicService> services) {
-        // 기존 ID 목록 가져오기
+    public void updateOrCreateBulkDocuments(List<PublicService> services) {
+        // 모든 service ID 목록
         List<String> serviceIds = services.stream()
             .map(PublicService::getId)
             .collect(Collectors.toList());
 
-        // ID에 해당하는 문서 맵 생성
-        Map<String, PublicData> existingDocsMap = mongoRepository.findAllById(serviceIds).stream()
-            .collect(Collectors.toMap(PublicData::getPublicServiceId, doc -> doc, (a, b) -> a));
+        // publicServiceId로 기존 문서 조회 (중요: findAllByPublicServiceId를 사용)
+        Map<String, PublicData> existingDocsMap = mongoRepository.findAllByPublicServiceIdIn(serviceIds).stream()
+            .collect(Collectors.toMap(
+                PublicData::getPublicServiceId,
+                doc -> doc,
+                (a, b) -> a  // 중복 시 첫 번째 문서 유지
+            ));
 
-        // 각 서비스 처리
+        // 처리할 문서 준비
         List<PublicData> docsToSave = services.stream()
             .map(service -> {
                 PublicData doc = convertToDocument(service);
                 if (existingDocsMap.containsKey(service.getId())) {
-                    // 기존 문서 ID 유지
+                    // 기존 문서의 ID 유지
                     doc.setId(existingDocsMap.get(service.getId()).getId());
                 }
                 return doc;
             })
             .collect(Collectors.toList());
 
-        // 일괄 저장
-        return mongoRepository.saveAll(docsToSave);
+        // 저장
+        mongoRepository.saveAll(docsToSave);
+    }
+
+    @PostConstruct
+    public void ensureIndexes() {
+        mongoTemplate.indexOps("service_info").ensureIndex(
+            new Index().on("publicServiceId", Sort.Direction.ASC).unique()
+        );
+        log.info("MongoDB 인덱스 설정 완료: publicServiceId (unique)");
+    }
+
+    @Transactional
+    public void deduplicateMongoDocuments() {
+        log.info("MongoDB 문서 중복 제거 시작");
+
+        // 1. 모든 publicServiceId 목록 조회
+        List<String> allServiceIds = mongoRepository.findAllPublicServiceIds();
+        int totalProcessed = 0;
+        int totalRemoved = 0;
+
+        // 2. 각 ID별로 처리
+        for (String serviceId : allServiceIds) {
+            List<PublicData> duplicates = mongoRepository.findAllByPublicServiceId(serviceId);
+
+            if (duplicates.size() > 1) {
+                // 가장 최근 문서를 남기고 나머지 삭제
+                PublicData latestDoc = duplicates.get(0); // 또는 타임스탬프로 정렬하여 최신 문서 선택
+
+                // 나머지 중복 문서 삭제
+                for (int i = 1; i < duplicates.size(); i++) {
+                    mongoRepository.delete(duplicates.get(i));
+                    totalRemoved++;
+                }
+            }
+
+            totalProcessed++;
+            if (totalProcessed % 1000 == 0) {
+                log.info("중복 제거 진행 중: {}/{} 처리, {}개 제거됨",
+                    totalProcessed, allServiceIds.size(), totalRemoved);
+            }
+        }
+
+        log.info("MongoDB 문서 중복 제거 완료: 총 {}개 중 {}개 중복 제거됨",
+            totalProcessed, totalRemoved);
     }
 }

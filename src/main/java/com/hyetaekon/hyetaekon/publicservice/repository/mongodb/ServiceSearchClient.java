@@ -1,6 +1,7 @@
 package com.hyetaekon.hyetaekon.publicservice.repository.mongodb;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -14,9 +15,12 @@ import com.hyetaekon.hyetaekon.publicservice.dto.mongodb.ServiceSearchResultDto;
 import com.hyetaekon.hyetaekon.publicservice.entity.mongodb.ServiceInfo;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ServiceSearchClient {
@@ -308,7 +312,21 @@ public class ServiceSearchClient {
             total = count != null ? count.longValue() : 0L;
         }
 
-        return ServiceSearchResultDto.of(searchResults, total, pageable);
+        // 중복 제거: publicServiceId가 같은 경우 하나만 유지
+        Map<String, ServiceInfo> uniqueResults = new LinkedHashMap<>();
+        for (ServiceInfo info : searchResults) {
+            uniqueResults.putIfAbsent(info.getPublicServiceId(), info);
+        }
+
+        List<ServiceInfo> dedupedResults = new ArrayList<>(uniqueResults.values());
+
+        // 중복 제거 로깅
+        int removedDuplicates = searchResults.size() - dedupedResults.size();
+        if (removedDuplicates > 0) {
+            log.warn("검색 결과에서 중복된 항목 {}개가 제거되었습니다.", removedDuplicates);
+        }
+
+        return ServiceSearchResultDto.of(dedupedResults, total, pageable);
     }
 
     // 검색어 자동완성

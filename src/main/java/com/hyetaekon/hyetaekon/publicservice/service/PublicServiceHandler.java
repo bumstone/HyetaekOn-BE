@@ -239,6 +239,7 @@ public class PublicServiceHandler {
     public void refreshFilterOptions() {
     }
 
+    // 내가 북마크한 서비스 목록 조회
     public Page<PublicServiceListResponseDto> getBookmarkedServices(Long userId, Pageable pageable) {
       Page<PublicService> bookmarkedServices = publicServiceRepository.findByBookmarks_User_Id(userId, pageable);
 
