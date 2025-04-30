@@ -14,6 +14,8 @@ import com.hyetaekon.hyetaekon.publicservice.mapper.PublicServiceMapper;
 import com.hyetaekon.hyetaekon.publicservice.repository.PublicServiceRepository;
 import com.hyetaekon.hyetaekon.publicservice.util.PublicServiceValidate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -48,6 +50,10 @@ public class PublicServiceHandler {
         });
     }*/
 
+    /*    public ServiceCategory getServiceCategory(String categoryName) {
+        return publicServiceValidate.validateServiceCategory(categoryName);
+    }*/
+
     // 서비스 상세 조회
     @Transactional
     public PublicServiceDetailResponseDto getServiceDetail(String serviceId, Long userId) {
@@ -72,7 +78,8 @@ public class PublicServiceHandler {
         return dto;
     }
 
-    // 인기 서비스 목록 조회(6개 고정)
+    // 인기 서비스 목록 조회(6개 고정) - 캐싱적용
+    @Cacheable(value = "popularServices", key = "'top6'", unless = "#result.isEmpty()")
     public List<PublicServiceListResponseDto> getPopularServices(Long userId) {
 
         // 북마크 수 기준으로 상위 6개 서비스 조회
@@ -90,8 +97,9 @@ public class PublicServiceHandler {
             .collect(Collectors.toList());
     }
 
-    public ServiceCategory getServiceCategory(String categoryName) {
-        return publicServiceValidate.validateServiceCategory(categoryName);
+    // 인기 서비스 캐시 무효화 - 데이터 변경 시 호출
+    @CacheEvict(value = "popularServices", key = "'top6'")
+    public void refreshPopularServices() {
     }
 
     // 공공서비스 전체 목록 조회 (정렬 및 필터링 적용)
@@ -200,7 +208,8 @@ public class PublicServiceHandler {
         });
     }
 
-    // 기존 코드에 아래 메서드 추가
+    // 필터 옵션 조회 (캐싱 적용)
+    @Cacheable(value = "filterOptions")
     public Map<String, List<FilterOptionDto>> getFilterOptions() {
         Map<String, List<FilterOptionDto>> filterOptions = new HashMap<>();
 
@@ -225,6 +234,11 @@ public class PublicServiceHandler {
         return filterOptions;
     }
 
+    // 필터 옵션 캐시 무효화 - Enum이 변경될 때
+    @CacheEvict(value = "filterOptions", allEntries = true)
+    public void refreshFilterOptions() {
+    }
+
     public Page<PublicServiceListResponseDto> getBookmarkedServices(Long userId, Pageable pageable) {
       Page<PublicService> bookmarkedServices = publicServiceRepository.findByBookmarks_User_Id(userId, pageable);
 
@@ -239,4 +253,5 @@ public class PublicServiceHandler {
       return new PageImpl<>(serviceDtos, pageable, bookmarkedServices.getTotalElements());
 
     }
+
 }

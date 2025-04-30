@@ -5,6 +5,7 @@ import com.hyetaekon.hyetaekon.bookmark.repository.BookmarkRepository;
 import com.hyetaekon.hyetaekon.common.exception.GlobalException;
 import com.hyetaekon.hyetaekon.publicservice.entity.PublicService;
 import com.hyetaekon.hyetaekon.publicservice.repository.PublicServiceRepository;
+import com.hyetaekon.hyetaekon.publicservice.service.PublicServiceHandler;
 import com.hyetaekon.hyetaekon.user.entity.User;
 import com.hyetaekon.hyetaekon.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -20,6 +21,7 @@ public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
     private final UserRepository userRepository;
     private final PublicServiceRepository publicServiceRepository;
+    private final PublicServiceHandler publicServiceHandler;
 
     public void addBookmark(String serviceId, Long userId) {
         User user = userRepository.findById(userId)
@@ -42,6 +44,9 @@ public class BookmarkService {
 
         // 북마크 수 증가
         publicService.increaseBookmarkCount();
+
+        // 인기 서비스 캐시 무효화
+        publicServiceHandler.refreshPopularServices();
     }
 
     @Transactional
@@ -54,5 +59,8 @@ public class BookmarkService {
         // 북마크 수 감소
         PublicService publicService = bookmark.getPublicService();
         publicService.decreaseBookmarkCount();
+
+        // 인기 서비스 캐시 무효화
+        publicServiceHandler.refreshPopularServices();
     }
 }
