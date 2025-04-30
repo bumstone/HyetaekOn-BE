@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
+import org.springframework.data.mongodb.core.index.IndexInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -132,12 +133,35 @@ public class PublicDataMongoService {
         mongoRepository.saveAll(docsToSave);
     }
 
+    // 첫 실행 시에만 중복 제거 및 인덱스 생성
     @PostConstruct
     public void ensureIndexes() {
-        mongoTemplate.indexOps("service_info").ensureIndex(
-            new Index().on("publicServiceId", Sort.Direction.ASC).unique()
-        );
-        log.info("MongoDB 인덱스 설정 완료: publicServiceId (unique)");
+        try {
+            // 인덱스 존재 여부 확인
+            boolean indexExists = false;
+            for (IndexInfo indexInfo : mongoTemplate.indexOps("service_info").getIndexInfo()) {
+                if ("publicServiceId_1".equals(indexInfo.getName())) {
+                    indexExists = true;
+                    break;
+                }
+            }
+
+            if (!indexExists) {
+                // 인덱스가 없을 때만 중복 제거 및 인덱스 생성 수행
+                log.info("MongoDB 중복 제거 및 인덱스 생성 시작");
+                deduplicateMongoDocuments();
+
+                mongoTemplate.indexOps("service_info").ensureIndex(
+                    new Index().on("publicServiceId", Sort.Direction.ASC).unique()
+                );
+                log.info("MongoDB 인덱스 설정 완료: publicServiceId (unique)");
+            } else {
+                log.info("MongoDB 인덱스 이미 존재함: publicServiceId (unique)");
+            }
+        } catch (Exception e) {
+            log.error("MongoDB 인덱스 설정 중 오류 발생: {}", e.getMessage());
+            // 인덱스 생성 실패해도 애플리케이션은 시작되도록 함
+        }
     }
 
     @Transactional
