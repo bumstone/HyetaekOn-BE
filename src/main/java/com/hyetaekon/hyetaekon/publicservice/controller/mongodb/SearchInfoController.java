@@ -1,6 +1,5 @@
 package com.hyetaekon.hyetaekon.publicservice.controller.mongodb;
 
-import com.hyetaekon.hyetaekon.common.jwt.CustomUserDetails;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
@@ -8,12 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import com.hyetaekon.hyetaekon.publicservice.dto.PublicServiceListResponseDto;
 import com.hyetaekon.hyetaekon.publicservice.dto.mongodb.ServiceSearchCriteriaDto;
-import com.hyetaekon.hyetaekon.publicservice.service.mongodb.ServiceSearchService;
+import com.hyetaekon.hyetaekon.publicservice.service.mongodb.ServiceSearchHandler;
 import com.hyetaekon.hyetaekon.common.util.AuthenticateUser;
 
 import java.util.List;
@@ -23,7 +21,7 @@ import java.util.List;
 @RequestMapping("/api/mongo/services")
 @RequiredArgsConstructor
 public class SearchInfoController {
-    private final ServiceSearchService searchService;
+    private final ServiceSearchHandler searchService;
     private final AuthenticateUser authenticateUser;
 
     // 검색 API (로그인/비로그인 통합)
