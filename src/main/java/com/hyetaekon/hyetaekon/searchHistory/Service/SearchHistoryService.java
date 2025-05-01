@@ -50,10 +50,6 @@ public class SearchHistoryService {
      */
     @Transactional(readOnly = true)
     public List<SearchHistoryDto> getUserSearchHistories(Long userId) {
-        if (userId == 0L) {
-            return List.of();
-        }
-
         List<SearchHistory> histories = searchHistoryRepository.findByUserId(userId);
 
         // 최신 순으로 정렬하여 최대 6개 반환
@@ -69,11 +65,10 @@ public class SearchHistoryService {
      */
     @Transactional
     public void deleteSearchHistory(Long userId, String historyId) {
-        if (userId == 0L || !StringUtils.hasText(historyId)) {
+        if (!StringUtils.hasText(historyId)) {
             return;
         }
-
-        // 안전하게 사용자의 검색 기록만 삭제하기 위해 사용자 ID도 함께 확인
+        // 사용자의 검색 기록만 삭제하기 위해 사용자 ID도 함께 확인
         searchHistoryRepository.deleteByUserIdAndId(userId, historyId);
         log.debug("사용자 {} 검색 기록 삭제: {}", userId, historyId);
     }
@@ -83,10 +78,6 @@ public class SearchHistoryService {
      */
     @Transactional
     public void deleteAllSearchHistories(Long userId) {
-        if (userId == 0L) {
-            return;
-        }
-
         List<SearchHistory> histories = searchHistoryRepository.findByUserId(userId);
         searchHistoryRepository.deleteAll(histories);
         log.debug("사용자 {} 검색 기록 전체 삭제", userId);
