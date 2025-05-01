@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class PostDetailResponseDto {
     private Long postId;
-    private Long nickName;  // 작성자 닉네임
+    private String nickName;  // 작성자 닉네임
     private String title;
     private String content;
     private LocalDateTime createdAt;

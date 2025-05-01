@@ -3,10 +3,20 @@ package com.hyetaekon.hyetaekon.common.publicdata.mongodb.service;
 import com.hyetaekon.hyetaekon.common.publicdata.mongodb.document.PublicData;
 import com.hyetaekon.hyetaekon.common.publicdata.mongodb.repository.PublicDataMongoRepository;
 import com.hyetaekon.hyetaekon.publicservice.entity.PublicService;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.index.Index;
+import org.springframework.data.mongodb.core.index.IndexInfo;
+import org.bson.Document;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -27,17 +37,6 @@ public class PublicDataMongoService {
     public PublicData saveToMongo(PublicService publicService) {
         PublicData document = convertToDocument(publicService);
         return mongoRepository.save(document);
-    }
-
-    /**
-     * 여러 공공서비스 엔티티를 MongoDB에 저장
-     */
-    public List<PublicData> saveAllToMongo(List<PublicService> publicServices) {
-        List<PublicData> documents = publicServices.stream()
-            .map(this::convertToDocument)
-            .collect(Collectors.toList());
-
-        return mongoRepository.saveAll(documents);
     }
 
     /**
@@ -109,29 +108,129 @@ public class PublicDataMongoService {
     /**
      * 여러 서비스 문서 업데이트 또는 생성
      */
-    public List<PublicData> updateOrCreateBulkDocuments(List<PublicService> services) {
-        // 기존 ID 목록 가져오기
+    public void updateOrCreateBulkDocuments(List<PublicService> services) {
+        // 모든 service ID 목록
         List<String> serviceIds = services.stream()
             .map(PublicService::getId)
             .collect(Collectors.toList());
 
-        // ID에 해당하는 문서 맵 생성
-        Map<String, PublicData> existingDocsMap = mongoRepository.findAllById(serviceIds).stream()
-            .collect(Collectors.toMap(PublicData::getPublicServiceId, doc -> doc, (a, b) -> a));
+        // publicServiceId로 기존 문서 조회 (중요: findAllByPublicServiceId를 사용)
+        Map<String, PublicData> existingDocsMap = mongoRepository.findAllByPublicServiceIdIn(serviceIds).stream()
+            .collect(Collectors.toMap(
+                PublicData::getPublicServiceId,
+                doc -> doc,
+                (a, b) -> a  // 중복 시 첫 번째 문서 유지
+            ));
 
-        // 각 서비스 처리
+        // 처리할 문서 준비
         List<PublicData> docsToSave = services.stream()
             .map(service -> {
                 PublicData doc = convertToDocument(service);
                 if (existingDocsMap.containsKey(service.getId())) {
-                    // 기존 문서 ID 유지
+                    // 기존 문서의 ID 유지
                     doc.setId(existingDocsMap.get(service.getId()).getId());
                 }
                 return doc;
             })
             .collect(Collectors.toList());
 
-        // 일괄 저장
-        return mongoRepository.saveAll(docsToSave);
+        // 저장
+        mongoRepository.saveAll(docsToSave);
+    }
+
+    // 첫 실행 시에만 중복 제거 및 인덱스 생성
+    @PostConstruct
+    public void ensureIndexes() {
+        try {
+            // 1. 기존 인덱스 확인
+            boolean hasUniqueIndex = false;
+            for (IndexInfo indexInfo : mongoTemplate.indexOps("service_info").getIndexInfo()) {
+                if ("publicServiceId_1".equals(indexInfo.getName())) {
+                    hasUniqueIndex = indexInfo.isUnique();
+                    break;
+                }
+            }
+
+            // 2. 유니크 인덱스가 없는 경우만 처리
+            if (!hasUniqueIndex) {
+                // 2.1 일반 인덱스 존재 여부 확인
+                boolean hasNonUniqueIndex = false;
+                for (IndexInfo indexInfo : mongoTemplate.indexOps("service_info").getIndexInfo()) {
+                    if ("publicServiceId_1".equals(indexInfo.getName()) && !indexInfo.isUnique()) {
+                        hasNonUniqueIndex = true;
+                        break;
+                    }
+                }
+
+                // 2.2 일반 인덱스가 있다면 삭제
+                if (hasNonUniqueIndex) {
+                    mongoTemplate.indexOps("service_info").dropIndex("publicServiceId_1");
+                    log.info("기존 비유니크 인덱스 삭제: publicServiceId_1");
+                }
+
+                // 2.3 최적화된 중복 제거 실행
+                deduplicateMongoDocuments();
+
+                // 2.4 유니크 인덱스 생성
+                mongoTemplate.indexOps("service_info").ensureIndex(
+                    new Index().on("publicServiceId", Sort.Direction.ASC).unique()
+                );
+                log.info("MongoDB 인덱스 설정 완료: publicServiceId (unique)");
+            } else {
+                log.info("MongoDB 유니크 인덱스 이미 존재함: publicServiceId_1");
+            }
+        } catch (Exception e) {
+            log.error("MongoDB 인덱스 설정 중 오류 발생: {}", e.getMessage());
+            // 인덱스 생성 실패해도 애플리케이션은 시작되도록 함
+        }
+    }
+
+    @Transactional
+    public void deduplicateMongoDocuments() {
+        log.info("MongoDB 문서 중복 제거 시작 (최적화 버전)");
+
+        // 모든 publicServiceId와 해당 문서 ID를 그룹화하여 한 번에 조회
+        AggregationResults<Document> results = mongoTemplate.aggregate(
+            Aggregation.newAggregation(
+                Aggregation.group("publicServiceId")
+                    .first("_id").as("firstId")
+                    .push("_id").as("allIds")
+                    .count().as("count")
+            ),
+            "service_info",
+            Document.class
+        );
+
+        int totalProcessed = 0;
+        int totalRemoved = 0;
+
+        for (Document doc : results.getMappedResults()) {
+            int count = doc.getInteger("count");
+
+            // 중복이 있는 경우에만 처리
+            if (count > 1) {
+                String publicServiceId = doc.getString("_id");
+                List<Object> allIds = (List<Object>) doc.get("allIds");
+                Object firstId = doc.get("firstId");
+
+                // 첫 번째 문서를 제외한 나머지 문서 삭제
+                for (int i = 0; i < allIds.size(); i++) {
+                    Object currentId = allIds.get(i);
+                    if (!currentId.equals(firstId)) {
+                        mongoTemplate.remove(Query.query(Criteria.where("_id").is(currentId)), "service_info");
+                        totalRemoved++;
+                    }
+                }
+            }
+
+            totalProcessed++;
+            if (totalProcessed % 1000 == 0) {
+                log.info("중복 제거 진행 중: {}/{} 그룹 처리, {}개 제거됨",
+                    totalProcessed, results.getMappedResults().size(), totalRemoved);
+            }
+        }
+
+        log.info("MongoDB 문서 중복 제거 완료: 총 {}개 그룹 중 {}개 중복 제거됨",
+            totalProcessed, totalRemoved);
     }
 }

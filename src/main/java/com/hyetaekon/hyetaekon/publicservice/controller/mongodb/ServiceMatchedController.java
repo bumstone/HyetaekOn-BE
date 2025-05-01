@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/services/matched")
 @RequiredArgsConstructor
-public class PublicServiceMatchedController {
+public class ServiceMatchedController {
 
 
 }

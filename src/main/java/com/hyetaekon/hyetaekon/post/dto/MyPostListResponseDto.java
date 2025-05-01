@@ -15,7 +15,7 @@ public class MyPostListResponseDto {
     private Long postId;
     private String title;
     private String content;
-    private Long nickName;  // 작성자 닉네임
+    private String nickName;  // 작성자 닉네임
     private LocalDateTime createdAt;
     private int recommendCnt;
     private int commentCnt;

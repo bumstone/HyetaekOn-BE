@@ -48,7 +48,7 @@ public class Post {
     private int recommendCnt = 0;  // 추천수
 
     @Builder.Default
-    @Column(name = "view_cnt")
+    @Column(name = "view_count")
     private int viewCnt = 0;  // 조회수
 
     // TODO: 댓글 생성/수정 시 업데이트
