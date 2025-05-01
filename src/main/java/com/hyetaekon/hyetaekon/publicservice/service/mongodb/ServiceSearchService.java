@@ -58,7 +58,7 @@ public class ServiceSearchService {
         // 검색 조건이 없는 경우 빈 결과 반환
         if (!StringUtils.hasText(criteria.getSearchTerm())) {
             return Page.empty(criteria.getPageable());
-        } else { // 검색어가 유효하면 검색 기록 저장
+        } else if(StringUtils.hasText(criteria.getSearchTerm())) { // 검색어가 유효하면 검색 기록 저장
             searchHistoryService.saveSearchHistory(userId, criteria.getSearchTerm());
         }
 
