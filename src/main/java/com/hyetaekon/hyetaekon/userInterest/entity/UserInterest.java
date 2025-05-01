@@ -1,4 +1,4 @@
-package com.hyetaekon.hyetaekon.UserInterest.entity;
+package com.hyetaekon.hyetaekon.userInterest.entity;
 
 import com.hyetaekon.hyetaekon.user.entity.User;
 import jakarta.persistence.*;

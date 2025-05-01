@@ -1,4 +1,4 @@
-package com.hyetaekon.hyetaekon.UserInterest.dto;
+package com.hyetaekon.hyetaekon.userInterest.dto;
 
 import lombok.Getter;
 

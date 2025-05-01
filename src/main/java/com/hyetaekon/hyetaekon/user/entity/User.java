@@ -1,6 +1,6 @@
 package com.hyetaekon.hyetaekon.user.entity;
 
-import com.hyetaekon.hyetaekon.UserInterest.entity.UserInterest;
+import com.hyetaekon.hyetaekon.userInterest.entity.UserInterest;
 import com.hyetaekon.hyetaekon.bookmark.entity.Bookmark;
 import com.hyetaekon.hyetaekon.recommend.entity.Recommend;
 import jakarta.persistence.*;

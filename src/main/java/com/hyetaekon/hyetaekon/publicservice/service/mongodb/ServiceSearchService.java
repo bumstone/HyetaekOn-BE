@@ -1,7 +1,8 @@
 package com.hyetaekon.hyetaekon.publicservice.service.mongodb;
 
-import com.hyetaekon.hyetaekon.UserInterest.entity.UserInterest;
-import com.hyetaekon.hyetaekon.UserInterest.repository.UserInterestRepository;
+import com.hyetaekon.hyetaekon.searchHistory.Service.SearchHistoryService;
+import com.hyetaekon.hyetaekon.userInterest.entity.UserInterest;
+import com.hyetaekon.hyetaekon.userInterest.repository.UserInterestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -34,11 +35,12 @@ public class ServiceSearchService {
     private final UserRepository userRepository;
     private final UserInterestRepository userInterestRepository;
     private final IncomeEstimationHandler incomeEstimationHandler;
+    private final SearchHistoryService searchHistoryService;
 
     // 기본 검색 (비로그인)
     public Page<PublicServiceListResponseDto> searchServices(ServiceSearchCriteriaDto criteria) {
         // 검색 조건이 없는 경우 빈 결과 반환
-        if (!criteria.hasSearchCriteria()) {
+        if (!StringUtils.hasText(criteria.getSearchTerm())) {
             return Page.empty(criteria.getPageable());
         }
 
@@ -54,8 +56,10 @@ public class ServiceSearchService {
         ServiceSearchCriteriaDto criteria, Long userId) {
 
         // 검색 조건이 없는 경우 빈 결과 반환
-        if (!criteria.hasSearchCriteria()) {
+        if (!StringUtils.hasText(criteria.getSearchTerm())) {
             return Page.empty(criteria.getPageable());
+        } else if(StringUtils.hasText(criteria.getSearchTerm())) { // 검색어가 유효하면 검색 기록 저장
+            searchHistoryService.saveSearchHistory(userId, criteria.getSearchTerm());
         }
 
         // 사용자 정보 가져오기

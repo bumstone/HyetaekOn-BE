@@ -1,8 +1,7 @@
-package com.hyetaekon.hyetaekon.UserInterest.dto;
+package com.hyetaekon.hyetaekon.userInterest.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 import java.util.Map;

@@ -160,11 +160,19 @@ public class ServiceSearchClient {
             {
                 compound: {
                     should: [
-                        {exists: {path: "%s", exists: false}},
-                        {equals: {path: "%s", value: "Y"}}
+                        {
+                            compound: {
+                                mustNot: [{exists: {path: "%s"}}]
+                            }
+                        },
+                        {
+                            equals: {path: "%s", value: "Y"}
+                        }
                     ]
                 }
-            }""".formatted(genderField, genderField));
+            }
+            """.formatted(genderField, genderField));
+
         }
 
         // 나이 필수 조건
@@ -176,21 +184,36 @@ public class ServiceSearchClient {
             {
                 compound: {
                     should: [
-                        {exists: {path: "targetAgeStart", exists: false}},
-                        {range: {path: "targetAgeStart", lte: %d}}
+                        {
+                            compound: {
+                                mustNot: [{exists: {path: "targetAgeStart"}}]
+                            }
+                        },
+                        {
+                            range: {path: "targetAgeStart", lte: %d}
+                        }
                     ]
                 }
-            }""".formatted(age));
+            }
+            """.formatted(age));
 
-            mustClauses.add("""
+                        mustClauses.add("""
             {
                 compound: {
                     should: [
-                        {exists: {path: "targetAgeEnd", exists: false}},
-                        {range: {path: "targetAgeEnd", gte: %d}}
+                        {
+                            compound: {
+                                mustNot: [{exists: {path: "targetAgeEnd"}}]
+                            }
+                        },
+                        {
+                            range: {path: "targetAgeEnd", gte: %d}
+                        }
                     ]
                 }
-            }""".formatted(age));
+            }
+            """.formatted(age));
+
         }
 
         // must 조건이 없으면 빈 문자열 반환
