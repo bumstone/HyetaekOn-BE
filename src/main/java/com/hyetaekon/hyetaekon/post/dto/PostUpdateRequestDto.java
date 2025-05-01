@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostUpdateRequestDto {
-    private Long nickName;
+    private String nickName;
     private String title;
     private String content;
     // private LocalDateTime createdAt;
