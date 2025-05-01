@@ -8,8 +8,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexInfo;
+import org.bson.Document;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -137,26 +142,42 @@ public class PublicDataMongoService {
     @PostConstruct
     public void ensureIndexes() {
         try {
-            // 인덱스 존재 여부 확인
-            boolean indexExists = false;
+            // 1. 기존 인덱스 확인
+            boolean hasUniqueIndex = false;
             for (IndexInfo indexInfo : mongoTemplate.indexOps("service_info").getIndexInfo()) {
                 if ("publicServiceId_1".equals(indexInfo.getName())) {
-                    indexExists = true;
+                    hasUniqueIndex = indexInfo.isUnique();
                     break;
                 }
             }
 
-            if (!indexExists) {
-                // 인덱스가 없을 때만 중복 제거 및 인덱스 생성 수행
-                log.info("MongoDB 중복 제거 및 인덱스 생성 시작");
+            // 2. 유니크 인덱스가 없는 경우만 처리
+            if (!hasUniqueIndex) {
+                // 2.1 일반 인덱스 존재 여부 확인
+                boolean hasNonUniqueIndex = false;
+                for (IndexInfo indexInfo : mongoTemplate.indexOps("service_info").getIndexInfo()) {
+                    if ("publicServiceId_1".equals(indexInfo.getName()) && !indexInfo.isUnique()) {
+                        hasNonUniqueIndex = true;
+                        break;
+                    }
+                }
+
+                // 2.2 일반 인덱스가 있다면 삭제
+                if (hasNonUniqueIndex) {
+                    mongoTemplate.indexOps("service_info").dropIndex("publicServiceId_1");
+                    log.info("기존 비유니크 인덱스 삭제: publicServiceId_1");
+                }
+
+                // 2.3 최적화된 중복 제거 실행
                 deduplicateMongoDocuments();
 
+                // 2.4 유니크 인덱스 생성
                 mongoTemplate.indexOps("service_info").ensureIndex(
                     new Index().on("publicServiceId", Sort.Direction.ASC).unique()
                 );
                 log.info("MongoDB 인덱스 설정 완료: publicServiceId (unique)");
             } else {
-                log.info("MongoDB 인덱스 이미 존재함: publicServiceId (unique)");
+                log.info("MongoDB 유니크 인덱스 이미 존재함: publicServiceId_1");
             }
         } catch (Exception e) {
             log.error("MongoDB 인덱스 설정 중 오류 발생: {}", e.getMessage());
@@ -166,36 +187,50 @@ public class PublicDataMongoService {
 
     @Transactional
     public void deduplicateMongoDocuments() {
-        log.info("MongoDB 문서 중복 제거 시작");
+        log.info("MongoDB 문서 중복 제거 시작 (최적화 버전)");
 
-        // 1. 모든 publicServiceId 목록 조회
-        List<String> allServiceIds = mongoRepository.findAllPublicServiceIds();
+        // 모든 publicServiceId와 해당 문서 ID를 그룹화하여 한 번에 조회
+        AggregationResults<Document> results = mongoTemplate.aggregate(
+            Aggregation.newAggregation(
+                Aggregation.group("publicServiceId")
+                    .first("_id").as("firstId")
+                    .push("_id").as("allIds")
+                    .count().as("count")
+            ),
+            "service_info",
+            Document.class
+        );
+
         int totalProcessed = 0;
         int totalRemoved = 0;
 
-        // 2. 각 ID별로 처리
-        for (String serviceId : allServiceIds) {
-            List<PublicData> duplicates = mongoRepository.findAllByPublicServiceId(serviceId);
+        for (Document doc : results.getMappedResults()) {
+            int count = doc.getInteger("count");
 
-            if (duplicates.size() > 1) {
-                // 가장 최근 문서를 남기고 나머지 삭제
-                PublicData latestDoc = duplicates.get(0); // 또는 타임스탬프로 정렬하여 최신 문서 선택
+            // 중복이 있는 경우에만 처리
+            if (count > 1) {
+                String publicServiceId = doc.getString("_id");
+                List<Object> allIds = (List<Object>) doc.get("allIds");
+                Object firstId = doc.get("firstId");
 
-                // 나머지 중복 문서 삭제
-                for (int i = 1; i < duplicates.size(); i++) {
-                    mongoRepository.delete(duplicates.get(i));
-                    totalRemoved++;
+                // 첫 번째 문서를 제외한 나머지 문서 삭제
+                for (int i = 0; i < allIds.size(); i++) {
+                    Object currentId = allIds.get(i);
+                    if (!currentId.equals(firstId)) {
+                        mongoTemplate.remove(Query.query(Criteria.where("_id").is(currentId)), "service_info");
+                        totalRemoved++;
+                    }
                 }
             }
 
             totalProcessed++;
             if (totalProcessed % 1000 == 0) {
-                log.info("중복 제거 진행 중: {}/{} 처리, {}개 제거됨",
-                    totalProcessed, allServiceIds.size(), totalRemoved);
+                log.info("중복 제거 진행 중: {}/{} 그룹 처리, {}개 제거됨",
+                    totalProcessed, results.getMappedResults().size(), totalRemoved);
             }
         }
 
-        log.info("MongoDB 문서 중복 제거 완료: 총 {}개 중 {}개 중복 제거됨",
+        log.info("MongoDB 문서 중복 제거 완료: 총 {}개 그룹 중 {}개 중복 제거됨",
             totalProcessed, totalRemoved);
     }
 }
