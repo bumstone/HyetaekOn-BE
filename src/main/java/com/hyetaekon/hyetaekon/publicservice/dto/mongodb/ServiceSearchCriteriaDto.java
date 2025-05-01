@@ -36,8 +36,4 @@ public class ServiceSearchCriteriaDto {
             .build();
     }
 
-    // 검색 조건 유무 확인
-    public boolean hasSearchCriteria() {
-        return StringUtils.hasText(searchTerm);
-    }
 }
