@@ -1,10 +1,10 @@
-package com.hyetaekon.hyetaekon.UserInterest.service;
+package com.hyetaekon.hyetaekon.userInterest.service;
 
-import com.hyetaekon.hyetaekon.UserInterest.dto.CategorizedInterestsWithSelectionDto;
-import com.hyetaekon.hyetaekon.UserInterest.dto.InterestItemDto;
-import com.hyetaekon.hyetaekon.UserInterest.entity.UserInterest;
-import com.hyetaekon.hyetaekon.UserInterest.entity.UserInterestEnum;
-import com.hyetaekon.hyetaekon.UserInterest.repository.UserInterestRepository;
+import com.hyetaekon.hyetaekon.userInterest.dto.CategorizedInterestsWithSelectionDto;
+import com.hyetaekon.hyetaekon.userInterest.dto.InterestItemDto;
+import com.hyetaekon.hyetaekon.userInterest.entity.UserInterest;
+import com.hyetaekon.hyetaekon.userInterest.entity.UserInterestEnum;
+import com.hyetaekon.hyetaekon.userInterest.repository.UserInterestRepository;
 import com.hyetaekon.hyetaekon.common.exception.ErrorCode;
 import com.hyetaekon.hyetaekon.common.exception.GlobalException;
 import com.hyetaekon.hyetaekon.user.entity.User;

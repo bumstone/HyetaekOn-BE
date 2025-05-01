@@ -28,7 +28,9 @@ public class SecurityPath {
       "/api/interests",
       "/api/interests/me",
       "/api/posts",
-      "/api/posts/*"
+      "/api/posts/*",
+      "/api/search/history",
+      "/api/search/history/*"
   };
 
   // hasRole("ADMIN")

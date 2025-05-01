@@ -1,10 +1,9 @@
-package com.hyetaekon.hyetaekon.UserInterest.repository;
+package com.hyetaekon.hyetaekon.userInterest.repository;
 
-import com.hyetaekon.hyetaekon.UserInterest.entity.UserInterest;
+import com.hyetaekon.hyetaekon.userInterest.entity.UserInterest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Repository

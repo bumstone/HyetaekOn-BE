@@ -1,10 +1,10 @@
-package com.hyetaekon.hyetaekon.UserInterest.controller;
+package com.hyetaekon.hyetaekon.userInterest.controller;
 
-import com.hyetaekon.hyetaekon.UserInterest.dto.CategorizedInterestsResponseDto;
-import com.hyetaekon.hyetaekon.UserInterest.dto.CategorizedInterestsWithSelectionDto;
-import com.hyetaekon.hyetaekon.UserInterest.dto.InterestSelectionRequestDto;
-import com.hyetaekon.hyetaekon.UserInterest.entity.UserInterestEnum;
-import com.hyetaekon.hyetaekon.UserInterest.service.UserInterestService;
+import com.hyetaekon.hyetaekon.userInterest.dto.CategorizedInterestsResponseDto;
+import com.hyetaekon.hyetaekon.userInterest.dto.CategorizedInterestsWithSelectionDto;
+import com.hyetaekon.hyetaekon.userInterest.dto.InterestSelectionRequestDto;
+import com.hyetaekon.hyetaekon.userInterest.entity.UserInterestEnum;
+import com.hyetaekon.hyetaekon.userInterest.service.UserInterestService;
 import com.hyetaekon.hyetaekon.common.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
