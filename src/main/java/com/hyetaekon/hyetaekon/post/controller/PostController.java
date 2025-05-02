@@ -52,7 +52,7 @@ public class PostController {
     // ✅ 게시글 생성
     @PostMapping
     public ResponseEntity<PostDetailResponseDto> createPost(
-        @RequestBody PostCreateRequestDto requestDto,
+            @ModelAttribute PostCreateRequestDto requestDto,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(postService.createPost(requestDto, userDetails.getId()));
     }
@@ -61,7 +61,7 @@ public class PostController {
     @PutMapping("/{postId}")
     public ResponseEntity<PostDetailResponseDto> updatePost(
         @PathVariable Long postId,
-        @RequestBody PostUpdateRequestDto updateDto,
+        @ModelAttribute PostUpdateRequestDto updateDto,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(postService.updatePost(postId, updateDto, userDetails.getId()));
     }
