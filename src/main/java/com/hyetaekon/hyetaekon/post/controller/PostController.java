@@ -25,15 +25,18 @@ public class PostController {
     // PostType에 해당하는 게시글 목록 조회
     @GetMapping("/type")
     public ResponseEntity<Page<PostListResponseDto>> getPosts(
-        @RequestParam(required = false, defaultValue = "전체") String postType,
-        @PageableDefault(page = 0, size = 10) Pageable pageable) {
+            @RequestParam(required = false, defaultValue = "전체") String postType,
+            @RequestParam(required = false) String keyword,  // 🔥 제목 검색 추가
+            @RequestParam(defaultValue = "createdAt") String sortBy,  // 🔥 정렬 키워드 추가
+            @RequestParam(defaultValue = "DESC") String direction,    // 🔥 정렬 방향 추가
+            @PageableDefault(page = 0, size = 10) Pageable pageable) {
 
         PostType type = PostType.fromKoreanName(postType);
 
         if (type == PostType.ALL) {
-            return ResponseEntity.ok(postService.getAllPosts(pageable));
+            return ResponseEntity.ok(postService.getAllPosts(keyword, sortBy, direction, pageable));
         } else {
-            return ResponseEntity.ok(postService.getPostsByType(type, pageable));
+            return ResponseEntity.ok(postService.getPostsByType(type, keyword, sortBy, direction, pageable));
         }
     }
 
@@ -49,7 +52,7 @@ public class PostController {
     // ✅ 게시글 생성
     @PostMapping
     public ResponseEntity<PostDetailResponseDto> createPost(
-        @RequestBody PostCreateRequestDto requestDto,
+            @ModelAttribute PostCreateRequestDto requestDto,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(postService.createPost(requestDto, userDetails.getId()));
     }
@@ -58,7 +61,7 @@ public class PostController {
     @PutMapping("/{postId}")
     public ResponseEntity<PostDetailResponseDto> updatePost(
         @PathVariable Long postId,
-        @RequestBody PostUpdateRequestDto updateDto,
+        @ModelAttribute PostUpdateRequestDto updateDto,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         return ResponseEntity.ok(postService.updatePost(postId, updateDto, userDetails.getId()));
     }
