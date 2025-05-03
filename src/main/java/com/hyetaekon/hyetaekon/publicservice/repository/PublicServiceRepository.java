@@ -17,7 +17,6 @@ import java.util.Optional;
 
 @Repository
 public interface PublicServiceRepository extends JpaRepository<PublicService, String> {
-    Page<PublicService> findByServiceCategory(ServiceCategory category, Pageable pageable);
 
     List<PublicService> findTop6ByOrderByBookmarkCntDesc();
 
@@ -41,5 +40,4 @@ public interface PublicServiceRepository extends JpaRepository<PublicService, St
     // 사용자의 북마크 공공서비스 목록 페이지
     @Query("SELECT p FROM PublicService p JOIN p.bookmarks b WHERE b.user.id = :userId ORDER BY b.createdAt DESC")
     Page<PublicService> findByBookmarks_User_Id(@Param("userId") Long userId, Pageable pageable);
-
 }

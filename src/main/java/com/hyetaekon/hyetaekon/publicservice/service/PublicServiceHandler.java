@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class PublicServiceHandler {
     private final PublicServiceRepository publicServiceRepository;
     private final PublicServiceMapper publicServiceMapper;
@@ -79,13 +78,11 @@ public class PublicServiceHandler {
     }
 
     // 인기 서비스 목록 조회(6개 고정) - 캐싱적용
-    @Cacheable(value = "popularServices", key = "'top6'", unless = "#result.isEmpty()")
+    @Transactional(readOnly = true)
     public List<PublicServiceListResponseDto> getPopularServices(Long userId) {
 
         // 북마크 수 기준으로 상위 6개 서비스 조회
-        List<PublicService> services = publicServiceRepository.findTop6ByOrderByBookmarkCntDesc();
-
-        return services.stream()
+        return publicServiceRepository.findTop6ByOrderByBookmarkCntDesc().stream()
             .map(service -> {
                 PublicServiceListResponseDto dto = publicServiceMapper.toListDto(service);
                 // 로그인한 사용자는 북마크 여부 확인
@@ -97,12 +94,8 @@ public class PublicServiceHandler {
             .collect(Collectors.toList());
     }
 
-    // 인기 서비스 캐시 무효화 - 데이터 변경 시 호출
-    @CacheEvict(value = "popularServices", key = "'top6'")
-    public void refreshPopularServices() {
-    }
-
     // 공공서비스 전체 목록 조회 (정렬 및 필터링 적용)
+    @Transactional(readOnly = true)
     public Page<PublicServiceListResponseDto> getAllServices(
         String sort,
         List<String> specialGroups,
@@ -209,6 +202,7 @@ public class PublicServiceHandler {
     }
 
     // 필터 옵션 조회 (캐싱 적용)
+    @Transactional(readOnly = true)
     @Cacheable(value = "filterOptions")
     public Map<String, List<FilterOptionDto>> getFilterOptions() {
         Map<String, List<FilterOptionDto>> filterOptions = new HashMap<>();
@@ -235,11 +229,13 @@ public class PublicServiceHandler {
     }
 
     // 필터 옵션 캐시 무효화 - Enum이 변경될 때
+    @Transactional
     @CacheEvict(value = "filterOptions", allEntries = true)
     public void refreshFilterOptions() {
     }
 
     // 내가 북마크한 서비스 목록 조회
+    @Transactional(readOnly = true)
     public Page<PublicServiceListResponseDto> getBookmarkedServices(Long userId, Pageable pageable) {
       Page<PublicService> bookmarkedServices = publicServiceRepository.findByBookmarks_User_Id(userId, pageable);
 

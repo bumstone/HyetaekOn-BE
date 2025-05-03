@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 public enum CacheType {
     SERVICE_AUTOCOMPLETE("serviceAutocomplete", 2, 1200),   // 자동완성 캐시
     FILTER_OPTIONS("filterOptions", 24, 50),              // 필터 옵션 캐시 (하루 유지)
-    POPULAR_SERVICES("popularServices", 1, 100),           // 인기 서비스 캐시
     MATCHED_SERVICES("matchedServices", 2, 100);          // 맞춤 서비스 캐시
 
     private final String cacheName;

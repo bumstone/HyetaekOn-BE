@@ -44,9 +44,7 @@ public class BookmarkService {
 
         // 북마크 수 증가
         publicService.increaseBookmarkCount();
-
-        // 인기 서비스 캐시 무효화
-        publicServiceHandler.refreshPopularServices();
+        publicServiceRepository.save(publicService);
     }
 
     @Transactional
@@ -59,8 +57,6 @@ public class BookmarkService {
         // 북마크 수 감소
         PublicService publicService = bookmark.getPublicService();
         publicService.decreaseBookmarkCount();
-
-        // 인기 서비스 캐시 무효화
-        publicServiceHandler.refreshPopularServices();
+        publicServiceRepository.save(publicService);
     }
 }
