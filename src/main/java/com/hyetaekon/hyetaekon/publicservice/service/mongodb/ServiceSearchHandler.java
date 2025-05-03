@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ServiceSearchService {
+public class ServiceSearchHandler {
     private final ServiceSearchClient serviceSearchClient;
     private final BookmarkRepository bookmarkRepository;
     private final ServiceInfoMapper serviceInfoMapper;
@@ -116,7 +116,7 @@ public class ServiceSearchService {
     }
 
     // 나이 계산 헬퍼 메서드
-    private Integer calculateAge(LocalDate birthDate) {
+    public Integer calculateAge(LocalDate birthDate) {
         if (birthDate == null) return null;
         return Period.between(birthDate, LocalDate.now()).getYears();
     }
