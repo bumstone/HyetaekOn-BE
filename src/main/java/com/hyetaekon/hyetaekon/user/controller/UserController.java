@@ -1,6 +1,7 @@
 package com.hyetaekon.hyetaekon.user.controller;
 
 import com.hyetaekon.hyetaekon.common.jwt.CustomUserDetails;
+import com.hyetaekon.hyetaekon.common.jwt.CustomUserPrincipal;
 import com.hyetaekon.hyetaekon.post.dto.MyPostListResponseDto;
 import com.hyetaekon.hyetaekon.post.service.PostService;
 import com.hyetaekon.hyetaekon.publicservice.dto.PublicServiceListResponseDto;
@@ -71,13 +72,15 @@ public class UserController {
   // 회원 탈퇴
   @DeleteMapping("/users/me")
   public ResponseEntity<Void> deleteUser(
-      @AuthenticationPrincipal CustomUserDetails customUserDetails,
+      @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
       @RequestBody UserDeleteRequestDto deleteRequestDto,
       @CookieValue(name = "refreshToken", required = false) String refreshToken,
       @RequestHeader("Authorization") String authHeader
   ) {
-    String accessToken = authHeader.replace("Bearer", "");
-    userService.deleteUser(customUserDetails.getId(), deleteRequestDto.getDeleteReason(), accessToken, refreshToken);
+    String accessToken = authHeader.replace("Bearer ", "");
+    if(customUserPrincipal instanceof CustomUserDetails customUserDetails) {
+      userService.deleteUser(customUserDetails.getId(), deleteRequestDto.getDeleteReason(), accessToken, refreshToken);
+    }
 
     return ResponseEntity.noContent().build();
   }
