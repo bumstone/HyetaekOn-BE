@@ -1,13 +1,20 @@
 package com.hyetaekon.hyetaekon.user.controller;
 
+import com.hyetaekon.hyetaekon.common.exception.ErrorCode;
+import com.hyetaekon.hyetaekon.common.exception.GlobalException;
 import com.hyetaekon.hyetaekon.common.jwt.CustomUserDetails;
 import com.hyetaekon.hyetaekon.common.jwt.CustomUserPrincipal;
+import com.hyetaekon.hyetaekon.common.jwt.JwtTokenParser;
+import com.hyetaekon.hyetaekon.common.jwt.JwtTokenProvider;
 import com.hyetaekon.hyetaekon.post.dto.MyPostListResponseDto;
 import com.hyetaekon.hyetaekon.post.service.PostService;
 import com.hyetaekon.hyetaekon.publicservice.dto.PublicServiceListResponseDto;
 import com.hyetaekon.hyetaekon.publicservice.service.PublicServiceHandler;
 import com.hyetaekon.hyetaekon.user.dto.*;
+import com.hyetaekon.hyetaekon.user.entity.User;
+import com.hyetaekon.hyetaekon.user.repository.UserRepository;
 import com.hyetaekon.hyetaekon.user.service.UserService;
+import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -31,6 +38,8 @@ public class UserController {
   private final UserService userService;
   private final PublicServiceHandler publicServiceHandler;
   private final PostService postService;
+  private final JwtTokenParser jwtTokenParser;
+  private final UserRepository userRepository;
 
   // 회원 가입 api
   @PostMapping("/signup")
@@ -70,18 +79,48 @@ public class UserController {
   }
 
   // 회원 탈퇴
-  @DeleteMapping("/users/me")
+  /*@DeleteMapping("/users/me")
   public ResponseEntity<Void> deleteUser(
-      @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
+      @AuthenticationPrincipal CustomUserDetails customUserDetails,
       @RequestBody UserDeleteRequestDto deleteRequestDto,
       @CookieValue(name = "refreshToken", required = false) String refreshToken,
       @RequestHeader("Authorization") String authHeader
   ) {
     String accessToken = authHeader.replace("Bearer ", "");
-    if(customUserPrincipal instanceof CustomUserDetails customUserDetails) {
-      userService.deleteUser(customUserDetails.getId(), deleteRequestDto.getDeleteReason(), accessToken, refreshToken);
+    userService.deleteUser(customUserDetails.getId(), deleteRequestDto.getDeleteReason(), accessToken, refreshToken);
+
+    return ResponseEntity.noContent().build();
+  }*/
+  @DeleteMapping("/users/me")
+  public ResponseEntity<Void> deleteUser(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @RequestBody UserDeleteRequestDto deleteRequestDto,
+      @CookieValue(name = "refreshToken", required = false) String refreshToken,
+      @RequestHeader("Authorization") String authHeader
+  ) {
+    log.debug("회원 탈퇴 요청 - 인증 객체: {}", userDetails);
+
+    if (userDetails == null) {
+      // 인증 객체가 null일 경우 토큰에서 직접 정보 추출
+      try {
+        String token = authHeader.replace("Bearer ", "");
+        Claims claims = jwtTokenParser.parseClaims(token);
+        String realId = claims.getSubject();
+
+        User user = userRepository.findByRealIdAndDeletedAtIsNull(realId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND_BY_REAL_ID));
+
+        userService.deleteUser(user.getId(), deleteRequestDto.getDeleteReason(), token, refreshToken);
+        return ResponseEntity.noContent().build();
+      } catch (Exception e) {
+        log.error("회원 탈퇴 처리 실패: {}", e.getMessage());
+        throw new GlobalException(ErrorCode.DELETE_USER_DENIED);
+      }
     }
 
+    // 기존 로직
+    String accessToken = authHeader.replace("Bearer ", "");
+    userService.deleteUser(userDetails.getId(), deleteRequestDto.getDeleteReason(), accessToken, refreshToken);
     return ResponseEntity.noContent().build();
   }
 
