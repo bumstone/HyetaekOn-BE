@@ -18,5 +18,6 @@ public interface UserAdminMapper {
     // UserReport Entity -> 신고 내역 DTO 변환
     @Mapping(source = "reporter.nickname", target = "reporterNickname")
     @Mapping(source = "reported.nickname", target = "reportedNickname")
+    @Mapping(source = "status.description", target = "status")
     UserReportResponseDto toReportResponseDto(UserReport userReport);
 }

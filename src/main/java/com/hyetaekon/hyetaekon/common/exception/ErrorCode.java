@@ -16,8 +16,12 @@ public enum ErrorCode {
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "AUTH-006", "유효하지 않은 사용자 이름 또는 비밀번호입니다."),
     INVALID_SECRET_KEY(HttpStatus.UNAUTHORIZED, "AUTH-007", "유효하지 않은 비밀 키입니다."),
     DELETE_USER_DENIED(HttpStatus.FORBIDDEN, "AUTH-008", "회원 탈퇴가 거부되었습니다."),
-    ROLE_NOT_FOUND(HttpStatus.FORBIDDEN, "AUTH-009", "권한 정보가 없습니다."),
-    BLACKLIST_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH-010", "사용할 수 없는 액세스 토큰입니다."),
+    CANNOT_REPORT_SELF(HttpStatus.BAD_REQUEST, "AUTH-009","자기 자신을 신고할 수 없습니다."),
+    ROLE_NOT_FOUND(HttpStatus.FORBIDDEN, "AUTH-010", "권한 정보가 없습니다."),
+    BLACKLIST_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH-011", "사용할 수 없는 액세스 토큰입니다."),
+    REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH-012", "해당 신고 내역을 찾을 수 없습니다."),
+    REPORT_ALREADY_PROCESSED(HttpStatus.BAD_REQUEST, "AUTH-013", "이미 처리된 신고입니다."),
+    INVALID_REPORT_REQUEST(HttpStatus.BAD_REQUEST, "AUTH-014","잘못된 신고 요청입니다."),
 
     // 계정 관련
     DUPLICATED_REAL_ID(HttpStatus.CONFLICT, "ACCOUNT-001", "이미 존재하는 아이디입니다."),

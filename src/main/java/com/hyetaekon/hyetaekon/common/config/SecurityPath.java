@@ -31,7 +31,8 @@ public class SecurityPath {
       "/api/posts/*",
       "/api/search/history",
       "/api/search/history/*",
-      "/api/mongo/services/matched"
+      "/api/mongo/services/matched",
+      "/api/users/reports"
   };
 
   // hasRole("ADMIN")

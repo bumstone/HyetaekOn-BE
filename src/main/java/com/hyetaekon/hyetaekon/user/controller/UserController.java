@@ -72,12 +72,12 @@ public class UserController {
   @DeleteMapping("/users/me")
   public ResponseEntity<Void> deleteUser(
       @AuthenticationPrincipal CustomUserDetails customUserDetails,
-      @RequestBody String deleteReason,
+      @RequestBody UserDeleteRequestDto deleteRequestDto,
       @CookieValue(name = "refreshToken", required = false) String refreshToken,
       @RequestHeader("Authorization") String authHeader
   ) {
     String accessToken = authHeader.replace("Bearer ", "");
-    userService.deleteUser(customUserDetails.getId(), deleteReason, accessToken, refreshToken);
+    userService.deleteUser(customUserDetails.getId(), deleteRequestDto.getDeleteReason(), accessToken, refreshToken);
 
     return ResponseEntity.noContent().build();
   }
