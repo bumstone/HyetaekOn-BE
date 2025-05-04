@@ -76,7 +76,7 @@ public class UserController {
       @CookieValue(name = "refreshToken", required = false) String refreshToken,
       @RequestHeader("Authorization") String authHeader
   ) {
-    String accessToken = authHeader.replace("Bearer ", "");
+    String accessToken = authHeader.replace("Bearer", "");
     userService.deleteUser(customUserDetails.getId(), deleteRequestDto.getDeleteReason(), accessToken, refreshToken);
 
     return ResponseEntity.noContent().build();
