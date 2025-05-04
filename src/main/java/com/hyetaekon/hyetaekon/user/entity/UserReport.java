@@ -35,11 +35,22 @@ public class UserReport {
     private String content;
 
     @Column(name = "status", length = 20)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private ReportStatus status;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "processed_at")
     private LocalDateTime processedAt;
+
+    public void resolve() {
+        this.status = ReportStatus.RESOLVED;
+        this.processedAt = LocalDateTime.now();
+    }
+
+    public void reject() {
+        this.status = ReportStatus.REJECTED;
+        this.processedAt = LocalDateTime.now();
+    }
 }
