@@ -123,29 +123,27 @@ public class PostService {
     @Transactional
     public PostDetailResponseDto createPost(PostCreateRequestDto requestDto, Long userId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + userId));
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + userId));
 
-        // PostType Enum 변환
         PostType postType = PostType.fromKoreanName(requestDto.getPostType());
 
-        // DTO -> Entity 변환
         Post post = postMapper.toEntity(requestDto);
         post.setUser(user);
         post.setPostType(postType);
 
-        // 게시글 저장
         Post savedPost = postRepository.save(post);
 
-        // 이미지 처리
         if (requestDto.getImages() != null && !requestDto.getImages().isEmpty()) {
             List<PostImage> postImages = processPostImages(requestDto.getImages(), savedPost);
             if (!postImages.isEmpty()) {
                 postImageRepository.saveAll(postImages);
+                savedPost.setPostImages(postImages); // ✅ 이 줄이 핵심
             }
         }
 
-        return postMapper.toPostDetailDto(savedPost);
+        return postMapper.toPostDetailDto(savedPost); // ✅ Mapper가 imageUrls 포함해서 반환
     }
+
 
     /**
      * 게시글 수정 (본인만 가능)

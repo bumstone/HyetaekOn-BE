@@ -53,9 +53,12 @@ public class PostController {
     @PostMapping
     public ResponseEntity<PostDetailResponseDto> createPost(
             @ModelAttribute PostCreateRequestDto requestDto,
-        @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ResponseEntity.ok(postService.createPost(requestDto, userDetails.getId()));
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        PostDetailResponseDto dto = postService.createPost(requestDto, userDetails.getId());
+        return ResponseEntity.ok(dto);
     }
+
 
     // ✅ 게시글 수정 - 본인
     @PutMapping("/{postId}")
