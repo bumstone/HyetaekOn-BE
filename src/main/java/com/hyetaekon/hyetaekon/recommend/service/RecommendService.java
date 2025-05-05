@@ -42,6 +42,7 @@ public class RecommendService {
 
         // 북마크 수 증가
         post.incrementRecommendCnt();
+        postRepository.save(post);
     }
 
     @jakarta.transaction.Transactional
@@ -54,5 +55,6 @@ public class RecommendService {
         // 추천수 감소
         Post post  = recommend.getPost();
         post.decrementRecommendCnt();
+        postRepository.save(post);
     }
 }
