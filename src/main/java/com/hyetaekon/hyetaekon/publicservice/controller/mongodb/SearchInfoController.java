@@ -63,7 +63,7 @@ public class SearchInfoController {
     }
 
     // 자동완성 API(서비스에 대해서만)
-    @GetMapping("/search/autocomplete")
+    @GetMapping("/services/autocomplete")
     public ResponseEntity<List<String>> getAutocompleteResults(
         @RequestParam(name = "word") String word
     ) {

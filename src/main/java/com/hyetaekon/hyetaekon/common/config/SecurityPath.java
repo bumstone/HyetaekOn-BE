@@ -17,7 +17,7 @@ public class SecurityPath {
       "/api/public-data/serviceList/test",
       "/api/mongo/search/services",
       "/api/mongo/search/posts",
-      "/api/mongo/services/search/autocomplete"
+      "/api/mongo/search/services/autocomplete"
   };
 
   // hasRole("USER")
