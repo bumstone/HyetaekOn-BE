@@ -24,6 +24,7 @@ public class AuthController {
     private Long refreshTokenExpired;
 
     private final AuthService authService;
+    private final CookieUtil cookieUtil;
 
     // 로그인 처리
     @PostMapping("/login")
@@ -31,7 +32,7 @@ public class AuthController {
                                                       HttpServletResponse response) {
 
         JwtToken jwtToken = authService.login(userSignInRequestDto);
-        CookieUtil.setCookie(response, "refreshToken", jwtToken.getRefreshToken(),refreshTokenExpired);
+        cookieUtil.setCookie(response, "refreshToken", jwtToken.getRefreshToken(),refreshTokenExpired);
 
         return ResponseEntity.ok(new UserTokenResponseDto(jwtToken.getAccessToken()));
     }
@@ -63,7 +64,7 @@ public class AuthController {
         }
 
         JwtToken jwtToken = authService.refresh(refreshToken);
-        CookieUtil.setCookie(response, "refreshToken", jwtToken.getRefreshToken(), refreshTokenExpired);
+        cookieUtil.setCookie(response, "refreshToken", jwtToken.getRefreshToken(), refreshTokenExpired);
 
         // JWT 토큰 정보 반환
         return ResponseEntity.ok(new UserTokenResponseDto(jwtToken.getAccessToken()));

@@ -26,6 +26,7 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final UserService userService;
     private final BlacklistService blacklistService;
+    private final CookieUtil cookieUtil;
 
     // 로그인
     @Transactional
@@ -59,7 +60,7 @@ public class AuthService {
     public void logout(String accessToken, String refreshToken, HttpServletResponse response) {
         blacklistService.addToBlacklist(accessToken);
         refreshTokenService.deleteRefreshToken(refreshToken);
-        CookieUtil.deleteCookie(response, "refreshToken");
+        cookieUtil.deleteCookie(response, "refreshToken");
     }
 
     // realId, password를 사용해서 유저 확인

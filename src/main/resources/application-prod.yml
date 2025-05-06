@@ -10,3 +10,8 @@ spring:
 jwt:
   access-expired: 1800 # 30분
   refresh-expired: 86400  # 1일
+
+app:
+  cookie:
+    secure: true
+    same-site: None

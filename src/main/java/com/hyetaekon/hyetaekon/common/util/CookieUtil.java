@@ -5,18 +5,26 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
+import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 
 import java.util.Optional;
 
+@Component
 public class CookieUtil {
+
+  private final CookieProperties cookieProperties;
+
+  public CookieUtil(CookieProperties cookieProperties) {
+    this.cookieProperties = cookieProperties;
+  }
   // 쿠키 설정
-  public static void setCookie(HttpServletResponse response, String name, String value, Long maxAge) {
+  public void setCookie(HttpServletResponse response, String name, String value, Long maxAge) {
     ResponseCookie cookie = ResponseCookie.from(name, value)
         .httpOnly(true)
-        .secure(true)
+        .secure(cookieProperties.isSecure())
         .path("/")
-        .sameSite("None")
+        .sameSite(cookieProperties.getSameSite())
         .maxAge(maxAge)
         .build();
 
@@ -24,12 +32,12 @@ public class CookieUtil {
   }
 
   // 쿠키 삭제
-  public static void deleteCookie(HttpServletResponse response, String name) {
+  public void deleteCookie(HttpServletResponse response, String name) {
     ResponseCookie cookie = ResponseCookie.from(name, null)
         .httpOnly(true)
-        .secure(true)
+        .secure(cookieProperties.isSecure())
         .path("/")
-        .sameSite("None")
+        .sameSite(cookieProperties.getSameSite())
         .maxAge(0) // 즉시 만료
         .build();
 
@@ -37,7 +45,7 @@ public class CookieUtil {
   }
 
   // 특정 쿠키 값 가져오기
-  public static Optional<String> getCookieValue(HttpServletRequest request, String name) {
+  public Optional<String> getCookieValue(HttpServletRequest request, String name) {
     Cookie cookie = WebUtils.getCookie(request, name);
     return cookie != null ? Optional.of(cookie.getValue()) : Optional.empty();
   }
