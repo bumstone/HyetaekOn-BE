@@ -20,7 +20,7 @@ import java.util.List;
 
 @Validated
 @RestController
-@RequestMapping("/api/mongo/services")
+@RequestMapping("/api/mongo/search")
 @RequiredArgsConstructor
 public class SearchInfoController {
     private final ServiceSearchHandler searchService;
@@ -28,7 +28,7 @@ public class SearchInfoController {
     private final AuthenticateUser authenticateUser;
 
     // 검색 API (로그인/비로그인 통합)
-    @GetMapping("/search")
+    @GetMapping("/services")
     public ResponseEntity<Page<PublicServiceListResponseDto>> searchServices(
         @RequestParam(name = "searchTerm", required = false, defaultValue = "") String searchTerm,
         @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,

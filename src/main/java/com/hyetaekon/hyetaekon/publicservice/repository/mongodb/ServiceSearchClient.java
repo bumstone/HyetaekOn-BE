@@ -72,7 +72,6 @@ public class ServiceSearchClient {
 
     private String buildSearchQuery(ServiceSearchCriteriaDto criteria) {
         List<String> shouldClauses = new ArrayList<>();
-        String mustClause = buildUserMustClause(criteria);
 
         // 검색어 관련 조건 추가
         if (StringUtils.hasText(criteria.getSearchTerm())) {
@@ -82,28 +81,24 @@ public class ServiceSearchClient {
         // 사용자 관심사 관련 조건 추가
         if (criteria.getUserInterests() != null && !criteria.getUserInterests().isEmpty()) {
             for (String interest : criteria.getUserInterests()) {
-                shouldClauses.add(createSearchClause("serviceCategory", interest, 2.5f, 0));
-                shouldClauses.add(createSearchClause("specialGroup", interest, 2.5f, 0));
-                shouldClauses.add(createSearchClause("familyType", interest, 2.5f, 0));
+                shouldClauses.add(createSearchClause("serviceCategory", interest, 3.5f, 0));
+                shouldClauses.add(createSearchClause("specialGroup", interest, 3.5f, 0));
+                shouldClauses.add(createSearchClause("familyType", interest, 3.5f, 0));
             }
         }
 
-        // 소득 수준 일치 가산점 (should 조건)
+        // 사용자 정보(성별, 나이, 직업, 소득) 기반 조건 추가
         addUserMatchBoosts(shouldClauses, criteria);
-
-        if (StringUtils.hasText(criteria.getUserIncomeLevel())) {
-            shouldClauses.add(createSearchClause("incomeLevel", criteria.getUserIncomeLevel(), 2.8f, 0));
-            shouldClauses.add(createSearchClause("incomeLevel", "ANY", 1.0f, 0));
-        }
 
         String shouldClausesStr = shouldClauses.isEmpty() ? "[]" : "[" + String.join(",", shouldClauses) + "]";
 
-        // must 조건이 있으면 추가, 없으면 생략
+        // compound 쿼리 구성 (should 조건만 사용)
         String compoundQuery = """
         compound: {
-            should: %s%s
+            should: %s,
+            minimumShouldMatch: 1
         }
-    """.formatted(shouldClausesStr, mustClause);
+        """.formatted(shouldClausesStr);
 
         return """
         {
@@ -147,16 +142,14 @@ public class ServiceSearchClient {
             }}""".formatted(searchTerm));
     }
 
-    private String buildUserMustClause(ServiceSearchCriteriaDto criteria) {
-        List<String> mustClauses = new ArrayList<>();
-
-        // 성별 필수 조건
+    private void addUserMatchBoosts(List<String> clauses, ServiceSearchCriteriaDto criteria) {
+        // 성별 조건 (should로 변경)
         if (StringUtils.hasText(criteria.getUserGender())) {
             String genderField = "MALE".equalsIgnoreCase(criteria.getUserGender())
                 ? "targetGenderMale" : "targetGenderFemale";
 
-            // 대상 성별이 null이거나 Y인 서비스만 포함
-            mustClauses.add("""
+            // 대상 성별이 null이거나 Y인 서비스에 가산점
+            clauses.add("""
             {
                 compound: {
                     should: [
@@ -168,19 +161,19 @@ public class ServiceSearchClient {
                         {
                             equals: {path: "%s", value: "Y"}
                         }
-                    ]
+                    ],
+                    score: {boost: {value: 5.0}}
                 }
             }
             """.formatted(genderField, genderField));
-
         }
 
-        // 나이 필수 조건
+        // 나이 조건 (should로 변경)
         if (criteria.getUserAge() != null) {
             int age = criteria.getUserAge();
 
-            // 대상 나이 범위가 null이거나 사용자 나이를 포함하는 서비스만 포함
-            mustClauses.add("""
+            // 대상 나이 범위가 null이거나 사용자 나이를 포함하는 서비스에 가산점
+            clauses.add("""
             {
                 compound: {
                     should: [
@@ -192,12 +185,13 @@ public class ServiceSearchClient {
                         {
                             range: {path: "targetAgeStart", lte: %d}
                         }
-                    ]
+                    ],
+                    score: {boost: {value: 4.5}}
                 }
             }
             """.formatted(age));
 
-                        mustClauses.add("""
+            clauses.add("""
             {
                 compound: {
                     should: [
@@ -209,23 +203,13 @@ public class ServiceSearchClient {
                         {
                             range: {path: "targetAgeEnd", gte: %d}
                         }
-                    ]
+                    ],
+                    score: {boost: {value: 4.5}}
                 }
             }
             """.formatted(age));
-
         }
 
-        // must 조건이 없으면 빈 문자열 반환
-        if (mustClauses.isEmpty()) {
-            return "";
-        }
-
-        // must 조건이 있으면 문자열 형식으로 반환
-        return ", must: [" + String.join(",", mustClauses) + "]";
-    }
-
-    private void addUserMatchBoosts(List<String> clauses, ServiceSearchCriteriaDto criteria) {
         // 직업 일치 가산점
         if (StringUtils.hasText(criteria.getUserJob())) {
             String userJob = criteria.getUserJob();
