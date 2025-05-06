@@ -15,7 +15,8 @@ public class SecurityPath {
       "/api/services/category/*",
       "/api/services/detail/*",
       "/api/public-data/serviceList/test",
-      "/api/mongo/services/search",
+      "/api/mongo/search/services",
+      "/api/mongo/search/posts",
       "/api/mongo/services/search/autocomplete"
   };
 
