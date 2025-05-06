@@ -1,5 +1,7 @@
 package com.hyetaekon.hyetaekon.publicservice.controller.mongodb;
 
+import com.hyetaekon.hyetaekon.post.dto.PostListResponseDto;
+import com.hyetaekon.hyetaekon.post.service.PostService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
@@ -22,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SearchInfoController {
     private final ServiceSearchHandler searchService;
+    private final PostService postService;
     private final AuthenticateUser authenticateUser;
 
     // 검색 API (로그인/비로그인 통합)
@@ -48,7 +51,18 @@ public class SearchInfoController {
         }
     }
 
-    // 자동완성 API
+    // 게시글 제목 검색(통합검색)
+    @GetMapping("/posts")
+    public ResponseEntity<Page<PostListResponseDto>> searchPosts(
+        @RequestParam String searchTerm,
+        @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
+        @RequestParam(name = "size", defaultValue = "9") @Positive @Max(50) int size) {
+
+        return ResponseEntity.ok(postService.getAllPosts(
+            searchTerm, "createdAt", "DESC", PageRequest.of(page, size)));
+    }
+
+    // 자동완성 API(서비스에 대해서만)
     @GetMapping("/search/autocomplete")
     public ResponseEntity<List<String>> getAutocompleteResults(
         @RequestParam(name = "word") String word
