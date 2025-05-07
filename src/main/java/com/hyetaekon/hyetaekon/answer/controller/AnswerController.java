@@ -28,10 +28,13 @@ public class AnswerController {
     }
 
     // 답변 채택
-    // TODO: 질문 게시글 작성자만 가능
     @PutMapping("/{answerId}/select")
-    public ResponseEntity<Void> selectAnswer(@PathVariable Long answerId) {
-        answerService.selectAnswer(answerId);
+    public ResponseEntity<Void> selectAnswer(
+        @PathVariable Long postId,
+        @PathVariable Long answerId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
+        // 로그인한 사용자의 ID를 서비스에 전달
+        answerService.selectAnswer(postId, answerId, userDetails.getId());
         return ResponseEntity.ok().build();
     }
 

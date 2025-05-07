@@ -49,6 +49,10 @@ public enum ErrorCode {
     // 게시글
     POST_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND,"POST-001", "해당 아이디의 게시글을 찾을 수 없습니다"),
 
+    // 답변
+    ANSWER_NOT_FOUND(HttpStatus.NOT_FOUND, "ANSWER-001","답변을 찾을 수 없습니다."),
+    ANSWER_NOT_MATCHED_POST(HttpStatus.BAD_REQUEST, "ANSWER-002","해당 게시글에 속하지 않는 답변입니다."),
+
     // 관심사 선택 제한
     INTEREST_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "INTEREST-001", "관심사는 최대 6개까지만 등록 가능합니다."),
     INVALID_INTEREST(HttpStatus.BAD_REQUEST, "INTEREST-002", "유효하지 않은 관심사입니다."),

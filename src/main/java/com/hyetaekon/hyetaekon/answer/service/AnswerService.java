@@ -4,10 +4,15 @@ import com.hyetaekon.hyetaekon.answer.dto.AnswerDto;
 import com.hyetaekon.hyetaekon.answer.entity.Answer;
 import com.hyetaekon.hyetaekon.answer.mapper.AnswerMapper;
 import com.hyetaekon.hyetaekon.answer.repository.AnswerRepository;
+import com.hyetaekon.hyetaekon.common.exception.ErrorCode;
+import com.hyetaekon.hyetaekon.common.exception.GlobalException;
+import com.hyetaekon.hyetaekon.post.entity.Post;
+import com.hyetaekon.hyetaekon.post.repository.PostRepository;
 import com.hyetaekon.hyetaekon.user.entity.PointActionType;
 import com.hyetaekon.hyetaekon.user.service.UserPointService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,12 +20,17 @@ import org.springframework.stereotype.Service;
 public class AnswerService {
     private final AnswerRepository answerRepository;
     private final AnswerMapper answerMapper;
-
+    private final PostRepository postRepository;
     private final UserPointService userPointService;
 
     public AnswerDto createAnswer(Long postId, AnswerDto answerDto, Long userId) {
+        // 게시글 존재 여부 확인
+        postRepository.findByIdAndDeletedAtIsNull(postId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.POST_NOT_FOUND_BY_ID));
+
         Answer answer = answerMapper.toEntity(answerDto);
         answer.setPostId(postId);
+        answer.setUserId(userId);
         answer = answerRepository.save(answer);
 
         userPointService.addPointForAction(userId, PointActionType.ANSWER_CREATION);
@@ -28,19 +38,31 @@ public class AnswerService {
         return answerMapper.toDto(answer);
     }
 
-    public void selectAnswer(Long answerId) {
-        Answer answer = answerRepository.findById(answerId)
-                .orElseThrow(() -> new EntityNotFoundException("Answer not found"));
-        // 이미 선택된 답변인지 확인
-        if (!answer.isSelected()) {
-            answer.setSelected(true);
-            answerRepository.save(answer);
+    public void selectAnswer(Long postId, Long answerId, Long userId) {
+        // 게시글 조회
+        Post post = postRepository.findByIdAndDeletedAtIsNull(postId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.POST_NOT_FOUND_BY_ID));
 
-            // 답변 채택 시 답변 작성자에게 포인트 부여
-            userPointService.addPointForAction(answer.getUserId(), PointActionType.ANSWER_ACCEPTED);
+        // 요청자가 게시글 작성자인지 확인
+        if (!post.getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("게시글 작성자만 답변을 채택할 수 있습니다.");
         }
 
+        // 답변 조회
+        Answer answer = answerRepository.findById(answerId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.ANSWER_NOT_FOUND));
+
+        // 답변이 해당 게시글에 속하는지 확인
+        if (!answer.getPostId().equals(postId)) {
+            throw new GlobalException(ErrorCode.ANSWER_NOT_MATCHED_POST);
+        }
+
+        // 답변 채택 처리
+        answer.setSelected(true);
         answerRepository.save(answer);
+
+        // 답변 작성자에게 포인트 부여
+        userPointService.addPointForAction(answer.getUserId(), PointActionType.ANSWER_ACCEPTED);
     }
 
     public void deleteAnswer(Long answerId) {
