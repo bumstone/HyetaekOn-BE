@@ -33,12 +33,15 @@ public class SecurityPath {
       "/api/search/history",
       "/api/search/history/*",
       "/api/mongo/services/matched",
-      "/api/users/reports"
+      "/api/users/reports",
+      "/api/posts/*/answers",
+      "/api/posts/*/answers/*/select"
   };
 
   // hasRole("ADMIN")
   public static final String[] ADMIN_ENDPOINTS = {
       "/api/admin/**",
+      "/api/posts/*/answers/admin/answers/*",
       "/api/public-data/serviceDetailList",
       "/api/public-data/supportConditionsList",
       "/api/public-data/serviceList"

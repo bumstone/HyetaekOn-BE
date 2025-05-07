@@ -11,8 +11,10 @@ import com.hyetaekon.hyetaekon.post.mapper.PostMapper;
 import com.hyetaekon.hyetaekon.post.repository.PostImageRepository;
 import com.hyetaekon.hyetaekon.post.repository.PostRepository;
 import com.hyetaekon.hyetaekon.recommend.repository.RecommendRepository;
+import com.hyetaekon.hyetaekon.user.entity.PointActionType;
 import com.hyetaekon.hyetaekon.user.entity.User;
 import com.hyetaekon.hyetaekon.user.repository.UserRepository;
+import com.hyetaekon.hyetaekon.user.service.UserPointService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -45,6 +47,7 @@ public class PostService {
     private final PostMapper postMapper;
     private final PostImageMapper postImageMapper;
     private final S3BucketService s3BucketService;
+    private final UserPointService userPointService;
 
     // 이미지 업로드 제한 설정
     private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -140,6 +143,10 @@ public class PostService {
                 savedPost.setPostImages(postImages); // ✅ 이 줄이 핵심
             }
         }
+
+        // 게시글 작성 포인트 부여
+        userPointService.addPointForAction(userId, PointActionType.POST_CREATION);
+        log.info("사용자 {}에게 게시글 작성 포인트가 부여되었습니다.", userId);
 
         return postMapper.toPostDetailDto(savedPost); // ✅ Mapper가 imageUrls 포함해서 반환
     }

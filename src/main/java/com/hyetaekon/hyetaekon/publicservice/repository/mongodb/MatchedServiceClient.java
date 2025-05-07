@@ -195,7 +195,7 @@ public class MatchedServiceClient {
                             equals: {path: "%s", value: "Y"}
                         }
                     ],
-                    score: {boost: {value: 5.0}}
+                    score: {boost: {value: 5.5}}
                 }
             }
             """.formatted(genderField, genderField));
