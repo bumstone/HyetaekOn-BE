@@ -90,31 +90,29 @@ public class IncomeEstimationHandler {
         // 일반적인 직업 키워드 기반 추정
         String lowercaseJob = job.toLowerCase();
 
-        if (lowercaseJob.contains("학생") || lowercaseJob.contains("무직") ||
-            lowercaseJob.contains("구직") || lowercaseJob.contains("실업")) {
+        if (lowercaseJob.contains("학생") || lowercaseJob.contains("구직자")
+            || lowercaseJob.contains("실업자")) {
             return "LOW";
         }
 
-        if (lowercaseJob.contains("알바") || lowercaseJob.contains("프리랜서") ||
-            lowercaseJob.contains("인턴")) {
+        if (lowercaseJob.contains("공무원") || lowercaseJob.contains("인턴")) {
             return "MIDDLE_LOW";
         }
 
-        if (lowercaseJob.contains("공무원") || lowercaseJob.contains("직장인") ||
-            lowercaseJob.contains("회사원")) {
+        if (lowercaseJob.contains("직장인") || lowercaseJob.contains("회사원")
+            || lowercaseJob.contains("프리랜서")) {
             return "MIDDLE";
         }
 
-        if (lowercaseJob.contains("전문가") || lowercaseJob.contains("매니저") ||
-            lowercaseJob.contains("관리자")) {
+        if (lowercaseJob.contains("전문직") || lowercaseJob.contains("관리직")) {
             return "MIDDLE_HIGH";
         }
 
-        if (lowercaseJob.contains("대표") || lowercaseJob.contains("임원") ||
-            lowercaseJob.contains("의사") || lowercaseJob.contains("변호사")) {
+        if (lowercaseJob.contains("임원") || lowercaseJob.contains("의사")
+            || lowercaseJob.contains("변호사")) {
             return "HIGH";
         }
 
-        return "MIDDLE"; // 기본값
+        return "MIDDLE_LOW";  // 기본값
     }
 }
