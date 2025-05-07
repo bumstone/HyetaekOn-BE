@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +29,7 @@ public class AnswerService {
     private final PostRepository postRepository;
     private final UserPointService userPointService;
 
-    // 게시글에 답변 목록 조히
+    // 게시글에 답변 목록 조회
     public Page<AnswerDto> getAnswersByPostId(Long postId, Pageable pageable) {
         // 게시글 존재 여부 확인
         postRepository.findByIdAndDeletedAtIsNull(postId)
@@ -48,6 +49,7 @@ public class AnswerService {
         Answer answer = answerMapper.toEntity(answerDto);
         answer.setPostId(postId);
         answer.setUserId(userId);
+        answer.setCreatedAt(LocalDateTime.now());
         answer = answerRepository.save(answer);
 
         userPointService.addPointForAction(userId, PointActionType.ANSWER_CREATION);
