@@ -2,11 +2,13 @@ package com.hyetaekon.hyetaekon.comment.controller;
 
 import com.hyetaekon.hyetaekon.comment.dto.CommentDto;
 import com.hyetaekon.hyetaekon.comment.service.CommentService;
+import com.hyetaekon.hyetaekon.common.jwt.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -57,9 +59,15 @@ public class CommentController {
 
     // 댓글 삭제 (관리자만 가능)
     @DeleteMapping("/admin/comments/{commentId}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
-        commentService.deleteComment(commentId);
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<Void> deleteComment(
+            @PathVariable Long commentId,
+            @AuthenticationPrincipal CustomUserDetails userDetails, @PathVariable String postId) {
+
+        Long currentUserId = userDetails.getId();
+        boolean isAdmin = "ROLE_ADMIN".equals(userDetails.getRole());
+
+        commentService.deleteComment(commentId, currentUserId, isAdmin);
         return ResponseEntity.noContent().build();
     }
 }
