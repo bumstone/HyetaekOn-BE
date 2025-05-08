@@ -14,5 +14,8 @@ public class CommentDto {
     private Long postId;
     private Long parentId;  // 대댓글일 경우 부모 댓글 ID
     private String content;
+    private Long userId;
+    private String nickname;
+    private boolean deleted;
     private LocalDateTime createdAt;
 }

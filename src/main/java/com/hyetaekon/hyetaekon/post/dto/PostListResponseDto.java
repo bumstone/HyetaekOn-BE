@@ -16,4 +16,5 @@ public class PostListResponseDto {
     private LocalDateTime createdAt;
     private int viewCnt;
     private String postType;
+    private int recommendCnt;
 }

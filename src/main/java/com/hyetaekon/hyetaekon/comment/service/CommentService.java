@@ -43,7 +43,16 @@ public class CommentService {
         return commentMapper.toDto(reply);
     }
 
-    public void deleteComment(Long commentId) {
-        commentRepository.deleteById(commentId);
+    public void deleteComment(Long commentId, Long currentUserId, boolean isAdmin) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new RuntimeException("댓글 없음"));
+
+        if (comment.getUserId().equals(currentUserId) || isAdmin) {
+            comment.setDeleted(true);
+            comment.setContent("삭제된 댓글입니다.");
+            commentRepository.save(comment);
+        } else {
+            throw new RuntimeException("삭제 권한 없음");
+        }
     }
 }

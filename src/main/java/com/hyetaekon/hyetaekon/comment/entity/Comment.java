@@ -21,10 +21,26 @@ public class Comment {
 
     private Long postId;
 
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
+    @Column(name = "nickname", nullable = false)
+    private String nickname;
+
     private Long parentId;  // 대댓글이면 부모 댓글 ID, 아니면 null
 
     @Column(nullable = false, length = 1000)
     private String content;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private boolean deleted = false;
+
+    // ⭐ 생성 시점에 createdAt 자동 설정
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }
