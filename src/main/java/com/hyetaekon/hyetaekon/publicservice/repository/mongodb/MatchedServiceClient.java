@@ -203,44 +203,16 @@ public class MatchedServiceClient {
 
         // 나이 조건 (should로 변경)
         if (userAge != null) {
-            int age = userAge;
-
-            // 대상 나이 범위가 null이거나 사용자 나이를 포함하는 서비스에 가산점
             clauses.add("""
             {
-                compound: {
-                    should: [
-                        {
-                            compound: {
-                                mustNot: [{exists: {path: "targetAgeStart"}}]
-                            }
-                        },
-                        {
-                            range: {path: "targetAgeStart", lte: %d}
-                        }
-                    ],
-                    score: {boost: {value: 4.5}}
+                range: {
+                    path: ["targetAgeStart", "targetAgeEnd"],
+                    gte: 0,
+                    lte: %d,
+                    score: { boost: { value: 4.5 } }
                 }
             }
-            """.formatted(age));
-
-            clauses.add("""
-            {
-                compound: {
-                    should: [
-                        {
-                            compound: {
-                                mustNot: [{exists: {path: "targetAgeEnd"}}]
-                            }
-                        },
-                        {
-                            range: {path: "targetAgeEnd", gte: %d}
-                        }
-                    ],
-                    score: {boost: {value: 4.5}}
-                }
-            }
-            """.formatted(age));
+            """.formatted(userAge));
         }
 
         // 직업 관련 조건 추가
