@@ -17,6 +17,7 @@ public interface PostMapper {
     @Mapping(source = "id", target = "postId")
     @Mapping(source = "user.nickname", target = "nickName")
     @Mapping(source = "postType.koreanName", target = "postType")
+    @Mapping(source = "recommendCnt", target = "recommendCnt")
     PostListResponseDto toPostListDto(Post post);
 
     // ✅ 마이페이지용 게시글 DTO

@@ -30,4 +30,10 @@ public class Answer {
 
     @Column(name = "selected", nullable = false)
     private boolean selected; // 채택 여부
+
+    // ⭐ 생성 시점에 createdAt 자동 설정
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 }
