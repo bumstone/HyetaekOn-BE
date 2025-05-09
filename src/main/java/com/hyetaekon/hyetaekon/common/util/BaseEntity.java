@@ -25,25 +25,4 @@ public class BaseEntity {
   @Column(name = "modified_at", nullable = false, columnDefinition = "DATETIME(0)")
   private LocalDateTime modifiedAt;
 
-  @Column(name = "deleted_at")
-  private LocalDateTime deletedAt;
-
-  @Column(name = "suspend_at")
-  private LocalDateTime suspendAt;
-
-  // 삭제 처리
-  public void delete() {
-    this.deletedAt = LocalDateTime.now();
-  }
-
-  // 정지 처리
-  public void suspend() {
-    this.suspendAt = LocalDateTime.now();
-  }
-
-  // 복원시
-  public void restore() {
-    this.deletedAt = null;
-    this.suspendAt = null;
-  }
 }
