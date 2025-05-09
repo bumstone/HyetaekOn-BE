@@ -1,5 +1,7 @@
 package com.hyetaekon.hyetaekon.comment.entity;
 
+import com.hyetaekon.hyetaekon.post.entity.Post;
+import com.hyetaekon.hyetaekon.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,13 +21,13 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long postId;
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
-    @Column(name = "nickname", nullable = false)
-    private String nickname;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private Long parentId;  // 대댓글이면 부모 댓글 ID, 아니면 null
 
@@ -35,8 +37,11 @@ public class Comment {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(nullable = false)
-    private boolean deleted = false;
+    @Column(name = "deleted_at", nullable = false)
+    private LocalDateTime deletedAt;
+
+    @Column(name = "suspend_at", nullable = false)
+    private LocalDateTime suspendAt;
 
     // ⭐ 생성 시점에 createdAt 자동 설정
     @PrePersist

@@ -27,12 +27,10 @@ public interface PostMapper {
 
     // ✅ 게시글 생성 시 DTO → Entity 변환
     @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
-    @Mapping(target = "postType", ignore = true) // postType은 Service에서 직접 세팅
     Post toEntity(PostCreateRequestDto createDto);
 
     // ✅ 게시글 수정 시 일부 값만 업데이트 (null 무시)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "postType", ignore = true)
     void updatePostFromDto(PostUpdateRequestDto updateDto, @MappingTarget Post post);
 
     // ✅ 게시글 상세 보기용 DTO (imageUrls 수동으로 처리)

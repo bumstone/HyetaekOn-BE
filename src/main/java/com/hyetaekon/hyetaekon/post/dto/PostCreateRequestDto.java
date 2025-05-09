@@ -12,10 +12,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostCreateRequestDto {
-    private String nickName;
     private String title;
     private String content;
-    private LocalDateTime createdAt;
     private String postType;
     private String urlTitle;
     private String urlPath;
