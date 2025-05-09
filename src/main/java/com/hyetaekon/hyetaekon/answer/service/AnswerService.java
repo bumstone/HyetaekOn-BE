@@ -12,17 +12,12 @@ import com.hyetaekon.hyetaekon.user.entity.PointActionType;
 import com.hyetaekon.hyetaekon.user.entity.User;
 import com.hyetaekon.hyetaekon.user.repository.UserRepository;
 import com.hyetaekon.hyetaekon.user.service.UserPointService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

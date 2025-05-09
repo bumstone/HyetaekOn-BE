@@ -1,7 +1,6 @@
 package com.hyetaekon.hyetaekon.comment.controller;
 
 import com.hyetaekon.hyetaekon.comment.dto.CommentCreateRequestDto;
-import com.hyetaekon.hyetaekon.comment.dto.CommentDto;
 import com.hyetaekon.hyetaekon.comment.dto.CommentListResponseDto;
 import com.hyetaekon.hyetaekon.comment.service.CommentService;
 import com.hyetaekon.hyetaekon.common.jwt.CustomUserDetails;
@@ -9,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 

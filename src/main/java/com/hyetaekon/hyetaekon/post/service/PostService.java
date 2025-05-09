@@ -129,6 +129,7 @@ public class PostService {
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + userId));
 
         PostType postType = PostType.fromKoreanName(requestDto.getPostType());
+        log.info("Received postType: '{}'", requestDto.getPostType());
 
         Post post = postMapper.toEntity(requestDto);
         post.setUser(user);

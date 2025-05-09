@@ -20,11 +20,13 @@ public enum PostType {
      */
     public static PostType fromKoreanName(String koreanName) {
         for (PostType type : values()) {
+            System.out.println("Comparing with: '" + type.getKoreanName() + "'");
             if (type.getKoreanName().equals(koreanName)) {
                 return type;
             }
         }
         // 일치하는 이름이 없거나 null인 경우 기본값으로 ALL 반환
+        System.out.println("No match found, returning default: ALL");
         return ALL;
     }
 }
