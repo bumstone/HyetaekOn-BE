@@ -181,6 +181,7 @@ public class PostService {
             for (PostImage image : existingImages) {
                 image.softDelete();
             }
+            postImageRepository.saveAll(existingImages);
 
             // 새 이미지 추가
             List<PostImage> newImages = processPostImages(updateDto.getImages(), post);
@@ -209,13 +210,16 @@ public class PostService {
         }
 
         // Soft Delete 처리
-        post.setDeletedAt(LocalDateTime.now());
+        post.delete();
 
         // 모든 이미지 soft delete 처리
         List<PostImage> images = postImageRepository.findByPostAndDeletedAtIsNull(post);
         for (PostImage image : images) {
             image.softDelete();
         }
+
+        postRepository.save(post);
+        postImageRepository.saveAll(images);
     }
 
     /**

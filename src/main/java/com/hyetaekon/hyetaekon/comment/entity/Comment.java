@@ -1,46 +1,45 @@
 package com.hyetaekon.hyetaekon.comment.entity;
 
+import com.hyetaekon.hyetaekon.common.util.BaseEntity;
+import com.hyetaekon.hyetaekon.post.entity.Post;
+import com.hyetaekon.hyetaekon.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "comments")
-public class Comment {
+public class Comment extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long postId;
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
-    @Column(name = "nickname", nullable = false)
-    private String nickname;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private Long parentId;  // 대댓글이면 부모 댓글 ID, 아니면 null
 
     @Column(nullable = false, length = 1000)
     private String content;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(nullable = false)
-    private boolean deleted = false;
-
-    // ⭐ 생성 시점에 createdAt 자동 설정
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+    public String getDisplayContent() {
+        if (getDeletedAt() != null) {
+            return "삭제된 댓글입니다.";
+        } else if (getSuspendAt() != null) {
+            return "관리자에 의해 삭제된 댓글입니다.";
+        }
+        return content;
     }
+
 }

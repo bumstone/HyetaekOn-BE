@@ -26,11 +26,6 @@ public class PostImage {
 
     private LocalDateTime deletedAt;
 
-    // 이미지가 삭제되었는지 확인하는 메소드
-    public boolean isDeleted() {
-        return deletedAt != null;
-    }
-
     // Soft delete 처리 메소드
     public void softDelete() {
         this.deletedAt = LocalDateTime.now();

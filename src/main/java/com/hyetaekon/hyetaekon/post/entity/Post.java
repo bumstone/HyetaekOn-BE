@@ -1,6 +1,7 @@
 package com.hyetaekon.hyetaekon.post.entity;
 
 import com.hyetaekon.hyetaekon.bookmark.entity.Bookmark;
+import com.hyetaekon.hyetaekon.common.util.BaseEntity;
 import com.hyetaekon.hyetaekon.publicservice.entity.PublicService;
 import com.hyetaekon.hyetaekon.recommend.entity.Recommend;
 import com.hyetaekon.hyetaekon.user.entity.User;
@@ -18,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "post")
-public class Post {
+public class Post extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,11 +38,6 @@ public class Post {
 
     @Column(columnDefinition = "VARCHAR(500) CHARACTER SET utf8mb4", nullable = false)  // ✅ 내용 500자 제한
     private String content;
-
-    @Builder.Default
-    private LocalDateTime createdAt = null;  // 빌더 사용 시 null로 초기화
-
-    private LocalDateTime deletedAt;
 
     @Builder.Default
     @Column(name = "recommend_cnt")
@@ -73,6 +69,7 @@ public class Post {
     @Column(name = "category_id")
     private Long categoryId;
 
+
     @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostImage> postImages = new ArrayList<>();  // ✅ 게시글 이미지와 연결
@@ -80,14 +77,6 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Recommend> recommends = new ArrayList<>();
-
-    // 저장 시점에 현재 시간으로 설정
-    @PrePersist
-    public void prePersist() {
-        if (this.createdAt == null) {
-            this.createdAt = LocalDateTime.now();
-        }
-    }
 
     // 조회수 증가
     public void incrementViewCnt() {
@@ -112,5 +101,14 @@ public class Post {
         this.commentCnt = Math.max(0, this.commentCnt - 1);
     }
 
+
+    public String getDisplayContent() {
+        if (getDeletedAt() != null) {
+            return "삭제된 게시글입니다.";
+        } else if (getSuspendAt() != null) {
+            return "관리자에 의해 삭제된 게시글입니다.";
+        }
+        return content;
+    }
 
 }

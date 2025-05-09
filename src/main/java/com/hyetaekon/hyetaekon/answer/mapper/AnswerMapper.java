@@ -4,16 +4,12 @@ import com.hyetaekon.hyetaekon.answer.dto.AnswerDto;
 import com.hyetaekon.hyetaekon.answer.entity.Answer;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface AnswerMapper {
-    AnswerMapper INSTANCE = Mappers.getMapper(AnswerMapper.class);
-
+    @Mapping(target = "content", expression = "java(answer.getDisplayContent())")
     AnswerDto toDto(Answer answer);
 
-    @Mapping(target = "id", ignore = true)  // id는 자동 생성되므로 무시
-    @Mapping(target = "selected", ignore = true)  // 기본값 false 처리
-    @Mapping(target = "createdAt", ignore = true) // createdAt 자동 설정
     Answer toEntity(AnswerDto answerDto);
 }
