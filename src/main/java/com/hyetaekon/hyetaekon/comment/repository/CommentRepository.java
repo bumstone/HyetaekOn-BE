@@ -10,11 +10,19 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     // 게시글의 최상위 댓글 조회 (삭제되지 않은 댓글만)
-    Page<Comment> findByPostAndParentIdIsNullAndDeletedAtIsNull(Post post, Pageable pageable);
+    Page<Comment> findByPostAndParentIdIsNull(Post post, Pageable pageable);
 
     // 특정 댓글의 대댓글 조회 (삭제되지 않은 댓글만)
-    Page<Comment> findByPostAndParentIdAndDeletedAtIsNull(Post post, Long parentId, Pageable pageable);
+    Page<Comment> findByPostAndParentId(Post post, Long parentId, Pageable pageable);
 
-    // 모든 댓글 조회 (삭제 여부 관계없이)
-    Page<Comment> findByPost(Post post, Pageable pageable);
+    // 삭제된 댓글만 조회 (관리자용)
+    Page<Comment> findByPostAndDeletedAtIsNotNull(Post post, Pageable pageable);
+
+    // 정지된 댓글만 조회 (관리자용)
+    Page<Comment> findByPostAndSuspendAtIsNotNull(Post post, Pageable pageable);
+
+    // 통계용 카운팅 메서드들
+    long countByPost(Post post);
+    long countByPostAndDeletedAtIsNotNull(Post post);
+    long countByPostAndSuspendAtIsNotNull(Post post);
 }

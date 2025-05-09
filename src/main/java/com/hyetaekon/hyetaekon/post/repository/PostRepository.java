@@ -35,4 +35,16 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 제목 검색 + 특정 타입 + 삭제되지 않은 게시글
     Page<Post> findByPostTypeAndTitleContainingAndDeletedAtIsNull(PostType postType, String keyword, Pageable pageable);
 
+    // 삭제된 게시글만 조회 (관리자용)
+    Page<Post> findByDeletedAtIsNotNull(Pageable pageable);
+
+    // 정지된 게시글만 조회 (관리자용)
+    Page<Post> findBySuspendAtIsNotNull(Pageable pageable);
+
+
+    // 통계용 카운팅 메서드들
+    long count();
+    long countByDeletedAtIsNotNull();
+    long countBySuspendAtIsNotNull();
+
 }
