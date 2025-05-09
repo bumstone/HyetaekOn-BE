@@ -11,18 +11,17 @@ import java.util.List;
 
 @Repository
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
-    // 페이지네이션 적용한 답변 목록 조회
-    Page<Answer> findByPostId(Long postId, Pageable pageable);
+    // 페이지네이션 적용한 답변 목록 조회 (post 객체 사용)
+    Page<Answer> findByPost(Post post, Pageable pageable);
 
     // 채택 여부 및 등록일 기준 정렬된 페이징 처리된 답변 목록 조회
-    Page<Answer> findByPostIdOrderBySelectedDescCreatedAtDesc(Long postId, Pageable pageable);
+    Page<Answer> findByPostOrderBySelectedDescCreatedAtDesc(Post post, Pageable pageable);
 
     // 삭제된 답변만 조회 (관리자용)
     Page<Answer> findByPostAndDeletedAtIsNotNull(Post post, Pageable pageable);
 
     // 정지된 답변만 조회 (관리자용)
     Page<Answer> findByPostAndSuspendAtIsNotNull(Post post, Pageable pageable);
-
 
     // 통계용 카운팅 메서드들
     long countByPost(Post post);
