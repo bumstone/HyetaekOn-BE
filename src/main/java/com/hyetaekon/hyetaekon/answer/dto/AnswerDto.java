@@ -8,6 +8,7 @@ public class AnswerDto {
     private Long id;
     private Long postId;
     private Long userId;
+    private String nickname;
     private String content;
     private LocalDateTime createdAt;
     private boolean selected;
