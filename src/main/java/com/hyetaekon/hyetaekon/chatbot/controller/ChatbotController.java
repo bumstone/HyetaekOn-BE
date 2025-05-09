@@ -20,22 +20,19 @@ public class ChatbotController {
             // ✅ 초기 인사
             case "처음":
                 return ok("처음", "안녕하세요! 혜택온 챗봇입니다. 무엇을 도와드릴까요?",
-                        List.of("이 사이트는 어떤 기능이 있나요?", "복지 서비스는 어떤 분야로 나뉘나요?",
-                                "가구 형태는 어떤 기준으로 나뉘나요?", "포인트 제도 설명",
+                        List.of("혜택온 사이트 소개", "포인트 제도 설명",
                                 "커뮤니티 이용 가이드", "신고 및 제재 기준"));
 
-            // ✅ 사이트 소개
-            case "이 사이트는 어떤 기능이 있나요?":
-                return ok(question, "복지 정보를 확인하고, 커뮤니티에서 게시글을 통해 의견을 나눌 수 있는 플랫폼입니다.",
-                        List.of("포인트 제도 설명", "커뮤니티 이용 가이드"));
+            // ✅ 혜택온 사이트 소개
+            case "혜택온 사이트 소개":
+                return ok(question, "혜택온은 복지 정보를 확인하고, 커뮤니티에서 의견을 나눌 수 있는 플랫폼입니다.\n궁금한 주제를 선택해주세요.",
+                        List.of("복지 서비스", "가구 형태 기준"));
 
-            case "복지 서비스는 어떤 분야로 나뉘나요?":
-                return ok(question, "복지 서비스는 주거, 보육, 교육, 고용, 의료, 돌봄 등 여러 분야로 구성되어 있어요.",
-                        List.of("포인트 제도 설명", "커뮤니티 이용 가이드"));
+            case "복지 서비스":
+                return ok(question, "복지 서비스는 주거, 보육, 교육, 고용, 의료, 돌봄 등 여러 분야로 구성되어 있어요.", null);
 
-            case "가구 형태는 어떤 기준으로 나뉘나요?":
-                return ok(question, "1인가구, 다자녀 가구, 청년가구, 노인가구, 장애인가구 등 다양한 형태로 구분돼요.",
-                        List.of("포인트 제도 설명", "커뮤니티 이용 가이드"));
+            case "가구 형태 기준":
+                return ok(question, "1인가구, 다자녀 가구, 청년가구, 노인가구, 장애인가구 등 다양한 형태로 구분돼요.", null);
 
             // ✅ 포인트 제도
             case "포인트 제도 설명":
@@ -62,7 +59,7 @@ public class ChatbotController {
                                 "- 1000점 이상: 구름",
                         null);
 
-            // ✅ 커뮤니티 이용
+            // ✅ 커뮤니티 이용 가이드
             case "커뮤니티 이용 가이드":
                 return ok(question, "커뮤니티에서는 다음과 같은 기능들을 사용할 수 있어요. 궁금한 항목을 선택해주세요.",
                         List.of("게시글 작성 방법", "댓글/대댓글 기능", "좋아요 및 공감", "북마크 사용법", "댓글 채택"));
@@ -70,7 +67,7 @@ public class ChatbotController {
             case "게시글 작성 방법":
                 return ok(question,
                         "게시글은 제목(20자 이내), 내용(500자 이내)으로 작성할 수 있으며,\n" +
-                                "이미지 첨부(5MB), 태그, 관련 링크 추가도 가능합니다.",
+                                "이미지 첨부(5MB), 태그, 관련 링크 추가도 가능합니다.\n" + "단, 규칙에 어긋나는 표현은 삭제 또는 제재될 수 있어요.",
                         null);
 
             case "댓글/대댓글 기능":
@@ -127,13 +124,13 @@ public class ChatbotController {
             case "기타":
                 return ok(question, "사례별로 관리자가 판단하여 별도 조치가 적용됩니다.", null);
 
-            // 기본 응답
+            // ✅ 기본 응답
             default:
                 return ok(question, "죄송해요, 해당 질문에 대한 답변을 찾을 수 없어요.", null);
         }
     }
 
-    // ✅ 응답 생성 헬퍼 메서드
+    // ✅ 공통 응답 생성 메서드
     private ResponseEntity<ChatbotDto> ok(String question, String answer, List<String> options) {
         return ResponseEntity.ok(ChatbotDto.builder()
                 .question(question)
