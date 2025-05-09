@@ -9,11 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/posts/{postId}/answers")
@@ -26,7 +23,7 @@ public class AnswerController {
     // 게시글의 답변 목록 조회
     @GetMapping
     public ResponseEntity<Page<AnswerDto>> getAnswersByPostId(
-        @PathVariable Long postId,
+        @PathVariable("postId") Long postId,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "5") int size) {
 
@@ -38,7 +35,7 @@ public class AnswerController {
     // 답변 작성
     @PostMapping
     public ResponseEntity<AnswerDto> createAnswer(
-        @PathVariable Long postId,
+        @PathVariable("postId") Long postId,
         @RequestBody AnswerDto answerDto,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         AnswerDto createdAnswer = answerService.createAnswer(postId, answerDto, userDetails.getId());
@@ -48,19 +45,19 @@ public class AnswerController {
     // 답변 채택
     @PutMapping("/{answerId}/select")
     public ResponseEntity<Void> selectAnswer(
-        @PathVariable Long postId,
-        @PathVariable Long answerId,
+        @PathVariable("postId") Long postId,
+        @PathVariable("answerId") Long answerId,
         @AuthenticationPrincipal CustomUserDetails userDetails) {
         // 로그인한 사용자의 ID를 서비스에 전달
         answerService.selectAnswer(postId, answerId, userDetails.getId());
         return ResponseEntity.ok().build();
     }
 
-    // 답변 삭제 (관리자만 가능)
+    // 답변 삭제 (관리자와 작성자만 가능)
     @DeleteMapping("/{answerId}")
     public ResponseEntity<Void> deleteAnswer(
-            @PathVariable Long postId,
-            @PathVariable Long answerId,
+            @PathVariable("postId") Long postId,
+            @PathVariable("answerId") Long answerId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         answerService.deleteAnswer(postId, answerId, userDetails.getId(), userDetails.getRole());
         return ResponseEntity.noContent().build();

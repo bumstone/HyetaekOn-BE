@@ -7,8 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
 public interface AnswerRepository extends JpaRepository<Answer, Long> {
     // 페이지네이션 적용한 답변 목록 조회 (post 객체 사용)

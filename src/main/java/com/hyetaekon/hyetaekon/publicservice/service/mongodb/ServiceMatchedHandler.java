@@ -13,6 +13,7 @@ import com.hyetaekon.hyetaekon.userInterest.entity.UserInterest;
 import com.hyetaekon.hyetaekon.userInterest.repository.UserInterestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,4 +89,8 @@ public class ServiceMatchedHandler {
             .collect(Collectors.toList());
     }
 
+    @CacheEvict(value = "matchedServices", key = "#userId")
+    public void refreshMatchedServicesCache(Long userId) {
+        // 캐시 갱신 메서드
+    }
 }
