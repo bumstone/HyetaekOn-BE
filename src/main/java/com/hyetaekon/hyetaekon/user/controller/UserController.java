@@ -57,6 +57,13 @@ public class UserController {
     return ResponseEntity.ok(userInfo);
   }
 
+  @GetMapping("/users/{userId}")
+  public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long userId) {
+    UserResponseDto user = userService.getUserById(userId);
+    return ResponseEntity.ok(user);
+  }
+
+
   // 회원 정보 수정 api
   @PutMapping("/users/me/profile")
   public ResponseEntity<UserResponseDto> updateMyProfile(

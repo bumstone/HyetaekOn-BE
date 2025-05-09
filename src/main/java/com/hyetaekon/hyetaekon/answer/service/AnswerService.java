@@ -11,6 +11,7 @@ import com.hyetaekon.hyetaekon.post.repository.PostRepository;
 import com.hyetaekon.hyetaekon.user.entity.PointActionType;
 import com.hyetaekon.hyetaekon.user.service.UserPointService;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -84,7 +85,20 @@ public class AnswerService {
         userPointService.addPointForAction(answer.getUserId(), PointActionType.ANSWER_ACCEPTED);
     }
 
-    public void deleteAnswer(Long answerId) {
-        answerRepository.deleteById(answerId);
+    @Transactional
+    public void deleteAnswer(Long postId, Long answerId, Long userId, boolean isAdmin) {
+        Answer answer = answerRepository.findById(answerId)
+                .orElseThrow(() -> new GlobalException(ErrorCode.ANSWER_NOT_FOUND));
+
+        if (!answer.getPostId().equals(postId)) {
+            throw new GlobalException(ErrorCode.ANSWER_NOT_MATCHED_POST);
+        }
+
+        if (!answer.getUserId().equals(userId) && !isAdmin) {
+            throw new AccessDeniedException("답변 삭제 권한이 없습니다.");
+        }
+
+        answerRepository.delete(answer);
     }
+
 }

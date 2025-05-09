@@ -57,9 +57,17 @@ public class AnswerController {
     }
 
     // 답변 삭제 (관리자만 가능)
-    @DeleteMapping("/admin/answers/{answerId}")
-    public ResponseEntity<Void> deleteAnswer(@PathVariable Long answerId) {
-        answerService.deleteAnswer(answerId);
+    @DeleteMapping("/{answerId}")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public ResponseEntity<Void> deleteAnswer(
+            @PathVariable Long postId,
+            @PathVariable Long answerId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        Long userId = userDetails.getId();
+        boolean isAdmin = "ROLE_ADMIN".equals(userDetails.getRole());
+
+        answerService.deleteAnswer(postId, answerId, userId, isAdmin);
         return ResponseEntity.noContent().build();
     }
 }
