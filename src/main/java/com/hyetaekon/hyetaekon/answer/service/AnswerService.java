@@ -9,6 +9,7 @@ import com.hyetaekon.hyetaekon.common.exception.GlobalException;
 import com.hyetaekon.hyetaekon.post.entity.Post;
 import com.hyetaekon.hyetaekon.post.repository.PostRepository;
 import com.hyetaekon.hyetaekon.user.entity.PointActionType;
+import com.hyetaekon.hyetaekon.user.repository.UserRepository;
 import com.hyetaekon.hyetaekon.user.service.UserPointService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -28,6 +29,7 @@ public class AnswerService {
     private final AnswerRepository answerRepository;
     private final AnswerMapper answerMapper;
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
     private final UserPointService userPointService;
 
     // 게시글에 답변 목록 조회
@@ -86,12 +88,20 @@ public class AnswerService {
     }
 
     @Transactional
-    public void deleteAnswer(Long postId, Long answerId, Long userId, boolean isAdmin) {
+    public void deleteAnswer(Long postId, Long answerId, Long userId, String role) {
         Answer answer = answerRepository.findById(answerId)
                 .orElseThrow(() -> new GlobalException(ErrorCode.ANSWER_NOT_FOUND));
 
         if (!answer.getPostId().equals(postId)) {
             throw new GlobalException(ErrorCode.ANSWER_NOT_MATCHED_POST);
+        }
+
+        // 작성자 또는 관리자 확인
+        boolean isOwner = answer.getUserId().equals(userId);
+        boolean isAdmin = "ROLE_ADMIN".equals(role);
+
+        if (!isOwner && !isAdmin) {
+            throw new AccessDeniedException("댓글 삭제 권한이 없습니다");
         }
 
         if (!answer.getUserId().equals(userId) && !isAdmin) {
