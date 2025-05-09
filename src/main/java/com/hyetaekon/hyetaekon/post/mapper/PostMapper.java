@@ -23,10 +23,10 @@ public interface PostMapper {
     // ✅ 마이페이지용 게시글 DTO
     @Mapping(source = "id", target = "postId")
     @Mapping(source = "user.nickname", target = "nickName")
+    @Mapping(target = "content", expression = "java(post.getDisplayContent())")
     MyPostListResponseDto toMyPostListDto(Post post);
 
     // ✅ 게시글 생성 시 DTO → Entity 변환
-    @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
     Post toEntity(PostCreateRequestDto createDto);
 
     // ✅ 게시글 수정 시 일부 값만 업데이트 (null 무시)
@@ -39,7 +39,7 @@ public interface PostMapper {
                 .postId(post.getId())
                 .nickName(post.getUser().getNickname())
                 .title(post.getTitle())
-                .content(post.getContent())
+                .content(post.getDisplayContent())
                 .createdAt(post.getCreatedAt())
                 .postType(post.getPostType().getKoreanName())
                 .recommendCnt(post.getRecommendCnt())

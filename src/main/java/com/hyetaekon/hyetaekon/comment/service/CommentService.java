@@ -36,7 +36,7 @@ public class CommentService {
         Post post = postRepository.findById(postId)
             .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다"));
 
-        return commentRepository.findByPostAndParentIdIsNullAndDeletedAtIsNull(post, pageable)
+        return commentRepository.findByPostAndParentIdIsNull(post, pageable)
             .map(commentMapper::toResponseDto);
     }
 
@@ -70,7 +70,7 @@ public class CommentService {
         Post post = postRepository.findById(postId)
             .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다"));
 
-        return commentRepository.findByPostAndParentIdAndDeletedAtIsNull(post, commentId, pageable)
+        return commentRepository.findByPostAndParentId(post, commentId, pageable)
             .map(commentMapper::toResponseDto);
     }
 
@@ -91,8 +91,7 @@ public class CommentService {
         }
 
         // Soft Delete 처리
-        comment.setDeletedAt(LocalDateTime.now());
-        comment.setContent("삭제된 댓글입니다.");
+        comment.delete();
         commentRepository.save(comment);
     }
 

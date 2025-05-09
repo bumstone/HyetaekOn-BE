@@ -11,19 +11,12 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CommentMapper {
-    @Mapping(target = "createdAt", expression = "java(java.time.LocalDateTime.now())")
+
     Comment toEntity(CommentCreateRequestDto requestDto);
 
-    @Mapping(source = "user.nickname", target = "nickName")
+    @Mapping(source = "user.nickname", target = "nickname")
     @Mapping(source = "post.id", target = "postId")
+    @Mapping(target = "content", expression = "java(comment.getDisplayContent())")
     CommentListResponseDto toResponseDto(Comment comment);
 
-    default String getDisplayContent(Comment comment) {
-        if (comment.getDeletedAt() != null) {
-            return "삭제된 댓글입니다.";
-        } else if (comment.getSuspendAt() != null) {
-            return "관리자에 의해 정지된 댓글입니다.";
-        }
-        return comment.getContent();
-    }
 }
