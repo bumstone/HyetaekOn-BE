@@ -25,7 +25,7 @@ public class PostController {
     // PostType에 해당하는 게시글 목록 조회
     @GetMapping("/type")
     public ResponseEntity<Page<PostListResponseDto>> getPosts(
-            @RequestParam(required = false, defaultValue = "전체") String postType,
+            @RequestParam(required = false, defaultValue = "ALL") String postType,
             @RequestParam(required = false) String keyword,  // 🔥 제목 검색 추가
             @RequestParam(defaultValue = "createdAt") String sortBy,  // 🔥 정렬 키워드 추가
             @RequestParam(defaultValue = "DESC") String direction,    // 🔥 정렬 방향 추가

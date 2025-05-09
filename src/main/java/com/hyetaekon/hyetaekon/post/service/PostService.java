@@ -128,7 +128,7 @@ public class PostService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + userId));
 
-        PostType postType = PostType.fromKoreanName(requestDto.getPostType());
+        PostType postType = PostType.fromString(requestDto.getPostType());
         log.info("Received postType: '{}'", requestDto.getPostType());
 
         Post post = postMapper.toEntity(requestDto);
@@ -166,9 +166,9 @@ public class PostService {
             throw new AccessDeniedException("게시글 수정 권한이 없습니다");
         }
 
-        // PostType 변환
+        // 영문 타입 코드로 PostType 찾기
         if (updateDto.getPostType() != null) {
-            PostType postType = PostType.fromKoreanName(updateDto.getPostType());
+            PostType postType = PostType.fromString(updateDto.getPostType());
             post.setPostType(postType);
         }
 
