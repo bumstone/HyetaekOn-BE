@@ -7,6 +7,9 @@ import com.hyetaekon.hyetaekon.recommend.entity.Recommend;
 import com.hyetaekon.hyetaekon.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,7 +22,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "post")
-public class Post extends BaseEntity {
+@EntityListeners(AuditingEntityListener.class)
+public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,6 +73,16 @@ public class Post extends BaseEntity {
     @Column(name = "category_id")
     private Long categoryId;
 
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @Column(name = "suspend_at")
+    private LocalDateTime suspendAt;
+
 
     @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -101,11 +115,20 @@ public class Post extends BaseEntity {
         this.commentCnt = Math.max(0, this.commentCnt - 1);
     }
 
+    // 삭제 처리
+    public void delete() {
+        this.deletedAt = LocalDateTime.now();
+    }
+
+    // 정지 처리
+    public void suspend() {
+        this.suspendAt = LocalDateTime.now();
+    }
 
     public String getDisplayContent() {
-        if (getDeletedAt() != null) {
+        if (this.deletedAt != null) {
             return "삭제된 게시글입니다.";
-        } else if (getSuspendAt() != null) {
+        } else if (this.suspendAt != null) {
             return "관리자에 의해 삭제된 게시글입니다.";
         }
         return content;
