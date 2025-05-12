@@ -39,7 +39,8 @@ public class SecurityPath {
       "/api/posts/*/answers/*/select",
       "/api/posts/*/comments",
       "/api/posts/*/comments/*",
-      "/api/posts/*/comments/*/replies"
+      "/api/posts/*/comments/*/replies",
+      "/api/services/recent"
   };
 
   // hasRole("ADMIN")
