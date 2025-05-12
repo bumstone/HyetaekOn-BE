@@ -5,12 +5,14 @@ import com.hyetaekon.hyetaekon.searchHistory.Repository.SearchHistoryRepository;
 import com.hyetaekon.hyetaekon.searchHistory.entity.SearchHistory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Comparator;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -18,8 +20,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SearchHistoryService {
     private final SearchHistoryRepository searchHistoryRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     private static final int MAX_DISPLAY_COUNT = 6;
+    private static final long TTL_DAYS = 60; // 데이터 유지 기간(일)
+
 
     /**
      * 검색 기록 저장
@@ -31,15 +36,7 @@ public class SearchHistoryService {
             return;
         }
 
-        // 검색어 중복 제거를 위한 기존 검색 기록 확인
-        List<SearchHistory> existingHistories = searchHistoryRepository.findByUserId(userId);
-
-        // 이미 동일한 검색어가 있으면 삭제
-        existingHistories.stream()
-            .filter(history -> history.getSearchTerm().equals(searchTerm))
-            .forEach(history -> searchHistoryRepository.deleteById(history.getId()));
-
-        // 새로운 검색 기록 저장
+        // 새로운 검색 기록 생성 및 저장
         SearchHistory newHistory = SearchHistory.of(userId, searchTerm);
         searchHistoryRepository.save(newHistory);
         log.debug("사용자 {} 검색 기록 저장: {}", userId, searchTerm);
@@ -61,16 +58,28 @@ public class SearchHistoryService {
     }
 
     /**
-     * 개별 검색 기록 삭제
+     * 개별 검색 기록 삭제 - Redis 직접 접근
      */
     @Transactional
     public void deleteSearchHistory(Long userId, String historyId) {
         if (!StringUtils.hasText(historyId)) {
             return;
         }
-        // 사용자의 검색 기록만 삭제하기 위해 사용자 ID도 함께 확인
-        searchHistoryRepository.deleteByUserIdAndId(userId, historyId);
-        log.debug("사용자 {} 검색 기록 삭제: {}", userId, historyId);
+
+        // historyId가 올바른 형식인지 검증 (userId:timestamp 형식)
+        if (!historyId.startsWith(userId + ":")) {
+            log.warn("잘못된 historyId 형식 또는 권한 없음: {}", historyId);
+            return;
+        }
+
+        // Redis에서 직접 키 삭제
+        boolean deleted = Boolean.TRUE.equals(redisTemplate.delete(historyId));
+
+        if (deleted) {
+            log.debug("사용자 {} 검색 기록 삭제 성공: {}", userId, historyId);
+        } else {
+            log.warn("사용자 {} 검색 기록 삭제 실패: {}", userId, historyId);
+        }
     }
 
     /**
@@ -78,8 +87,21 @@ public class SearchHistoryService {
      */
     @Transactional
     public void deleteAllSearchHistories(Long userId) {
-        List<SearchHistory> histories = searchHistoryRepository.findByUserId(userId);
-        searchHistoryRepository.deleteAll(histories);
-        log.debug("사용자 {} 검색 기록 전체 삭제", userId);
+        // userId로 시작하는 모든 키 패턴 조회
+        String keyPattern = userId + ":*";
+        try {
+            // 패턴에 일치하는 모든 키 조회
+            Set<String> keys = redisTemplate.keys(keyPattern);
+
+            if (keys != null && !keys.isEmpty()) {
+                // 모든 키 삭제
+                redisTemplate.delete(keys);
+                log.debug("사용자 {} 검색 기록 전체 삭제 완료: {}개", userId, keys.size());
+            } else {
+                log.debug("사용자 {} 삭제할 검색 기록 없음", userId);
+            }
+        } catch (Exception e) {
+            log.error("사용자 {} 검색 기록 전체 삭제 중 오류 발생", userId, e);
+        }
     }
 }
