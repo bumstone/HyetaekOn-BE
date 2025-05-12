@@ -2,6 +2,7 @@ package com.hyetaekon.hyetaekon.common.publicdata.schedule;
 
 import com.hyetaekon.hyetaekon.common.publicdata.service.PublicServiceDataService;
 import com.hyetaekon.hyetaekon.common.publicdata.util.PublicDataPath;
+import com.hyetaekon.hyetaekon.publicservice.util.ServiceCacheManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class PublicServiceDataScheduler {
 
     private final PublicServiceDataService publicServiceDataService;
+    private final ServiceCacheManager serviceCacheManager;
 
     /**
      * 매주 월요일 새벽 2시에 공공서비스 데이터 전체 동기화 실행
@@ -42,6 +44,9 @@ public class PublicServiceDataScheduler {
             log.info("미사용 공공서비스 데이터 정리 시작");
             int deletedCount = publicServiceDataService.cleanupObsoleteServices();
             log.info("미사용 공공서비스 데이터 {}건 삭제 완료", deletedCount);
+
+            // 5. 동기화 완료 후 캐시 초기화
+            serviceCacheManager.clearAllServiceCaches();
 
             log.info("공공서비스 데이터 전체 동기화 완료");
         } catch (Exception e) {

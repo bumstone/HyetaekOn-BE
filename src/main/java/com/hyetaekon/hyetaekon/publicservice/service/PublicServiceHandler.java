@@ -34,6 +34,7 @@ public class PublicServiceHandler {
     private final PublicServiceMapper publicServiceMapper;
     private final PublicServiceValidate publicServiceValidate;
     private final BookmarkRepository bookmarkRepository;
+    private final RecentVisitService recentVisitService;
 
     // 서비스분야별 서비스목록 조회(페이지)
     /*public Page<PublicServiceListResponseDto> getServicesByCategory(ServiceCategory category, Pageable pageable, Long userId) {
@@ -66,6 +67,8 @@ public class PublicServiceHandler {
         // 조회수 증가
         service.updateViewsUp();
         publicServiceRepository.save(service);
+
+        recentVisitService.addVisit(userId, serviceId);
 
         PublicServiceDetailResponseDto dto = publicServiceMapper.toDetailDto(service);
 

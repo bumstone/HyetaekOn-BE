@@ -6,7 +6,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import com.hyetaekon.hyetaekon.publicservice.entity.mongodb.CacheType;
+import com.hyetaekon.hyetaekon.publicservice.entity.CacheType;
 
 import java.time.Duration;
 import java.util.Arrays;
