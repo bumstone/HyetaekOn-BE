@@ -1,7 +1,6 @@
 package com.hyetaekon.hyetaekon.publicservice.service;
 
 import com.hyetaekon.hyetaekon.bookmark.repository.BookmarkRepository;
-import com.hyetaekon.hyetaekon.bookmark.service.BookmarkService;
 import com.hyetaekon.hyetaekon.publicservice.dto.PublicServiceListResponseDto;
 import com.hyetaekon.hyetaekon.publicservice.entity.PublicService;
 import com.hyetaekon.hyetaekon.publicservice.mapper.PublicServiceMapper;
@@ -16,7 +15,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
