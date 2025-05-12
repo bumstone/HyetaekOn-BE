@@ -30,8 +30,9 @@ public class SearchHistoryController {
      * 특정 검색 기록 삭제
      */
     @DeleteMapping("/{historyId}")
-    public ResponseEntity<Void> deleteSearchHistory(@PathVariable String historyId
-    , @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<Void> deleteSearchHistory(
+        @PathVariable("historyId") String historyId,
+        @AuthenticationPrincipal CustomUserDetails userDetails) {
         searchHistoryService.deleteSearchHistory(userDetails.getId(), historyId);
         return ResponseEntity.ok().build();
     }
