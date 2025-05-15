@@ -96,19 +96,4 @@ public class UserInterestService {
         log.debug("회원 관심사 갱신 - 유저 ID: {}, 선택 관심사: {}", userId, selectedInterests);
     }
 
-   /* // 나의 관심사 조회
-    @Transactional(readOnly = true)
-    public UserInterestResponseDto getUserInterestsByUserId(Long userId) {
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
-            .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND_BY_ID));
-
-        List<String> userInterests = user.getInterests().stream()
-            .map(UserInterest::getInterest)
-            .toList();
-
-        log.debug("회원 관심사 조회 - 유저 ID: {}, 관심사: {}", userId, userInterests);
-        return new UserInterestResponseDto(userInterests);
-    }
-
-    */
 }
