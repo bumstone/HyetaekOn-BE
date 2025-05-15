@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class CommentListResponseDto {
     private Long id;
     private Long postId;
+    private Long userId;
     private Long parentId;  // 대댓글일 경우 부모 댓글 ID
     private String content;
     private String nickname;

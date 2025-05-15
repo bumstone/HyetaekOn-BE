@@ -37,7 +37,7 @@ public class Post {
     @JoinColumn(name = "public_service_id")
     private PublicService publicService;
 
-    @Column(columnDefinition = "VARCHAR(20) CHARACTER SET utf8mb4", nullable = false)  // ✅ 제목 20자 제한
+    @Column(columnDefinition = "VARCHAR(40) CHARACTER SET utf8mb4", nullable = false)  // ✅ 제목 20자 제한
     private String title;
 
     @Column(columnDefinition = "VARCHAR(500) CHARACTER SET utf8mb4", nullable = false)  // ✅ 내용 500자 제한

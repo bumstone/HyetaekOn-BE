@@ -18,6 +18,7 @@ public interface PostMapper {
     @Mapping(source = "user.nickname", target = "nickName")
     @Mapping(source = "postType.koreanName", target = "postType")
     @Mapping(source = "recommendCnt", target = "recommendCnt")
+    @Mapping(source = "user.id", target = "userId") // 🔥 추가
     PostListResponseDto toPostListDto(Post post);
 
     // ✅ 마이페이지용 게시글 DTO
@@ -34,9 +35,11 @@ public interface PostMapper {
     void updatePostFromDto(PostUpdateRequestDto updateDto, @MappingTarget Post post);
 
     // ✅ 게시글 상세 보기용 DTO (imageUrls 수동으로 처리)
+    // 상세용 DTO (default 메서드 내부에 userId 수동 추가)
     default PostDetailResponseDto toPostDetailDto(Post post) {
         return PostDetailResponseDto.builder()
                 .postId(post.getId())
+                .userId(post.getUser().getId()) // 🔥 추가
                 .nickName(post.getUser().getNickname())
                 .title(post.getTitle())
                 .content(post.getDisplayContent())
@@ -49,12 +52,12 @@ public interface PostMapper {
                 .tags(post.getTags())
                 .imageUrls(
                         post.getPostImages().stream()
-                                .filter(img -> img.getDeletedAt() == null)            // soft delete 제외
-                                .map(PostImage::getImageUrl)                          // S3 URL 추출
-                                .filter(Objects::nonNull)
+                                .filter(img -> img.getDeletedAt() == null)
+                                .map(PostImage::getImageUrl)
                                 .collect(Collectors.toList())
                 )
-                .recommended(false) // 이후에 서비스에서 setRecommended(true/false)
+                .recommended(false)
                 .build();
     }
+
 }

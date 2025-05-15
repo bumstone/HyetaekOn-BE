@@ -13,6 +13,7 @@ public class PostListResponseDto {
     private Long postId;
     private String title;
     private String nickName;  // 작성자 닉네임
+    private Long userId;
     private LocalDateTime createdAt;
     private int viewCnt;
     private String postType;

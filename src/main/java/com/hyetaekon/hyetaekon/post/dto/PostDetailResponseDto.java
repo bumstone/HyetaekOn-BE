@@ -14,6 +14,7 @@ import java.util.List;
 public class PostDetailResponseDto {
     private Long postId;
     private String nickName;  // 작성자 닉네임
+    private Long userId;
     private String title;
     private String content;
     private LocalDateTime createdAt;

@@ -12,6 +12,7 @@ public interface CommentMapper {
 
     Comment toEntity(CommentCreateRequestDto requestDto);
 
+    @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "user.nickname", target = "nickname")
     @Mapping(source = "post.id", target = "postId")
     @Mapping(target = "content", expression = "java(comment.getDisplayContent())")
