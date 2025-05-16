@@ -12,6 +12,7 @@ jwt:
   refresh-expired: 86400  # 1일
 
 app:
+  front-url: https://camping-on.site
   cookie:
     secure: true
     same-site: None
