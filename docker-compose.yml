@@ -56,4 +56,4 @@
 
   networks:
     app-network:
-      name: app-network
+      name: hyetaekon-network
