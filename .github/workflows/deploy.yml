@@ -50,9 +50,9 @@ jobs:
             sudo docker rm hyetaek-on || true
             # 새 컨테이너 실행
             sudo docker run -d \
-            --env SPRING_PROFILES_ACTIVE=prod \
-            --env-file ${{ secrets.EC2_TARGET_PATH }}/.env \
             --name hyetaek-on \
+            --env SPRING_PROFILES_ACTIVE=prod,s3Bucket \
+            --env-file ${{ secrets.EC2_TARGET_PATH }}/.env \
             --network hyetaekon-network \
             -p 8080:8080 \
             -v ${{ secrets.EC2_TARGET_PATH }}/logs:/app/logs \
