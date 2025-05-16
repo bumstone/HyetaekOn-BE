@@ -7,7 +7,7 @@ spring:
 
 jwt:
   access-expired: 3600  # 1시간
-  refresh-expired: 86400  # 1일
+  refresh-expired: 7200  # 2시간
 
 app:
   cookie:
