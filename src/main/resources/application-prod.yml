@@ -1,3 +1,6 @@
+server:
+  forward-headers-strategy: framework
+
 spring:
   datasource:
     url: ${MYSQL_PROD_URL}  # MySQL 데이터베이스 URL
