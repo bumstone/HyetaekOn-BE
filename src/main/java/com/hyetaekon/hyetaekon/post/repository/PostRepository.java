@@ -4,7 +4,10 @@ import com.hyetaekon.hyetaekon.post.entity.Post;
 import com.hyetaekon.hyetaekon.post.entity.PostType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -24,10 +27,21 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     boolean existsByUser_IdAndDeletedAtIsNull(Long userId);
 
     // 특정 사용자가 작성한 게시글 조회
-    Page<Post> findByUserIdAndDeletedAtIsNull(Long userId, Pageable pageable);
+    @EntityGraph(attributePaths = {"user"})
+    @Query("SELECT p FROM Post p " +
+        "WHERE p.user.id = :userId " +
+        "AND p.deletedAt IS NULL " +
+        "ORDER BY p.createdAt DESC")
+    Page<Post> findMyPostsOptimized(@Param("userId") Long userId, Pageable pageable);
 
     // 특정 사용자가 추천한 게시글 조회
-    Page<Post> findByRecommendsUserIdAndDeletedAtIsNull(Long userId, Pageable pageable);
+    @EntityGraph(attributePaths = {"user", "recommends"})
+    @Query("SELECT DISTINCT p FROM Post p " +
+        "JOIN p.recommends r " +
+        "WHERE r.user.id = :userId " +
+        "AND p.deletedAt IS NULL " +
+        "ORDER BY r.createdAt DESC")
+    Page<Post> findRecommendedPostsOptimized(@Param("userId") Long userId, Pageable pageable);
 
     // 제목 검색 + 삭제되지 않은 게시글
     Page<Post> findByTitleContainingAndDeletedAtIsNull(String keyword, Pageable pageable);

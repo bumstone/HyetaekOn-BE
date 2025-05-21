@@ -295,7 +295,7 @@ public class PostService {
      * 사용자가 작성한 게시글 목록 조회
      */
     public Page<MyPostListResponseDto> getPostsByUserId(Long userId, Pageable pageable) {
-        return postRepository.findByUserIdAndDeletedAtIsNull(userId, pageable)
+        return postRepository.findMyPostsOptimized(userId, pageable)
             .map(postMapper::toMyPostListDto);
     }
 
@@ -303,8 +303,13 @@ public class PostService {
      * 사용자가 추천한 게시글 목록 조회
      */
     public Page<MyPostListResponseDto> getRecommendedPostsByUserId(Long userId, Pageable pageable) {
-        return postRepository.findByRecommendsUserIdAndDeletedAtIsNull(userId, pageable)
-            .map(postMapper::toMyPostListDto);
+        return postRepository.findRecommendedPostsOptimized(userId, pageable)
+            .map(post -> {
+                MyPostListResponseDto dto = postMapper.toMyPostListDto(post);
+                // 추천 개수는 이미 로드된 데이터에서 가져옴 (추가 쿼리 없음)
+                // post.getRecommends().size()는 이미 메모리에 있음
+                return dto;
+            });
     }
 
 
