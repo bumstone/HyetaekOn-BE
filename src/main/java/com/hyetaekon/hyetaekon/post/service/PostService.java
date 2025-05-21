@@ -28,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -172,11 +171,11 @@ public class PostService {
             post.setPostType(postType);
         }
 
-        // 기본 정보 업데이트
+        // 기본 정보 업데이트(title, content, urlTitle, urlPath, tags)
         postMapper.updatePostFromDto(updateDto, post);
 
         // 이미지 업데이트 처리
-        if (updateDto.getImageModified()) {
+        if (Boolean.TRUE.equals(updateDto.getImageModified())) {  // null-safe
             updatePostImages(post, updateDto.getKeepImageIds(), updateDto.getNewImages());
         }
 
