@@ -1,7 +1,6 @@
 package com.hyetaekon.hyetaekon.recommend.repository;
 
 import com.hyetaekon.hyetaekon.recommend.entity.Recommend;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,8 +10,6 @@ import java.util.Optional;
 public interface RecommendRepository extends JpaRepository<Recommend, Long> {
     boolean existsByUserIdAndPostId(Long userId, Long postId);
 
-    @EntityGraph(attributePaths = {"post", "user"})
     Optional<Recommend> findByUserIdAndPostId(Long userId, Long postId);
 
-    int countByPostId(Long postId);
 }

@@ -13,9 +13,5 @@ public interface UserInterestRepository extends JpaRepository<UserInterest, Long
      */
     List<UserInterest> findByUserId(Long userId);
 
-    /**
-     * 사용자 ID로 관심사 존재 여부 확인
-     */
-    boolean existsByUserId(Long userId);
 
 }

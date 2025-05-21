@@ -338,8 +338,6 @@ public class PostService {
         return postRepository.findRecommendedPostsOptimized(userId, pageable)
             .map(post -> {
                 MyPostListResponseDto dto = postMapper.toMyPostListDto(post);
-                // 추천 개수는 이미 로드된 데이터에서 가져옴 (추가 쿼리 없음)
-                // post.getRecommends().size()는 이미 메모리에 있음
                 return dto;
             });
     }

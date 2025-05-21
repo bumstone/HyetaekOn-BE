@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -36,7 +35,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findMyPostsOptimized(@Param("userId") Long userId, Pageable pageable);
 
     // 특정 사용자가 추천한 게시글 조회
-    @EntityGraph(attributePaths = {"user", "recommends"})
     @Query("SELECT DISTINCT p FROM Post p " +
         "JOIN p.recommends r " +
         "WHERE r.user.id = :userId " +
