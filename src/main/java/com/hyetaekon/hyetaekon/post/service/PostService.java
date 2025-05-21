@@ -141,7 +141,7 @@ public class PostService {
             List<PostImage> postImages = processPostImages(requestDto.getImages(), savedPost);
             if (!postImages.isEmpty()) {
                 postImageRepository.saveAll(postImages);
-                savedPost.setPostImages(postImages); // ✅ 이 줄이 핵심
+                savedPost.setPostImages(postImages);
             }
         }
 
@@ -149,7 +149,7 @@ public class PostService {
         userPointService.addPointForAction(userId, PointActionType.POST_CREATION);
         log.info("사용자 {}에게 게시글 작성 포인트가 부여되었습니다.", userId);
 
-        return postMapper.toPostDetailDto(savedPost); // ✅ Mapper가 imageUrls 포함해서 반환
+        return postMapper.toPostDetailDto(savedPost);
     }
 
 
@@ -177,21 +177,29 @@ public class PostService {
 
         // 이미지 업데이트 처리
         if (updateDto.getImages() != null && !updateDto.getImages().isEmpty()) {
-            // 기존 이미지 soft delete 처리
-            List<PostImage> existingImages = postImageRepository.findByPostAndDeletedAtIsNull(post);
-            for (PostImage image : existingImages) {
-                image.softDelete();
-            }
-            postImageRepository.saveAll(existingImages);
-
-            // 새 이미지 추가
-            List<PostImage> newImages = processPostImages(updateDto.getImages(), post);
-            if (!newImages.isEmpty()) {
-                postImageRepository.saveAll(newImages);
-            }
+            updatePostImages(post, updateDto.getImages());
         }
 
-        return postMapper.toPostDetailDto(post);
+        // 업데이트 후 최신 상태로 다시 조회
+        Post updatedPost = postRepository.findByIdAndDeletedAtIsNull(postId)
+            .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다"));
+
+        return postMapper.toPostDetailDto(updatedPost);
+    }
+
+    private void updatePostImages(Post post, List<MultipartFile> newImages) {
+        // 기존 이미지 soft delete 처리
+        List<PostImage> existingImages = postImageRepository.findByPostAndDeletedAtIsNull(post);
+        for (PostImage image : existingImages) {
+            image.softDelete();
+        }
+        postImageRepository.saveAll(existingImages);
+
+        // 새 이미지 추가
+        List<PostImage> newPostImages = processPostImages(newImages, post);
+        if (!newPostImages.isEmpty()) {
+            postImageRepository.saveAll(newPostImages);
+        }
     }
 
     /**
