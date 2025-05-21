@@ -3,6 +3,7 @@ package com.hyetaekon.hyetaekon.user.repository;
 import com.hyetaekon.hyetaekon.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,6 +16,10 @@ import java.util.Optional;
 public interface UserRepository  extends JpaRepository<User, Long> {
   // user id로 검색
   Optional<User> findByIdAndDeletedAtIsNull(Long id);
+
+  @EntityGraph(attributePaths = {"interests"})
+  @Query("SELECT u FROM User u WHERE u.id = :id AND u.deletedAt IS NULL")
+  Optional<User> findByIdAndDeletedAtIsNullWithInterests(@Param("id") Long id);
 
   // user realId로 검색
   Optional<User> findByRealIdAndDeletedAtIsNull(String realId);
