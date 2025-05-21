@@ -130,12 +130,26 @@ public class PostService {
         PostType postType = PostType.fromString(requestDto.getPostType());
         log.info("Received postType: '{}'", requestDto.getPostType());
 
+        // 포인트 부여 로직을 게시글 저장 전에 수행
+        boolean isFirstGreetingPost = false;
+        try {
+            if (postType == PostType.GREETING) {
+                // 첫 인사 게시글 여부 확인 (게시글 저장 전에 체크)
+                isFirstGreetingPost = !postRepository.existsByUser_IdAndPostTypeAndDeletedAtIsNull(userId, PostType.GREETING);
+                log.info("인사 게시글 작성 체크 - 사용자 ID: {}, 첫 인사 게시글 여부: {}", userId, isFirstGreetingPost);
+            }
+        } catch (Exception e) {
+            log.error("포인트 부여 체크 중 오류 발생 - 사용자 ID: {}", userId, e);
+        }
+
+        // 게시글 저장
         Post post = postMapper.toEntity(requestDto);
         post.setUser(user);
         post.setPostType(postType);
 
         Post savedPost = postRepository.save(post);
 
+        // 이미지 처리
         if (requestDto.getImages() != null && !requestDto.getImages().isEmpty()) {
             List<PostImage> postImages = processPostImages(requestDto.getImages(), savedPost);
             if (!postImages.isEmpty()) {
@@ -144,9 +158,27 @@ public class PostService {
             }
         }
 
-        // 게시글 작성 포인트 부여
-        userPointService.addPointForAction(userId, PointActionType.POST_CREATION);
-        log.info("사용자 {}에게 게시글 작성 포인트가 부여되었습니다.", userId);
+        // 게시글 저장 후 포인트 부여
+        try {
+            if (postType == PostType.GREETING) {
+                if (isFirstGreetingPost) {
+                    // 첫 인사 게시글인 경우 100점
+                    userPointService.addPointForAction(userId, PointActionType.FIRST_GREETING_POST_CREATION);
+                    log.info("첫 인사 게시글 작성 완료 - 사용자 ID: {}, 부여 포인트: 100점", userId);
+                } else {
+                    // 추가 인사 게시글인 경우 20점
+                    userPointService.addPointForAction(userId, PointActionType.POST_CREATION);
+                    log.info("추가 인사 게시글 작성 완료 - 사용자 ID: {}, 부여 포인트: 20점", userId);
+                }
+            } else {
+                // 일반 게시글인 경우 20점
+                userPointService.addPointForAction(userId, PointActionType.POST_CREATION);
+                log.info("일반 게시글 작성 완료 - 사용자 ID: {}, 부여 포인트: 20점", userId);
+            }
+        } catch (Exception e) {
+            log.error("포인트 부여 중 오류 발생 - 사용자 ID: {}, 게시글 ID: {}", userId, savedPost.getId(), e);
+            // 포인트 부여 실패해도 게시글 생성은 성공으로 처리
+        }
 
         return postMapper.toPostDetailDto(savedPost);
     }

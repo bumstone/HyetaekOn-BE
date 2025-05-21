@@ -24,7 +24,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // ID로 삭제되지 않은 게시글 조회
     Optional<Post> findByIdAndDeletedAtIsNull(Long id);
 
-    boolean existsByUser_IdAndDeletedAtIsNull(Long userId);
+    // 특정 사용자가 특정 타입의 게시글을 작성한 적이 있는지 확인
+    boolean existsByUser_IdAndPostTypeAndDeletedAtIsNull(Long userId, PostType postType);
 
     // 특정 사용자가 작성한 게시글 조회
     @EntityGraph(attributePaths = {"user"})

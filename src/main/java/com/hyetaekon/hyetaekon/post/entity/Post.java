@@ -83,7 +83,6 @@ public class Post {
     @Column(name = "suspend_at")
     private LocalDateTime suspendAt;
 
-
     @Builder.Default
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostImage> postImages = new ArrayList<>();  // ✅ 게시글 이미지와 연결
