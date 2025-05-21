@@ -19,7 +19,7 @@ public class BookMarkController {
   // 북마크 추가
   @PostMapping
   public ResponseEntity<Void> addBookmark(
-      @PathVariable("serviceId") Long serviceId,
+      @PathVariable("serviceId") String serviceId,
       @AuthenticationPrincipal CustomUserDetails customUserDetails
   ) {
     bookmarkService.addBookmark(serviceId, customUserDetails.getId());
@@ -29,7 +29,7 @@ public class BookMarkController {
   // 북마크 제거
   @DeleteMapping
   public ResponseEntity<Void> removeBookmark(
-      @PathVariable("serviceId") Long serviceId,
+      @PathVariable("serviceId") String serviceId,
       @AuthenticationPrincipal CustomUserDetails customUserDetails
   ) {
     bookmarkService.removeBookmark(serviceId, customUserDetails.getId());

@@ -11,9 +11,9 @@ import java.util.Optional;
 @Repository
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
 
-    boolean existsByUserIdAndPublicServiceId(Long userId, Long serviceId);
+    boolean existsByUserIdAndPublicServiceId(Long userId, String serviceId);
 
-    Optional<Bookmark> findByUserIdAndPublicServiceId(Long userId, Long serviceId);
+    Optional<Bookmark> findByUserIdAndPublicServiceId(Long userId, String serviceId);
 
     /*@Query("SELECT b FROM Bookmark b " +
         "JOIN FETCH b.publicService ps " +

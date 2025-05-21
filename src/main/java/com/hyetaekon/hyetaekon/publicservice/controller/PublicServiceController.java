@@ -1,8 +1,8 @@
 package com.hyetaekon.hyetaekon.publicservice.controller;
 
+import com.hyetaekon.hyetaekon.publicservice.dto.FilterOptionDto;
 import com.hyetaekon.hyetaekon.publicservice.dto.PublicServiceDetailResponseDto;
 import com.hyetaekon.hyetaekon.publicservice.dto.PublicServiceListResponseDto;
-import com.hyetaekon.hyetaekon.publicservice.entity.ServiceCategory;
 import com.hyetaekon.hyetaekon.publicservice.service.PublicServiceHandler;
 import com.hyetaekon.hyetaekon.common.util.AuthenticateUser;
 import jakarta.validation.constraints.Max;
@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Validated
@@ -34,7 +35,7 @@ public class PublicServiceController {
         @RequestParam(required = false) List<String> familyTypes,
         @RequestParam(required = false) List<String> categories,
         @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
-        @RequestParam(name = "size", defaultValue = "9") @Positive @Max(30) int size) {
+        @RequestParam(name = "size", defaultValue = "9") @Positive @Max(50) int size) {
 
         Long userId = authenticateUser.authenticateUserId();
 
@@ -42,8 +43,13 @@ public class PublicServiceController {
             sort, specialGroups, familyTypes, categories, PageRequest.of(page, size), userId));
     }
 
+    @GetMapping("/filters")
+    public ResponseEntity<Map<String, List<FilterOptionDto>>> getFilterOptions() {
+        return ResponseEntity.ok(publicServiceHandler.getFilterOptions());
+    }
+
     // 서비스 분야별 공공서비스 목록 조회
-    @GetMapping("/category/{category}")
+    /*@GetMapping("/category/{category}")
     public ResponseEntity<Page<PublicServiceListResponseDto>> getServicesByCategory (
         @PathVariable("category") String categoryName,
         @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
@@ -52,11 +58,11 @@ public class PublicServiceController {
         ServiceCategory category = publicServiceHandler.getServiceCategory(categoryName);
         return ResponseEntity.ok(publicServiceHandler.getServicesByCategory(category, PageRequest.of(page, size), userId));
 
-    }
+    }*/
 
     // 공공서비스 상세 조회
     @GetMapping("/detail/{serviceId}")
-    public ResponseEntity<PublicServiceDetailResponseDto> getServiceDetail (@PathVariable("serviceId") Long serviceId) {
+    public ResponseEntity<PublicServiceDetailResponseDto> getServiceDetail (@PathVariable("serviceId") String serviceId) {
         Long userId = authenticateUser.authenticateUserId();
 
         return ResponseEntity.ok(publicServiceHandler.getServiceDetail(serviceId, userId));

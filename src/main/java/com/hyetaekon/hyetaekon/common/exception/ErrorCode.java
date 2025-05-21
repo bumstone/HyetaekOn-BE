@@ -16,8 +16,12 @@ public enum ErrorCode {
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "AUTH-006", "유효하지 않은 사용자 이름 또는 비밀번호입니다."),
     INVALID_SECRET_KEY(HttpStatus.UNAUTHORIZED, "AUTH-007", "유효하지 않은 비밀 키입니다."),
     DELETE_USER_DENIED(HttpStatus.FORBIDDEN, "AUTH-008", "회원 탈퇴가 거부되었습니다."),
-    ROLE_NOT_FOUND(HttpStatus.FORBIDDEN, "AUTH-009", "권한 정보가 없습니다."),
-    BLACKLIST_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH-010", "사용할 수 없는 액세스 토큰입니다."),
+    CANNOT_REPORT_SELF(HttpStatus.BAD_REQUEST, "AUTH-009","자기 자신을 신고할 수 없습니다."),
+    ROLE_NOT_FOUND(HttpStatus.FORBIDDEN, "AUTH-010", "권한 정보가 없습니다."),
+    BLACKLIST_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH-011", "사용할 수 없는 액세스 토큰입니다."),
+    REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH-012", "해당 신고 내역을 찾을 수 없습니다."),
+    REPORT_ALREADY_PROCESSED(HttpStatus.BAD_REQUEST, "AUTH-013", "이미 처리된 신고입니다."),
+    INVALID_REPORT_REQUEST(HttpStatus.BAD_REQUEST, "AUTH-014","잘못된 신고 요청입니다."),
 
     // 계정 관련
     DUPLICATED_REAL_ID(HttpStatus.CONFLICT, "ACCOUNT-001", "이미 존재하는 아이디입니다."),
@@ -40,7 +44,14 @@ public enum ErrorCode {
     // 좋아요
     RECOMMEND_ALREADY_EXISTS(HttpStatus.CONFLICT, "RECOMMEND-001", "이미 좋아요를 누른 게시글입니다."),
     RECOMMEND_NOT_FOUND(HttpStatus.NOT_FOUND, "RECOMMEND-002", "좋아요 정보를 찾을 수 없습니다."),
-    POST_NOT_FOUND(HttpStatus.NOT_FOUND, "POST-001", "해당 게시글을 찾을 수 없습니다."),
+    RECOMMEND_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "RECOMMEND-003", "추천한 유저를 찾을 수 없습니다."),
+
+    // 게시글
+    POST_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND,"POST-001", "해당 아이디의 게시글을 찾을 수 없습니다"),
+
+    // 답변
+    ANSWER_NOT_FOUND(HttpStatus.NOT_FOUND, "ANSWER-001","답변을 찾을 수 없습니다."),
+    ANSWER_NOT_MATCHED_POST(HttpStatus.BAD_REQUEST, "ANSWER-002","해당 게시글에 속하지 않는 답변입니다."),
 
     // 관심사 선택 제한
     INTEREST_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "INTEREST-001", "관심사는 최대 6개까지만 등록 가능합니다."),
@@ -48,7 +59,8 @@ public enum ErrorCode {
 
     // 공공서비스
     // 유효 JACODE 확인
-    INVALID_ENUM_CODE(HttpStatus.BAD_REQUEST, "ENUM-001", "유효하지 않은 코드 값입니다."),
+    INVALID_ENUM_CODE(HttpStatus.BAD_REQUEST, "SERVICE-001", "유효하지 않은 코드 값입니다."),
+    INCOMPLETE_SERVICE_DETAIL(HttpStatus.BAD_REQUEST, "SERVICE-002","서비스 상세 정보가 불완전합니다."),
 
     SERVICE_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE-001", "해당 서비스 분야를 찾을 수 없습니다."),
     SERVICE_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND,"SERVICE-002", "해당 아이디의 서비스를 찾을 수 없습니다"),

@@ -24,7 +24,7 @@ public class ChatbotService {
         }
 
         // 📌 질문이 DB에 없을 경우 기본 응답 반환
-        return new ChatbotDto(question, "죄송해요, 해당 질문에 대한 답변을 찾을 수 없어요.");
+        return new ChatbotDto(question, "죄송해요, 해당 질문에 대한 답변을 찾을 수 없어요.", null);
     }
 
     // 📌 새로운 질문-답변을 DB에 추가하는 메서드

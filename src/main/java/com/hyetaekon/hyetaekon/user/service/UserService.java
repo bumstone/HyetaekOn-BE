@@ -97,6 +97,14 @@ public class UserService {
 
     }
 
+    @Transactional(readOnly = true)
+    public UserResponseDto getUserById(Long userId) {
+        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+                .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND_BY_ID));
+
+        return userMapper.toResponseDto(user);
+    }
+
 
     // 회원 정보 수정(닉네임, 이름, 성별, 생년월일, 지역, 직업)
     @Transactional

@@ -1,62 +1,46 @@
 package com.hyetaekon.hyetaekon.post.mapper;
 
-import com.hyetaekon.hyetaekon.post.dto.PostDto;
+import com.hyetaekon.hyetaekon.post.dto.*;
 import com.hyetaekon.hyetaekon.post.entity.Post;
 import com.hyetaekon.hyetaekon.post.entity.PostImage;
-import com.hyetaekon.hyetaekon.post.entity.PostType;
-import com.hyetaekon.hyetaekon.publicservice.entity.PublicService;
-import com.hyetaekon.hyetaekon.user.entity.User;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = PostImageMapper.class)
 public interface PostMapper {
 
-    @Mapping(target = "imageUrls", expression = "java(mapPostImages(post))")
-    @Mapping(target = "postType", expression = "java(post.getPostType() != null ? post.getPostType().name() : null)")
-    PostDto toDto(Post post);
+    // ✅ 게시글 목록용 DTO 변환
+    @Mapping(source = "id", target = "postId")
+    @Mapping(source = "user.nickname", target = "nickName")
+    @Mapping(source = "postType.koreanName", target = "postType")
+    @Mapping(source = "recommendCnt", target = "recommendCnt")
+    @Mapping(source = "user.id", target = "userId") // 🔥 추가
+    PostListResponseDto toPostListDto(Post post);
 
-    default Post toEntity(PostDto dto) {
-        Post post = new Post();
-        // 👇 User 객체 세팅
-        User user = new User();
-        user.setId(dto.getUserId());
-        post.setUser(user);
+    // ✅ 마이페이지용 게시글 DTO
+    @Mapping(source = "id", target = "postId")
+    @Mapping(source = "user.nickname", target = "nickName")
+    @Mapping(target = "content", expression = "java(post.getDisplayContent())")
+    MyPostListResponseDto toMyPostListDto(Post post);
 
-        // 👇 PublicService 객체 세팅
-        PublicService publicService = new PublicService();
-        publicService.setId(dto.getPublicServiceId());
-        post.setPublicService(publicService);
-        post.setTitle(dto.getTitle());
-        post.setContent(dto.getContent());
-        post.setPostType(dto.getPostType() != null ? PostType.valueOf(dto.getPostType()) : null);
-        post.setServiceUrl(dto.getServiceUrl());
-        post.setUrlTitle(dto.getUrlTitle());
-        post.setUrlPath(dto.getUrlPath());
-        post.setTags(dto.getTags());
-        post.setCategoryId(dto.getCategoryId());
+    // ✅ 게시글 생성 시 DTO → Entity 변환
+    Post toEntity(PostCreateRequestDto createDto);
 
-        if (dto.getImageUrls() != null) {
-            List<PostImage> images = dto.getImageUrls().stream()
-                    .map(url -> {
-                        PostImage img = new PostImage();
-                        img.setImageUrl(url);
-                        img.setPost(post);
-                        return img;
-                    }).collect(Collectors.toList());
-            post.setPostImages(images);
-        }
+    // ✅ 게시글 수정 시 일부 값만 업데이트 (null 무시)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updatePostFromDto(PostUpdateRequestDto updateDto, @MappingTarget Post post);
 
-        return post;
-    }
+    @Mapping(source = "id", target = "postId")
+    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "user.nickname", target = "nickName")
+    @Mapping(target = "content", expression = "java(post.getDisplayContent())")
+    @Mapping(source = "postType.koreanName", target = "postType")
+    @Mapping(target = "recommended", constant = "false")
+    @Mapping(source = "postImages", target = "imageUrls")
+    PostDetailResponseDto toPostDetailDto(Post post);
 
-    default List<String> mapPostImages(Post post) {
-        if (post.getPostImages() == null) return null;
-        return post.getPostImages().stream()
-                .map(PostImage::getImageUrl)
-                .collect(Collectors.toList());
-    }
 }

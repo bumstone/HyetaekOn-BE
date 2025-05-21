@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -49,8 +50,9 @@ public class SecurityConfig {
     // 경로별 인가 작업
     http
         .authorizeHttpRequests((auth) -> auth
+            .requestMatchers("/api/posts/type", "/api/posts/type/**", "/api/posts/search").permitAll()
             .requestMatchers(SecurityPath.ADMIN_ENDPOINTS).hasRole("ADMIN")
-            .requestMatchers(SecurityPath.USER_ENDPOINTS).hasRole("USER")
+            .requestMatchers(SecurityPath.USER_ENDPOINTS).hasAnyRole("USER", "ADMIN")
             .requestMatchers(SecurityPath.PUBLIC_ENDPOINTS).permitAll()
             .anyRequest().permitAll()
         );
@@ -72,8 +74,8 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
     configuration.addAllowedOrigin("http://localhost:3000"); // 개발 환경
-    configuration.addAllowedOrigin("https://hyetaek-on.site"); // 혜택온 도메인
-    configuration.addAllowedOrigin("https://www.hyetaek-on.site");
+    configuration.addAllowedOrigin("https://hyetaek-on.co.kr"); // 혜택온 도메인
+    configuration.addAllowedOrigin("https://www.hyetaek-on.co.kr");
     configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
     configuration.addAllowedHeader("*"); // 모든 헤더 허용
     configuration.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type"));

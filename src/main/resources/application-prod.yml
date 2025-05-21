@@ -1,3 +1,6 @@
+server:
+  forward-headers-strategy: framework
+
 spring:
   datasource:
     url: ${MYSQL_PROD_URL}  # MySQL 데이터베이스 URL
@@ -9,4 +12,9 @@ spring:
 
 jwt:
   access-expired: 1800 # 30분
-  refresh-expired: 432000 # 5일
+  refresh-expired: 86400  # 1일
+
+app:
+  cookie:
+    secure: true
+    same-site: None

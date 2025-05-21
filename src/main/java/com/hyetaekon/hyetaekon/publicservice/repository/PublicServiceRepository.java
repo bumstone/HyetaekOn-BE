@@ -16,21 +16,20 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PublicServiceRepository extends JpaRepository<PublicService, Long> {
-    Page<PublicService> findByServiceCategory(ServiceCategory category, Pageable pageable);
+public interface PublicServiceRepository extends JpaRepository<PublicService, String> {
 
     List<PublicService> findTop6ByOrderByBookmarkCntDesc();
 
-    Optional<PublicService> findById(long serviceId);
+    Optional<PublicService> findById(String serviceId);
 
-    int deleteByIdNotIn(List<Long> Ids);
+    int deleteByIdNotIn(List<String> Ids);
 
     @Query("SELECT DISTINCT ps FROM PublicService ps " +
         "LEFT JOIN ps.specialGroups sg " +
         "LEFT JOIN ps.familyTypes ft " +
         "WHERE (:#{#categories == null || #categories.isEmpty()} = true OR ps.serviceCategory IN :categories) " +
-        "AND (:#{#specialGroupEnums == null || #specialGroupEnums.isEmpty()} = true OR sg.specialGroupEnum IN :specialGroupEnums) " +
-        "AND (:#{#familyTypeEnums == null || #familyTypeEnums.isEmpty()} = true OR ft.familyTypeEnum IN :familyTypeEnums)")
+        "AND (:#{#specialGroupEnums == null || #specialGroupEnums.isEmpty()} = true OR (sg IS NOT NULL AND sg.specialGroupEnum IN :specialGroupEnums)) " +
+        "AND (:#{#familyTypeEnums == null || #familyTypeEnums.isEmpty()} = true OR (ft IS NOT NULL AND ft.familyTypeEnum IN :familyTypeEnums))")
     Page<PublicService> findWithFilters(
         @Param("categories") List<ServiceCategory> categories,
         @Param("specialGroupEnums") List<SpecialGroupEnum> specialGroupEnums,
@@ -41,5 +40,4 @@ public interface PublicServiceRepository extends JpaRepository<PublicService, Lo
     // 사용자의 북마크 공공서비스 목록 페이지
     @Query("SELECT p FROM PublicService p JOIN p.bookmarks b WHERE b.user.id = :userId ORDER BY b.createdAt DESC")
     Page<PublicService> findByBookmarks_User_Id(@Param("userId") Long userId, Pageable pageable);
-
 }

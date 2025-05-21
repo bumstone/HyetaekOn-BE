@@ -11,7 +11,7 @@ import java.util.List;
 @Builder
 @ToString
 public class PublicServiceListResponseDto {
-    private Long publicServiceId;
+    private String publicServiceId;
     private String serviceName;
     private String summaryPurpose;
 

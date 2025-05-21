@@ -15,7 +15,11 @@ public enum ServiceCategory {
     EMPLOYMENT_STARTUP("고용·창업"),
     HEALTH_MEDICAL("보건·의료"),
     CULTURE_ENVIRONMENT("문화·환경"),
-    LIFE_STABILITY("생활안정");
+    LIFE_STABILITY("생활안정"),
+    PROTECTION_CARE("보호·돌봄"),
+    PREGNANCY_CHILDBIRTH("임신·출산"),
+    OTHER("기타");
+
 
     @JsonValue
     private final String type;

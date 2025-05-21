@@ -1,8 +1,11 @@
 package com.hyetaekon.hyetaekon.user.controller;
 
+import com.hyetaekon.hyetaekon.common.exception.ErrorCode;
+import com.hyetaekon.hyetaekon.common.exception.GlobalException;
 import com.hyetaekon.hyetaekon.user.dto.admin.UserAdminResponseDto;
 import com.hyetaekon.hyetaekon.user.dto.admin.UserReportResponseDto;
 import com.hyetaekon.hyetaekon.user.dto.admin.UserSuspendRequestDto;
+import com.hyetaekon.hyetaekon.user.entity.ReportStatus;
 import com.hyetaekon.hyetaekon.user.service.UserAdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +35,7 @@ public class UserAdminController {
      */
     @PostMapping("/users/{userId}/suspend")
     public ResponseEntity<Void> suspendUser(
-        @PathVariable Long userId,
+        @PathVariable("userId") Long userId,
         @RequestBody UserSuspendRequestDto requestDto) {
         userAdminService.suspendUser(userId, requestDto);
         return ResponseEntity.ok().build();
@@ -42,7 +45,7 @@ public class UserAdminController {
      * 정지 해제
      */
     @PutMapping("/users/{userId}/unsuspend")
-    public ResponseEntity<Void> unsuspendUser(@PathVariable Long userId) {
+    public ResponseEntity<Void> unsuspendUser(@PathVariable("userId") Long userId) {
         userAdminService.unsuspendUser(userId);
         return ResponseEntity.ok().build();
     }
@@ -75,6 +78,44 @@ public class UserAdminController {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(userAdminService.getUserReports(page, size));
+    }
+
+    /**
+     * 상태별 신고 내역 조회
+     */
+    @GetMapping("/users/reports/status/{status}")
+    public ResponseEntity<Page<UserReportResponseDto>> getReportsByStatus(
+        @PathVariable("status") ReportStatus status,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(userAdminService.getReportsByStatus(status, page, size));
+    }
+
+    /**
+     * 신고 승인 처리
+     */
+    @PostMapping("/users/reports/{reportId}/resolve")
+    public ResponseEntity<Void> resolveReport(
+        @PathVariable("reportId") Long reportId,
+        @RequestParam(defaultValue = "false") boolean suspendUser,
+        @RequestBody(required = false) UserSuspendRequestDto suspendRequestDto) {
+
+        // 사용자 정지 요청이 있지만 정지 정보가 없는 경우
+        if (suspendUser && suspendRequestDto == null) {
+            throw new GlobalException(ErrorCode.INVALID_REPORT_REQUEST);
+        }
+
+        userAdminService.resolveReport(reportId, suspendUser, suspendRequestDto);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 신고 거부 처리
+     */
+    @PostMapping("/users/reports/{reportId}/reject")
+    public ResponseEntity<Void> rejectReport(@PathVariable("reportId") Long reportId) {
+        userAdminService.rejectReport(reportId);
+        return ResponseEntity.ok().build();
     }
 
 }

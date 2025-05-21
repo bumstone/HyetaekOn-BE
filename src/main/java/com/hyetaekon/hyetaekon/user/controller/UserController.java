@@ -1,10 +1,20 @@
 package com.hyetaekon.hyetaekon.user.controller;
 
+import com.hyetaekon.hyetaekon.common.exception.ErrorCode;
+import com.hyetaekon.hyetaekon.common.exception.GlobalException;
 import com.hyetaekon.hyetaekon.common.jwt.CustomUserDetails;
+import com.hyetaekon.hyetaekon.common.jwt.CustomUserPrincipal;
+import com.hyetaekon.hyetaekon.common.jwt.JwtTokenParser;
+import com.hyetaekon.hyetaekon.common.jwt.JwtTokenProvider;
+import com.hyetaekon.hyetaekon.post.dto.MyPostListResponseDto;
+import com.hyetaekon.hyetaekon.post.service.PostService;
 import com.hyetaekon.hyetaekon.publicservice.dto.PublicServiceListResponseDto;
 import com.hyetaekon.hyetaekon.publicservice.service.PublicServiceHandler;
 import com.hyetaekon.hyetaekon.user.dto.*;
+import com.hyetaekon.hyetaekon.user.entity.User;
+import com.hyetaekon.hyetaekon.user.repository.UserRepository;
 import com.hyetaekon.hyetaekon.user.service.UserService;
+import io.jsonwebtoken.Claims;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -27,6 +37,9 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
   private final UserService userService;
   private final PublicServiceHandler publicServiceHandler;
+  private final PostService postService;
+  private final JwtTokenParser jwtTokenParser;
+  private final UserRepository userRepository;
 
   // 회원 가입 api
   @PostMapping("/signup")
@@ -43,6 +56,13 @@ public class UserController {
     UserResponseDto userInfo = userService.getMyInfo(userId);
     return ResponseEntity.ok(userInfo);
   }
+
+  @GetMapping("/users/{userId}")
+  public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long userId) {
+    UserResponseDto user = userService.getUserById(userId);
+    return ResponseEntity.ok(user);
+  }
+
 
   // 회원 정보 수정 api
   @PutMapping("/users/me/profile")
@@ -66,16 +86,48 @@ public class UserController {
   }
 
   // 회원 탈퇴
-  @DeleteMapping("/users/me")
+  /*@DeleteMapping("/users/me")
   public ResponseEntity<Void> deleteUser(
       @AuthenticationPrincipal CustomUserDetails customUserDetails,
-      @RequestBody String deleteReason,
+      @RequestBody UserDeleteRequestDto deleteRequestDto,
       @CookieValue(name = "refreshToken", required = false) String refreshToken,
       @RequestHeader("Authorization") String authHeader
   ) {
     String accessToken = authHeader.replace("Bearer ", "");
-    userService.deleteUser(customUserDetails.getId(), deleteReason, accessToken, refreshToken);
+    userService.deleteUser(customUserDetails.getId(), deleteRequestDto.getDeleteReason(), accessToken, refreshToken);
 
+    return ResponseEntity.noContent().build();
+  }*/
+  @DeleteMapping("/users/me")
+  public ResponseEntity<Void> deleteUser(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @RequestBody UserDeleteRequestDto deleteRequestDto,
+      @CookieValue(name = "refreshToken", required = false) String refreshToken,
+      @RequestHeader("Authorization") String authHeader
+  ) {
+    log.debug("회원 탈퇴 요청 - 인증 객체: {}", userDetails);
+
+    if (userDetails == null) {
+      // 인증 객체가 null일 경우 토큰에서 직접 정보 추출
+      try {
+        String token = authHeader.replace("Bearer ", "");
+        Claims claims = jwtTokenParser.parseClaims(token);
+        String realId = claims.getSubject();
+
+        User user = userRepository.findByRealIdAndDeletedAtIsNull(realId)
+            .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND_BY_REAL_ID));
+
+        userService.deleteUser(user.getId(), deleteRequestDto.getDeleteReason(), token, refreshToken);
+        return ResponseEntity.noContent().build();
+      } catch (Exception e) {
+        log.error("회원 탈퇴 처리 실패: {}", e.getMessage());
+        throw new GlobalException(ErrorCode.DELETE_USER_DENIED);
+      }
+    }
+
+    // 기존 로직
+    String accessToken = authHeader.replace("Bearer ", "");
+    userService.deleteUser(userDetails.getId(), deleteRequestDto.getDeleteReason(), accessToken, refreshToken);
     return ResponseEntity.noContent().build();
   }
 
@@ -89,40 +141,45 @@ public class UserController {
   }
 
   // 북마크한 서비스 목록 조회
-  @GetMapping("/users/me/bookmarked")
+  @GetMapping("/users/me/bookmarked/posts")
   public ResponseEntity<Page<PublicServiceListResponseDto>> getBookmarkedServices(
       @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
-      @RequestParam(name = "size", defaultValue = "9") @Positive @Max(30) int size,
+      @RequestParam(name = "size", defaultValue = "10") @Positive @Max(30) int size,
       @AuthenticationPrincipal CustomUserDetails userDetails) {
     return ResponseEntity.ok(publicServiceHandler.getBookmarkedServices(
         userDetails.getId(), PageRequest.of(page, size))
     );
   }
 
-    /**
-     * 작성한 게시글 목록 조회
-     */
-//    @GetMapping("/me/posts")
-//    @PreAuthorize("hasRole('USER')")
-//    public ResponseEntity<ApiResponseDto<Page<PostResponseDto>>> getMyPosts(
-//        @RequestParam(required = false) String postType,
-//        @RequestParam(defaultValue = "0") int page,
-//        @RequestParam(defaultValue = "10") int size) {
-//        Page<PostResponseDto> posts = userService.getMyPosts(postType, PageRequest.of(page, size));
-//        return ResponseEntity.ok(ApiResponseDto.success(posts));
-//    }
-//
-    /**
-     * 작성한 댓글 목록 조회
-     */
-//    @GetMapping("/me/comments")
-//    @PreAuthorize("hasRole('USER')")
-//    public ResponseEntity<ApiResponseDto<Page<CommentResponseDto>>> getMyComments(
-//        @RequestParam(defaultValue = "0") int page,
-//        @RequestParam(defaultValue = "10") int size) {
-//        Page<CommentResponseDto> comments = userService.getMyComments(PageRequest.of(page, size));
-//        return ResponseEntity.ok(ApiResponseDto.success(comments));
-//    }
+  /**
+   * 내가 작성한 게시글 목록 조회
+   */
+  @GetMapping("/users/me/posts")
+  public ResponseEntity<Page<MyPostListResponseDto>> getMyPosts(
+      @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
+      @RequestParam(name = "size", defaultValue = "10") @Positive @Max(30) int size,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+    Page<MyPostListResponseDto> posts = postService.getPostsByUserId(
+        userDetails.getId(), PageRequest.of(page, size));
+
+    return ResponseEntity.ok(posts);
+  }
+
+  /**
+   * 내가 추천한 게시글 목록 조회
+   */
+  @GetMapping("/users/me/recommended/posts")
+  public ResponseEntity<Page<MyPostListResponseDto>> getMyRecommendedPosts(
+      @RequestParam(name = "page", defaultValue = "0") @Min(0) int page,
+      @RequestParam(name = "size", defaultValue = "10") @Positive @Max(30) int size,
+      @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+    Page<MyPostListResponseDto> posts = postService.getRecommendedPostsByUserId(
+        userDetails.getId(), PageRequest.of(page, size));
+
+    return ResponseEntity.ok(posts);
+  }
 
 
 }

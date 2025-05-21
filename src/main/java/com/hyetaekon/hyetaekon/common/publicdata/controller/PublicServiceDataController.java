@@ -41,13 +41,13 @@ public class PublicServiceDataController {
   /**
    * 공공서비스 상세정보 전체 동기화 (페이징 처리)
    */
-  @PostMapping("/serviceDetailList")
+  @PostMapping("/serviceDetail")
   public ResponseEntity<String> createAndStoreServiceDetailList() {
     validator.validateAndHandleException(() -> {
       // 전체 상세정보 동기화 (페이징 처리)
-      publicServiceDataService.syncPublicServiceDetailData(SERVICE_DETAIL_LIST);
+      publicServiceDataService.syncPublicServiceDetailData(SERVICE_DETAIL);
       return null;
-    }, SERVICE_DETAIL_LIST);
+    }, SERVICE_DETAIL);
 
     return ResponseEntity.status(HttpStatus.OK).body("공공서비스 상세정보 데이터 동기화 완료");
   }
@@ -55,13 +55,13 @@ public class PublicServiceDataController {
   /**
    * 공공서비스 지원조건 전체 동기화 (페이징 처리)
    */
-  @PostMapping("/supportConditionsList")
+  @PostMapping("/supportConditions")
   public ResponseEntity<String> createAndStoreSupportConditionsList() {
     validator.validateAndHandleException(() -> {
       // 전체 지원조건 동기화 (페이징 처리)
-      publicServiceDataService.syncPublicServiceConditionsData(SERVICE_CONDITIONS_LIST);
+      publicServiceDataService.syncPublicServiceConditionsData(SERVICE_CONDITIONS);
       return null;
-    }, SERVICE_CONDITIONS_LIST);
+    }, SERVICE_CONDITIONS);
 
     return ResponseEntity.status(HttpStatus.OK).body("공공서비스 지원조건 데이터 동기화 완료");
   }
@@ -84,5 +84,19 @@ public class PublicServiceDataController {
     }, SERVICE_LIST);
 
     return ResponseEntity.status(HttpStatus.OK).body(result);
+  }
+
+  // 통합 동기화
+  @PostMapping("/sync-all")
+  public ResponseEntity<String> syncAllPublicServiceData() {
+    // 순차적으로 실행
+    createAndStoreServiceList();
+    createAndStoreServiceDetailList();
+    createAndStoreSupportConditionsList();
+
+    // 미사용 데이터 정리
+    publicServiceDataService.cleanupObsoleteServices();
+
+    return ResponseEntity.status(HttpStatus.OK).body("모든 공공서비스 데이터 동기화 완료");
   }
 }

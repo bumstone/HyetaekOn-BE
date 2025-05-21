@@ -34,7 +34,7 @@ public class JwtTokenParser {
         }
     }
 
-    // 토큰에서 이메일 정보 추출
+    // 토큰에서 아이디 정보 추출
     public String getRealIdFromToken(String accessToken) {
         Claims claims = Jwts.parserBuilder()
             .setSigningKey(secretKey)

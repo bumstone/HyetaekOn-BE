@@ -4,15 +4,18 @@ import com.hyetaekon.hyetaekon.common.publicdata.dto.PublicServiceConditionsData
 import com.hyetaekon.hyetaekon.common.publicdata.dto.PublicServiceDataDto;
 import com.hyetaekon.hyetaekon.common.publicdata.dto.PublicServiceDetailDataDto;
 import com.hyetaekon.hyetaekon.common.publicdata.mapper.PublicServiceDataMapper;
+import com.hyetaekon.hyetaekon.common.publicdata.mongodb.service.PublicDataMongoService;
 import com.hyetaekon.hyetaekon.common.publicdata.util.PublicDataPath;
 import com.hyetaekon.hyetaekon.common.publicdata.util.PublicServiceDataValidate;
 import com.hyetaekon.hyetaekon.publicservice.entity.*;
 import com.hyetaekon.hyetaekon.publicservice.repository.PublicServiceRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.web.client.RestTemplate;
 
 
@@ -28,7 +31,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class PublicServiceDataServiceImpl implements PublicServiceDataService {
-
+    private final PublicDataMongoService publicDataMongoService;
     private final PublicServiceRepository publicServiceRepository;
     private final PublicServiceDataMapper publicServiceDataMapper;
     private final PublicServiceDataProviderService publicServiceDataProviderService;
@@ -36,7 +39,7 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
     private final PublicServiceDataValidate validator;
 
     private static final int DEFAULT_PAGE_SIZE = 1000; // 기본 페이지 크기를 1000으로 설정
-    private final Set<Long> currentServiceIds = ConcurrentHashMap.newKeySet(); // 현재 동기화된 서비스 ID 저장
+    private final Set<String> currentServiceIds = ConcurrentHashMap.newKeySet(); // 현재 동기화된 서비스 ID 저장
 
     /**
      * 공공서비스 목록 데이터 호출 (페이징 처리)
@@ -145,7 +148,7 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
     /**
      * 공통 데이터 동기화 메서드 - 중복 코드 제거를 위한 템플릿 메서드
      */
-    private <T, D> long syncDataWithPaging(
+    private <T, D> void syncDataWithPaging(
         PublicDataPath apiPath,
         BiFunction<PublicDataPath, Integer, List<T>> fetcher, // 데이터 조회 함수
         Function<T, List<D>> dataExtractor, // DTO에서 데이터 추출 함수
@@ -204,7 +207,6 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
         }
 
         log.info("{} 전체 동기화 완료: 총 {}건", operationName, totalProcessed);
-        return totalProcessed;
     }
 
     /**
@@ -237,14 +239,16 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
 
             // 배치 처리 최적화: 1000개 단위로 저장
             if (entitiesToSave.size() >= 1000) {
-                publicServiceRepository.saveAll(entitiesToSave);
+                List<PublicService> savedEntities = publicServiceRepository.saveAll(entitiesToSave);
+                publicDataMongoService.updateOrCreateBulkDocuments(savedEntities);
                 entitiesToSave.clear();
             }
         }
 
         // 나머지 데이터 저장
         if (!entitiesToSave.isEmpty()) {
-            publicServiceRepository.saveAll(entitiesToSave);
+            List<PublicService> savedEntities = publicServiceRepository.saveAll(entitiesToSave);
+            publicDataMongoService.updateOrCreateBulkDocuments(savedEntities);
         }
 
         log.info("공공서비스 목록 데이터 {}건 저장 완료", validatedData.size());
@@ -260,12 +264,12 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
         List<PublicService> entitiesToSave = new ArrayList<>();
 
         // 서비스 ID 목록 생성
-        Set<Long> serviceIds = dataList.stream()
+        Set<String> serviceIds = dataList.stream()
             .map(PublicServiceDetailDataDto.Data::getServiceId)
             .collect(Collectors.toSet());
 
         // 서비스 ID로 한 번에 조회 (N+1 문제 방지)
-        Map<Long, PublicService> serviceMap = publicServiceRepository.findAllById(serviceIds)
+        Map<String, PublicService> serviceMap = publicServiceRepository.findAllById(serviceIds)
             .stream()
             .collect(Collectors.toMap(PublicService::getId, service -> service));
 
@@ -289,14 +293,16 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
 
             // 배치 처리 최적화: 1000개 단위로 저장
             if (entitiesToSave.size() >= 1000) {
-                publicServiceRepository.saveAll(entitiesToSave);
+                List<PublicService> savedEntities = publicServiceRepository.saveAll(entitiesToSave);
+                publicDataMongoService.updateOrCreateBulkDocuments(savedEntities);
                 entitiesToSave.clear();
             }
         }
 
         // 나머지 데이터 저장
         if (!entitiesToSave.isEmpty()) {
-            publicServiceRepository.saveAll(entitiesToSave);
+            List<PublicService> savedEntities = publicServiceRepository.saveAll(entitiesToSave);
+            publicDataMongoService.updateOrCreateBulkDocuments(savedEntities);
         }
 
         log.info("공공서비스 상세정보 데이터 {}건 저장 완료", validatedData.size());
@@ -306,18 +312,18 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
     /**
      * 공공서비스 지원조건 데이터 저장 (배치 처리)
      */
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public List<PublicServiceConditionsDataDto.Data> upsertSupportConditionsData(List<PublicServiceConditionsDataDto.Data> dataList) {
         List<PublicServiceConditionsDataDto.Data> validatedData = new ArrayList<>();
         List<PublicService> entitiesToSave = new ArrayList<>();
 
         // 서비스 ID 목록 생성
-        Set<Long> serviceIds = dataList.stream()
+        Set<String> serviceIds = dataList.stream()
             .map(PublicServiceConditionsDataDto.Data::getServiceId)
             .collect(Collectors.toSet());
 
         // 서비스 ID로 한 번에 조회 (N+1 문제 방지)
-        Map<Long, PublicService> serviceMap = publicServiceRepository.findAllById(serviceIds)
+        Map<String, PublicService> serviceMap = publicServiceRepository.findAllById(serviceIds)
             .stream()
             .collect(Collectors.toMap(PublicService::getId, service -> service));
 
@@ -345,14 +351,16 @@ public class PublicServiceDataServiceImpl implements PublicServiceDataService {
 
             // 배치 처리 최적화: 1000개 단위로 저장
             if (entitiesToSave.size() >= 1000) {
-                publicServiceRepository.saveAll(entitiesToSave);
+                List<PublicService> savedEntities = publicServiceRepository.saveAll(entitiesToSave);
+                publicDataMongoService.updateOrCreateBulkDocuments(savedEntities);
                 entitiesToSave.clear();
             }
         }
 
         // 나머지 데이터 저장
         if (!entitiesToSave.isEmpty()) {
-            publicServiceRepository.saveAll(entitiesToSave);
+            List<PublicService> savedEntities = publicServiceRepository.saveAll(entitiesToSave);
+            publicDataMongoService.updateOrCreateBulkDocuments(savedEntities);
         }
 
         log.info("공공서비스 지원조건 데이터 {}건 저장 완료", validatedData.size());
