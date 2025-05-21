@@ -19,7 +19,6 @@ public class PostUpdateRequestDto {
     private String urlPath;
     private String tags;
 
-    private Boolean imageModified = false;           // 이미지 수정 여부
     private List<Long> keepImageIds;                 // 유지할 기존 이미지 ID
     private List<MultipartFile> newImages;           // 새로 추가할 이미지
 }

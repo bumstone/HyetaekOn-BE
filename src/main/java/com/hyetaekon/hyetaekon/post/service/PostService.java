@@ -175,7 +175,7 @@ public class PostService {
         postMapper.updatePostFromDto(updateDto, post);
 
         // 이미지 업데이트 처리
-        if (Boolean.TRUE.equals(updateDto.getImageModified())) {  // null-safe
+        if (hasImageChanges(updateDto)) {  // null-safe
             updatePostImages(post, updateDto.getKeepImageIds(), updateDto.getNewImages());
         }
 
@@ -184,6 +184,15 @@ public class PostService {
             .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다"));
 
         return postMapper.toPostDetailDto(updatedPost);
+    }
+
+    // 이미지 변경사항 감지 메서드 (helper)
+    private boolean hasImageChanges(PostUpdateRequestDto updateDto) {
+        // 새로운 이미지가 있거나, 유지할 이미지 목록이 명시되어 있으면 변경으로 간주
+        boolean hasNewImages = updateDto.getNewImages() != null && !updateDto.getNewImages().isEmpty();
+        boolean hasKeepImageIds = updateDto.getKeepImageIds() != null && !updateDto.getKeepImageIds().isEmpty();
+
+        return hasNewImages || hasKeepImageIds;
     }
 
     private void updatePostImages(Post post, List<Long> keepImageIds, List<MultipartFile> newImages) {
@@ -297,4 +306,6 @@ public class PostService {
         return postRepository.findByRecommendsUserIdAndDeletedAtIsNull(userId, pageable)
             .map(postMapper::toMyPostListDto);
     }
+
+
 }
