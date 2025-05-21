@@ -35,4 +35,16 @@ public interface PostImageMapper {
             .collect(Collectors.toList());
     }
 
+    // List<PostImage> → List<String> 변환
+    default List<String> toImageUrls(List<PostImage> postImages) {
+        if (postImages == null || postImages.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return postImages.stream()
+            .filter(img -> img.getDeletedAt() == null)
+            .map(PostImage::getImageUrl)
+            .collect(Collectors.toList());
+    }
+
 }

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = PostImageMapper.class)
 public interface PostMapper {
 
     // ✅ 게시글 목록용 DTO 변환
@@ -34,30 +34,13 @@ public interface PostMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updatePostFromDto(PostUpdateRequestDto updateDto, @MappingTarget Post post);
 
-    // ✅ 게시글 상세 보기용 DTO (imageUrls 수동으로 처리)
-    // 상세용 DTO (default 메서드 내부에 userId 수동 추가)
-    default PostDetailResponseDto toPostDetailDto(Post post) {
-        return PostDetailResponseDto.builder()
-                .postId(post.getId())
-                .userId(post.getUser().getId()) // 🔥 추가
-                .nickName(post.getUser().getNickname())
-                .title(post.getTitle())
-                .content(post.getDisplayContent())
-                .createdAt(post.getCreatedAt())
-                .postType(post.getPostType().getKoreanName())
-                .recommendCnt(post.getRecommendCnt())
-                .viewCnt(post.getViewCnt())
-                .urlTitle(post.getUrlTitle())
-                .urlPath(post.getUrlPath())
-                .tags(post.getTags())
-                .imageUrls(
-                        post.getPostImages().stream()
-                                .filter(img -> img.getDeletedAt() == null)
-                                .map(PostImage::getImageUrl)
-                                .collect(Collectors.toList())
-                )
-                .recommended(false)
-                .build();
-    }
+    @Mapping(source = "id", target = "postId")
+    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "user.nickname", target = "nickName")
+    @Mapping(target = "content", expression = "java(post.getDisplayContent())")
+    @Mapping(source = "postType.koreanName", target = "postType")
+    @Mapping(target = "recommended", constant = "false")
+    @Mapping(source = "postImages", target = "imageUrls")
+    PostDetailResponseDto toPostDetailDto(Post post);
 
 }
