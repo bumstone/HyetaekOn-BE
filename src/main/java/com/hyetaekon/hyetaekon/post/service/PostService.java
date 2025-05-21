@@ -176,8 +176,8 @@ public class PostService {
         postMapper.updatePostFromDto(updateDto, post);
 
         // 이미지 업데이트 처리
-        if (updateDto.getImages() != null && !updateDto.getImages().isEmpty()) {
-            updatePostImages(post, updateDto.getImages());
+        if (updateDto.getImageModified()) {
+            updatePostImages(post, updateDto.getKeepImageIds(), updateDto.getNewImages());
         }
 
         // 업데이트 후 최신 상태로 다시 조회
@@ -187,17 +187,25 @@ public class PostService {
         return postMapper.toPostDetailDto(updatedPost);
     }
 
-    private void updatePostImages(Post post, List<MultipartFile> newImages) {
-        // 기존 이미지 soft delete 처리
+    private void updatePostImages(Post post, List<Long> keepImageIds, List<MultipartFile> newImages) {
+        // 기존 이미지 중 유지하지 않는 것만 삭제
         List<PostImage> existingImages = postImageRepository.findByPostAndDeletedAtIsNull(post);
-        for (PostImage image : existingImages) {
-            image.softDelete();
+
+        if (keepImageIds == null) {
+            keepImageIds = new ArrayList<>();
+        }
+
+        // 유지하지 않는 이미지만 soft delete
+        for (PostImage existingImage : existingImages) {
+            if (!keepImageIds.contains(existingImage.getId())) {
+                existingImage.softDelete();
+            }
         }
         postImageRepository.saveAll(existingImages);
 
         // 새 이미지 추가
-        List<PostImage> newPostImages = processPostImages(newImages, post);
-        if (!newPostImages.isEmpty()) {
+        if (newImages != null && !newImages.isEmpty()) {
+            List<PostImage> newPostImages = processPostImages(newImages, post);
             postImageRepository.saveAll(newPostImages);
         }
     }

@@ -24,11 +24,13 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true  # SQL 로그를 보기 좋게 포맷
+        generate_statistics: true
         auto_quote_keyword: true  # 예약어를 자동으로 따옴표 처리
         order_inserts: true
         order_updates: true
         jdbc:
           batch_size: 1000
+          batch_versioned_data: true
   profiles:
     active: dev, s3Bucket  # logback-spring SpringProfile 설정 및 AWS S3 Bucket 설정
 
