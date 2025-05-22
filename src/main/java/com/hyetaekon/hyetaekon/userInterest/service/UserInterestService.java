@@ -27,7 +27,7 @@ public class UserInterestService {
     // 모든 관심사 목록과 사용자 선택 여부 함께 조회
     @Transactional(readOnly = true)
     public CategorizedInterestsWithSelectionDto getUserInterestsWithSelection(Long userId) {
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findByIdAndDeletedAtIsNullWithInterests(userId)
             .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND_BY_ID));
 
         // 사용자가 선택한 관심사 목록
