@@ -74,6 +74,7 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
     configuration.addAllowedOrigin("http://localhost:3000"); // 개발 환경
+    configuration.addAllowedOrigin("https://hyetaekon.netlify.app");
     configuration.addAllowedOrigin("https://hyetaek-on.co.kr"); // 혜택온 도메인
     configuration.addAllowedOrigin("https://www.hyetaek-on.co.kr");
     configuration.addAllowedMethod("*"); // 모든 HTTP 메서드 허용
