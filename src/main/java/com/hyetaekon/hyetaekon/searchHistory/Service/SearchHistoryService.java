@@ -1,5 +1,6 @@
 package com.hyetaekon.hyetaekon.searchHistory.Service;
 
+import com.hyetaekon.hyetaekon.publicservice.service.mongodb.ServiceMatchedHandler;
 import com.hyetaekon.hyetaekon.searchHistory.Dto.SearchHistoryDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 public class SearchHistoryService {
-
+    private final ServiceMatchedHandler serviceMatchedHandler;
     private final RedisTemplate<String, String> redisTemplate;
 
     // Redis 키 관련 상수
@@ -49,6 +50,8 @@ public class SearchHistoryService {
 
             // 만료 시간 설정
             redisTemplate.expire(key, TTL_DAYS, TimeUnit.DAYS);
+
+            serviceMatchedHandler.refreshMatchedServicesCache(userId);
 
             log.debug("사용자 {} 검색 기록 저장 완료: {}", userId, searchTerm);
         } catch (Exception e) {
@@ -156,6 +159,8 @@ public class SearchHistoryService {
             Boolean deleted = redisTemplate.delete(key);
 
             if (Boolean.TRUE.equals(deleted)) {
+                // 캐시 무효화
+                serviceMatchedHandler.refreshMatchedServicesCache(userId);
                 log.debug("사용자 {} 검색 기록 전체 삭제 완료", userId);
             } else {
                 log.warn("사용자 {} 검색 기록 전체 삭제 실패: 키가 존재하지 않음", userId);
