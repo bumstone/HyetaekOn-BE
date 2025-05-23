@@ -8,11 +8,13 @@ import com.hyetaekon.hyetaekon.publicservice.repository.PublicServiceRepository;
 import com.hyetaekon.hyetaekon.publicservice.service.mongodb.ServiceMatchedHandler;
 import com.hyetaekon.hyetaekon.user.entity.User;
 import com.hyetaekon.hyetaekon.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import static com.hyetaekon.hyetaekon.common.exception.ErrorCode.*;
@@ -26,7 +28,6 @@ public class BookmarkService {
     private final UserRepository userRepository;
     private final PublicServiceRepository publicServiceRepository;
     private final ServiceMatchedHandler serviceMatchedHandler;
-    private final TaskExecutor taskExecutor;
 
     public void addBookmark(String serviceId, Long userId) {
         User user = userRepository.findById(userId)
@@ -69,17 +70,16 @@ public class BookmarkService {
         delayedCacheInvalidation(userId);
     }
 
-    private void delayedCacheInvalidation(Long userId) {
-        taskExecutor.execute(() -> {
-            try {
-                Thread.sleep(2000); // 2초 지연
-                serviceMatchedHandler.refreshMatchedServicesCache(userId);
-                log.debug("사용자 {} 북마크 변경으로 인한 지연된 캐시 무효화 완료", userId);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                log.warn("북마크 캐시 무효화 중 인터럽트 발생: {}", userId);
-            }
-        });
+    @Async("applicationTaskExecutor") // 사용할 TaskExecutor 지정
+    protected void delayedCacheInvalidation(Long userId) {
+        try {
+            Thread.sleep(2000);
+            serviceMatchedHandler.refreshMatchedServicesCache(userId);
+            log.debug("사용자 {} 북마크 변경으로 인한 지연된 캐시 무효화 완료", userId);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("북마크 캐시 무효화 중 인터럽트 발생: {}", userId);
+        }
     }
 
 }
