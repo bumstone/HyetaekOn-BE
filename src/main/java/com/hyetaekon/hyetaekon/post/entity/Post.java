@@ -126,7 +126,7 @@ public class Post {
 
     public String getDisplayContent() {
         if (this.deletedAt != null) {
-            return "삭제된 게시글입니다.";
+            return "사용자가 삭제한 게시글입니다.";
         } else if (this.suspendAt != null) {
             return "관리자에 의해 삭제된 게시글입니다.";
         }
