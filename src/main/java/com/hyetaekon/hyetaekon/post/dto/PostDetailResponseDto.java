@@ -24,6 +24,7 @@ public class PostDetailResponseDto {
     private String urlTitle;
     private String urlPath;
     private String tags;
-    private List<String> imageUrls; // ✅ 이미지 URL 리스트 추가
+    private List<PostImageResponseDto> images;
     private boolean recommended; // 현재 로그인한 사용자의 추천 여부
+
 }
