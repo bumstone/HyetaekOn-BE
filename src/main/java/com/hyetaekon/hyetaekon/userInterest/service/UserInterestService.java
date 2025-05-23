@@ -1,5 +1,6 @@
 package com.hyetaekon.hyetaekon.userInterest.service;
 
+import com.hyetaekon.hyetaekon.publicservice.service.mongodb.ServiceMatchedHandler;
 import com.hyetaekon.hyetaekon.userInterest.dto.CategorizedInterestsWithSelectionDto;
 import com.hyetaekon.hyetaekon.userInterest.dto.InterestItemDto;
 import com.hyetaekon.hyetaekon.userInterest.entity.UserInterest;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserInterestService {
     private final UserRepository userRepository;
+    private final ServiceMatchedHandler serviceMatchedHandler;
     private final UserInterestRepository userInterestRepository;
 
     // 모든 관심사 목록과 사용자 선택 여부 함께 조회
@@ -78,7 +80,7 @@ public class UserInterestService {
             }
         }
 
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findByIdAndDeletedAtIsNullWithInterests(userId)
             .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND_BY_ID));
 
         // 기존 관심사 제거
@@ -92,6 +94,10 @@ public class UserInterestService {
                 .build();
             userInterestRepository.save(newInterest);
         }
+
+        // 캐시 무효화
+        serviceMatchedHandler.refreshMatchedServicesCache(userId);
+        log.debug("회원 관심사 갱신 및 캐시 무효화 완료 - 유저 ID: {}, 선택 관심사: {}", userId, selectedInterests);
 
         log.debug("회원 관심사 갱신 - 유저 ID: {}, 선택 관심사: {}", userId, selectedInterests);
     }
