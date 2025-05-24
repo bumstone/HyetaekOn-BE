@@ -57,6 +57,7 @@ public class UserController {
     return ResponseEntity.ok(userInfo);
   }
 
+  // 타회원 정보 조회
   @GetMapping("/users/{userId}")
   public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long userId) {
     UserResponseDto user = userService.getUserById(userId);
