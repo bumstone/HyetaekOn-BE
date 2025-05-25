@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 public class SearchHistoryService {
-
     private final RedisTemplate<String, String> redisTemplate;
 
     // Redis 키 관련 상수

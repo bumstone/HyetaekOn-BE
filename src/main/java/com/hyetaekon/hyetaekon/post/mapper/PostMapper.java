@@ -40,7 +40,7 @@ public interface PostMapper {
     @Mapping(target = "content", expression = "java(post.getDisplayContent())")
     @Mapping(source = "postType.koreanName", target = "postType")
     @Mapping(target = "recommended", constant = "false")
-    @Mapping(source = "postImages", target = "imageUrls")
+    @Mapping(source = "postImages", target = "images")
     PostDetailResponseDto toPostDetailDto(Post post);
 
 }

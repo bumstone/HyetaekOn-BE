@@ -49,7 +49,7 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.CREATED).body(userSignUpResponseDto);
   }
 
-  // 회원 정보 조회 api
+  // 개인 정보 조회 api
   @GetMapping("/users/me")
   public ResponseEntity<UserResponseDto> getMyInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
     Long userId = userDetails.getId();
@@ -57,6 +57,7 @@ public class UserController {
     return ResponseEntity.ok(userInfo);
   }
 
+  // 타회원 정보 조회
   @GetMapping("/users/{userId}")
   public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long userId) {
     UserResponseDto user = userService.getUserById(userId);
@@ -64,7 +65,7 @@ public class UserController {
   }
 
 
-  // 회원 정보 수정 api
+  // 개인 정보 수정 api
   @PutMapping("/users/me/profile")
   public ResponseEntity<UserResponseDto> updateMyProfile(
       @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -86,18 +87,6 @@ public class UserController {
   }
 
   // 회원 탈퇴
-  /*@DeleteMapping("/users/me")
-  public ResponseEntity<Void> deleteUser(
-      @AuthenticationPrincipal CustomUserDetails customUserDetails,
-      @RequestBody UserDeleteRequestDto deleteRequestDto,
-      @CookieValue(name = "refreshToken", required = false) String refreshToken,
-      @RequestHeader("Authorization") String authHeader
-  ) {
-    String accessToken = authHeader.replace("Bearer ", "");
-    userService.deleteUser(customUserDetails.getId(), deleteRequestDto.getDeleteReason(), accessToken, refreshToken);
-
-    return ResponseEntity.noContent().build();
-  }*/
   @DeleteMapping("/users/me")
   public ResponseEntity<Void> deleteUser(
       @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -105,29 +94,26 @@ public class UserController {
       @CookieValue(name = "refreshToken", required = false) String refreshToken,
       @RequestHeader("Authorization") String authHeader
   ) {
-    log.debug("회원 탈퇴 요청 - 인증 객체: {}", userDetails);
+    String accessToken = authHeader.replace("Bearer ", "");
 
+    // 인증 객체가 null인 경우 토큰에서 직접 사용자 정보 추출
     if (userDetails == null) {
-      // 인증 객체가 null일 경우 토큰에서 직접 정보 추출
       try {
-        String token = authHeader.replace("Bearer ", "");
-        Claims claims = jwtTokenParser.parseClaims(token);
+        Claims claims = jwtTokenParser.parseClaims(accessToken);
         String realId = claims.getSubject();
 
         User user = userRepository.findByRealIdAndDeletedAtIsNull(realId)
             .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND_BY_REAL_ID));
 
-        userService.deleteUser(user.getId(), deleteRequestDto.getDeleteReason(), token, refreshToken);
-        return ResponseEntity.noContent().build();
+        userService.deleteUser(user.getId(), deleteRequestDto.getDeleteReason(), accessToken, refreshToken);
       } catch (Exception e) {
-        log.error("회원 탈퇴 처리 실패: {}", e.getMessage());
         throw new GlobalException(ErrorCode.DELETE_USER_DENIED);
       }
+    } else {
+      // 정상적인 인증 객체가 있는 경우
+      userService.deleteUser(userDetails.getId(), deleteRequestDto.getDeleteReason(), accessToken, refreshToken);
     }
 
-    // 기존 로직
-    String accessToken = authHeader.replace("Bearer ", "");
-    userService.deleteUser(userDetails.getId(), deleteRequestDto.getDeleteReason(), accessToken, refreshToken);
     return ResponseEntity.noContent().build();
   }
 

@@ -24,7 +24,7 @@ public class UserInterestController {
 
     private final UserInterestService userInterestService;
 
-    // 선택할 키워드 목록 조회
+    // 선택할 관심사 목록 조회
     @GetMapping
     public ResponseEntity<CategorizedInterestsResponseDto> getAvailableInterests() {
         // Enum에서 카테고리별 displayName 값 추출
@@ -36,7 +36,7 @@ public class UserInterestController {
         return ResponseEntity.ok(new CategorizedInterestsResponseDto(categorizedInterests));
     }
 
-    // 모든 관심사와 사용자 선택 여부 조회
+    // 선택한 관심사 목록 조회
     @GetMapping("/me")
     public ResponseEntity<CategorizedInterestsWithSelectionDto> getMyInterestsWithSelection(
         @AuthenticationPrincipal CustomUserDetails userDetails) {

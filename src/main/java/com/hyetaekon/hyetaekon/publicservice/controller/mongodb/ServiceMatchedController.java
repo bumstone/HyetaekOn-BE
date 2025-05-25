@@ -1,7 +1,6 @@
 package com.hyetaekon.hyetaekon.publicservice.controller.mongodb;
 
 import com.hyetaekon.hyetaekon.common.jwt.CustomUserDetails;
-import com.hyetaekon.hyetaekon.common.util.AuthenticateUser;
 import com.hyetaekon.hyetaekon.publicservice.dto.PublicServiceListResponseDto;
 import com.hyetaekon.hyetaekon.publicservice.service.mongodb.ServiceMatchedHandler;
 import jakarta.validation.constraints.Max;

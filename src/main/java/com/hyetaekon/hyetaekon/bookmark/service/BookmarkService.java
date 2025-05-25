@@ -5,16 +5,17 @@ import com.hyetaekon.hyetaekon.bookmark.repository.BookmarkRepository;
 import com.hyetaekon.hyetaekon.common.exception.GlobalException;
 import com.hyetaekon.hyetaekon.publicservice.entity.PublicService;
 import com.hyetaekon.hyetaekon.publicservice.repository.PublicServiceRepository;
-import com.hyetaekon.hyetaekon.publicservice.service.PublicServiceHandler;
-import com.hyetaekon.hyetaekon.publicservice.service.mongodb.ServiceMatchedHandler;
 import com.hyetaekon.hyetaekon.user.entity.User;
 import com.hyetaekon.hyetaekon.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import static com.hyetaekon.hyetaekon.common.exception.ErrorCode.*;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -22,7 +23,6 @@ public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
     private final UserRepository userRepository;
     private final PublicServiceRepository publicServiceRepository;
-    private final ServiceMatchedHandler serviceMatchedHandler;
 
     public void addBookmark(String serviceId, Long userId) {
         User user = userRepository.findById(userId)
@@ -46,8 +46,6 @@ public class BookmarkService {
         // 북마크 수 증가
         publicService.increaseBookmarkCount();
         publicServiceRepository.save(publicService);
-        // 캐시 무효화 추가
-        serviceMatchedHandler.refreshMatchedServicesCache(userId);
     }
 
     @Transactional
@@ -61,7 +59,7 @@ public class BookmarkService {
         PublicService publicService = bookmark.getPublicService();
         publicService.decreaseBookmarkCount();
         publicServiceRepository.save(publicService);
-        // 캐시 무효화 추가
-        serviceMatchedHandler.refreshMatchedServicesCache(userId);
     }
+
+
 }

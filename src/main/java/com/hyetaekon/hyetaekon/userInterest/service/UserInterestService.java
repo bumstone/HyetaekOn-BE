@@ -78,7 +78,7 @@ public class UserInterestService {
             }
         }
 
-        User user = userRepository.findByIdAndDeletedAtIsNull(userId)
+        User user = userRepository.findByIdAndDeletedAtIsNullWithInterests(userId)
             .orElseThrow(() -> new GlobalException(ErrorCode.USER_NOT_FOUND_BY_ID));
 
         // 기존 관심사 제거

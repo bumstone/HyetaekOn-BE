@@ -13,8 +13,6 @@ import com.hyetaekon.hyetaekon.userInterest.entity.UserInterest;
 import com.hyetaekon.hyetaekon.userInterest.repository.UserInterestRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -40,7 +38,6 @@ public class ServiceMatchedHandler {
     /**
      * 사용자 맞춤 공공서비스 추천 - 사용자 정보 및 검색 기록 기반
      */
-    @Cacheable(value = "matchedServices", key = "#userId", unless = "#result.isEmpty()")
     public List<PublicServiceListResponseDto> getPersonalizedServices(Long userId, int size) {
         // 사용자 정보 조회
         User user = userRepository.findById(userId)
@@ -89,8 +86,4 @@ public class ServiceMatchedHandler {
             .collect(Collectors.toList());
     }
 
-    @CacheEvict(value = "matchedServices", key = "#userId")
-    public void refreshMatchedServicesCache(Long userId) {
-        // 캐시 갱신 메서드
-    }
 }

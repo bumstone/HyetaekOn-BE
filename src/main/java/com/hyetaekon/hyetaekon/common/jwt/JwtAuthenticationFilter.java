@@ -43,20 +43,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // access token이 있고, BEARER로 시작한다면
         if (authHeader != null && authHeader.startsWith(BEARER)) {
-            String token = authHeader.substring(BEARER.length());
-            // 토큰 검증
-            if (jwtTokenProvider.validateToken(token)) {
-                // 유효한 토큰: 유저 정보 가져옴
-                Authentication authentication = jwtTokenProvider.getAuthentication(token);
+            String token = authHeader.substring(BEARER.length()).trim(); // trim 추가
 
-                // 관리자 API 접근 시 추가 검증
-                if (isAdminRequest && !hasAdminRole(authentication.getAuthorities())) {
-                    log.warn("관리자 권한 없이 관리자 리소스에 접근 시도: {}", requestURI);
-                    sendAccessDeniedResponse(response);
+            try {
+                // 토큰 검증
+                if (jwtTokenProvider.validateToken(token)) {
+                    // 유효한 토큰: 유저 정보 가져옴
+                    Authentication authentication = jwtTokenProvider.getAuthentication(token);
+
+                    // 관리자 API 접근 시 추가 검증
+                    if (isAdminRequest && !hasAdminRole(authentication.getAuthorities())) {
+                        log.warn("관리자 권한 없이 관리자 리소스에 접근 시도: {}", requestURI);
+                        sendAccessDeniedResponse(response);
+                        return;
+                    }
+
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    // 토큰이 유효하지 않은 경우 - 관리자 API는 차단, 일반 API는 진행
+                    if (isAdminRequest) {
+                        log.warn("유효하지 않은 토큰으로 관리자 리소스 접근 시도: {}", requestURI);
+                        sendUnauthorizedResponse(response);
+                        return;
+                    }
+                    // 일반 API는 인증 없이도 접근 가능한 경우가 있으므로 계속 진행
+                }
+            } catch (Exception e) {
+                // 토큰 처리 중 예외 발생
+                log.error("JWT 토큰 처리 중 오류 발생 - URI: {}, Error: {}", requestURI, e.getMessage());
+
+                if (isAdminRequest) {
+                    // 관리자 API는 예외 발생 시 차단
+                    sendUnauthorizedResponse(response);
                     return;
                 }
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                // 일반 API는 인증 실패로 처리하고 서비스 계속 진행 (SecurityContext 비워둠)
+                SecurityContextHolder.clearContext();
             }
         } else if (isAdminRequest) {
             // 관리자 API 접근 시 토큰 없으면 Unauthorized 응답

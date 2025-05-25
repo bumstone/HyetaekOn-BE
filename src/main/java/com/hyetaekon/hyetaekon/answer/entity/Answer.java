@@ -60,7 +60,7 @@ public class Answer {
 
     public String getDisplayContent() {
         if (this.deletedAt != null) {
-            return "삭제된 답변입니다.";
+            return "사용자가 삭제한 답변입니다.";
         } else if (this.suspendAt != null) {
             return "관리자에 의해 삭제된 답변입니다.";
         }
