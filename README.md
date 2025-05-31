@@ -1,5 +1,3 @@
-﻿# HyetaekOn-BE
-
 # 혜택온
 ![혜택온](https://github.com/user-attachments/assets/1058bd82-faf5-4986-8bc0-13860706aa16)
 
@@ -213,9 +211,50 @@
  
 -------------------------------------------------------------------------------------
 # 4. 실제 동작화면
-#### 자체 웹사이트 로그인/회원가입 기능 
 
+#### ✅ 자체 웹사이트 로그인/회원가입 기능
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/c35a5790-5300-499e-a380-a398c0dc5dff" width="45%" />
+  <img src="https://github.com/user-attachments/assets/6d1d2c32-8200-4f90-a4d5-395f840ba911" width="45%" />
+</div>
 
+---
+
+#### ✅ 로그인 성공 후 키워드 선택 시 메인홈
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/fba8079e-feba-4d1c-b35f-1143b918f34c" width="90%" />
+</div>
+
+---
+
+#### ✅ 복지혜택 전체보기 & 통합검색 페이지
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/450815ed-61b1-4929-ba35-a759f5e200ef" width="45%" />
+  <img src="https://github.com/user-attachments/assets/b454976f-cb91-4bc5-a931-f549bd5e1d19" width="45%" />
+</div>
+
+---
+
+#### ✅ 혜택온 커뮤니티
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/2ec7c6e5-7f5f-4d5d-98b8-67f5e2e43d83" width="45%" />
+  <img src="https://github.com/user-attachments/assets/53525f8f-c406-4952-84a0-8da2a34aa86f" width="45%" />
+</div>
+
+---
+
+#### ✅ 마이페이지
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/f0bc79cc-4432-4186-832c-6b44f970319c" width="90%" />
+</div>
+
+---
+
+#### ✅ 챗봇
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/4eadffa8-ef48-4d54-a25e-a68d73265a04" width="30%" />
+  <img src="https://github.com/user-attachments/assets/586d904e-5541-46f3-8d09-567c23777567" width="30%" />
+</div>
 
 
 
