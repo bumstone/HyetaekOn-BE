@@ -212,49 +212,68 @@
 -------------------------------------------------------------------------------------
 # 4. 실제 동작화면
 
-#### ✅ 자체 웹사이트 로그인/회원가입 기능
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/c35a5790-5300-499e-a380-a398c0dc5dff" width="45%" />
-  <img src="https://github.com/user-attachments/assets/6d1d2c32-8200-4f90-a4d5-395f840ba911" width="45%" />
-</div>
+### ✅ 자체 웹사이트 로그인/회원가입 기능
+#### 회원가입
+![혜택온-회원가입2배속](https://github.com/user-attachments/assets/e341e8ff-9341-425a-a0ab-7df6fc5d0fdf)
+
+
+#### 첫로그인이후 키워드 모달창 선택까지
+![혜택온-로그인2배속_1](https://github.com/user-attachments/assets/970bb82b-4c68-48f2-b356-8842e1c3a46f)
+
 
 ---
 
 #### ✅ 로그인 성공 후 키워드 선택 시 메인홈
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/fba8079e-feba-4d1c-b35f-1143b918f34c" width="90%" />
-</div>
+![혜택온-메인홈_2](https://github.com/user-attachments/assets/68b51801-11c4-4bc6-b358-d936e7935df6)
 
 ---
 
-#### ✅ 복지혜택 전체보기 & 통합검색 페이지
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/450815ed-61b1-4929-ba35-a759f5e200ef" width="45%" />
-  <img src="https://github.com/user-attachments/assets/b454976f-cb91-4bc5-a931-f549bd5e1d19" width="45%" />
-</div>
+#### ✅ 복지혜택 전체보기
+##### 복지혜택 필터로 검색한 경우
+![혜택온-복지전체-필터-Clipchamp로-제작](https://github.com/user-attachments/assets/17d9ce6f-0426-4579-bb0e-e60794d83909)
+
+
+##### 복지혜택 검색입력창으로 검색한 경우
+![혜택온-전체보기-검색창-Clipchamp로-제작](https://github.com/user-attachments/assets/98de3130-6691-4dd1-9a4e-f750b150c303)
+
+---
+
+#### ✅ 통합검색
+![혜택온-통합검색-Clipchamp로-제작](https://github.com/user-attachments/assets/64f4ab35-fe7c-41d5-a50d-e2ee68bc64b8)
+
 
 ---
 
 #### ✅ 혜택온 커뮤니티
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/2ec7c6e5-7f5f-4d5d-98b8-67f5e2e43d83" width="45%" />
-  <img src="https://github.com/user-attachments/assets/53525f8f-c406-4952-84a0-8da2a34aa86f" width="45%" />
-</div>
+##### 게시판 전반적인 기능
+![혜택온-게시판-전반적인-Clipchamp로-제작](https://github.com/user-attachments/assets/43f99dd3-fa3f-4f46-8548-4ab28cab309d)
+
+
+##### 게시판 글쓰기
+![혜택온-글쓰기-Clipchamp로-제작](https://github.com/user-attachments/assets/3345cc57-150b-463b-bfdd-b4416f7ef370)
+
+
+##### 게시판 글쓰기 : 질문게시판-채택기능
+![혜택온-채택기능-Clipchamp로-제작](https://github.com/user-attachments/assets/550a2792-584b-4e7d-ae89-a18db19248ba)
+
 
 ---
 
-#### ✅ 마이페이지
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/f0bc79cc-4432-4186-832c-6b44f970319c" width="90%" />
-</div>
+#### ✅ 마이페이지 & 로그아웃
+![혜택온-마이페이지-Clipchamp로-제작](https://github.com/user-attachments/assets/19cbb3b8-05a3-4d06-9d18-ec45aba5db4a)
+
+
+---
+
+#### ✅ 관리자페이지 : 관리자인 경우, 관리자페이지 이동후 신고된 유저관리
+![혜택온-관리자-Clipchamp로-제작](https://github.com/user-attachments/assets/9b174528-dc47-4616-9b71-93aa69bb7f24)
 
 ---
 
 #### ✅ 챗봇
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/4eadffa8-ef48-4d54-a25e-a68d73265a04" width="30%" />
-  <img src="https://github.com/user-attachments/assets/586d904e-5541-46f3-8d09-567c23777567" width="30%" />
-</div>
+https://github.com/user-attachments/assets/d7e126c4-f9a8-4269-956c-655743e85df6
+
+
 
 
 
